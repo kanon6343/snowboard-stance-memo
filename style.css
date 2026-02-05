@@ -1,0 +1,21 @@
+body {
+  font-family: sans-serif;
+  padding: 20px;
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.hole {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #ddd;
+}
+
+.hole.active {
+  background: #2196f3;
+}
