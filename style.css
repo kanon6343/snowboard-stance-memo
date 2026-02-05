@@ -50,4 +50,23 @@ select, .meta input {
   }
 }
 
-https://kanon6343.github.io/snowboard-stance-memo/
+.card {
+  background: #f7f7f7;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.holes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.row {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
