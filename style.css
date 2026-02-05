@@ -19,3 +19,11 @@ body {
 .hole.active {
   background: #2196f3;
 }
+.angle {
+  margin-bottom: 20px;
+}
+
+input {
+  width: 60px;
+  font-size: 16px;
+}
