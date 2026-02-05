@@ -53,17 +53,13 @@ function getBindData(side) {
   return holes;
 }
 
-function loadData() {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (!saved) return;
-
-  const data = JSON.parse(saved);
-
-  restoreBind("left", data.left);
-  restoreBind("right", data.right);
-
-  document.getElementById("left-angle").value = data.angles.left || "";
-  document.getElementById("right-angle").value = data.angles.right || "";
+function restoreBind(side, holes) {
+  holes.forEach(h => {
+    const el = document.querySelector(
+      `.holes[data-bind="${side}"] .hole[data-row="${h.row}"][data-index="${h.index}"]`
+    );
+    if (el) el.classList.add("active");
+  });
 }
 
 loadData();
