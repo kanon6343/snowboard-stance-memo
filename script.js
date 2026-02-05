@@ -25,6 +25,12 @@ function saveData() {
   };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
+meta: {
+  board: document.getElementById("board-name").value,
+  date: document.getElementById("ride-date").value,
+  snow: document.getElementById("snow-type").value
+}
+
 
 // 読み込み
 function loadData() {
@@ -39,6 +45,10 @@ function loadData() {
   document.getElementById("front-angle").value = data.angles.front || "";
   document.getElementById("back-angle").value = data.angles.back || "";
 }
+
+document.getElementById("board-name").value = data.meta?.board || "";
+document.getElementById("ride-date").value = data.meta?.date || "";
+document.getElementById("snow-type").value = data.meta?.snow || "";
 
 function getFootData(foot) {
   const holes = [];
