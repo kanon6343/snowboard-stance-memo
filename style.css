@@ -37,3 +37,9 @@ input {
 select, .meta input {
   font-size: 16px;
 }
+
+.bindings {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
