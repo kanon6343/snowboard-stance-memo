@@ -1,107 +1,44 @@
-/* 全体 */
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, "Helvetica Neue", Arial, sans-serif;
-  background: #ffffff;
-  margin: 0;
+  font-family: sans-serif;
   padding: 16px;
-  color: #222;
 }
 
-/* カード共通 */
-.card {
-  background: #f7f7f7;
-  padding: 16px;
-  border-radius: 14px;
-  width: 100%;
-  box-sizing: border-box;
+h1 {
+  text-align: center;
 }
 
-/* 上のメタ情報用（板名・日付・雪質） */
-.meta {
-  display: grid;
-  gap: 8px;
-  margin-bottom: 20px;
-}
-
-.meta input,
-.meta select {
-  font-size: 16px;
-  padding: 6px 8px;
-}
-
-/* 左右バインディング全体 */
 .bindings {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
 }
 
-/* スマホでは縦並び */
-@media (max-width: 600px) {
-  .bindings {
-    grid-template-columns: 1fr;
-  }
+.card {
+  background: #f4f4f4;
+  padding: 12px;
+  border-radius: 12px;
 }
 
-/* 見出し */
-h2 {
-  margin: 0 0 8px;
-  font-size: 18px;
-  text-align: center;
-}
-
-/* 角度入力 */
-.angle {
-  text-align: center;
-  margin-bottom: 12px;
-}
-
-.angle input {
-  width: 70px;
-  font-size: 18px;
-  text-align: center;
-  padding: 4px;
-}
-
-/* 穴エリア */
-.holes {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: center;
-}
-
-/* 上段・下段 */
 .row {
   display: flex;
-  gap: 10px;
-  justify-content: center;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
-/* 穴（ビス位置） */
 .hole {
-  width: 40px;          /* 手袋対応サイズ */
-  height: 40px;
+  width: 36px;
+  height: 36px;
+  border: 2px solid #999;
   border-radius: 50%;
-  background: #ddd;
-  border: 2px solid #bbb;
-  box-sizing: border-box;
 }
 
-/* タップ時 */
 .hole.active {
   background: #4caf50;
   border-color: #4caf50;
 }
 
-/* 左右で色を分ける（視認性UP） */
-.holes[data-bind="left"] .hole.active {
-  background: #2196f3;
-  border-color: #2196f3;
-}
-
-.holes[data-bind="right"] .hole.active {
-  background: #ff9800;
-  border-color: #ff9800;
+@media (max-width: 480px) {
+  .bindings {
+    grid-template-columns: 1fr;
+  }
 }
