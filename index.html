@@ -29,58 +29,48 @@
     </select>
   </div>
 </div>
- 
-  <h2>前足</h2>
+  
+<div class="bindings">
+  <section class="card">
+    <h2>左</h2>
+    <div class="angle">
+      角度：<input id="left-angle" placeholder="+15">
+    </div>
 
-<div class="holes" data-foot="front">
-  <div class="row">
-    <div class="hole" data-row="top" data-index="0"></div>
-    <div class="hole" data-row="top" data-index="1"></div>
-    <div class="hole" data-row="top" data-index="2"></div>
-    <div class="hole" data-row="top" data-index="3"></div>
-    <div class="hole" data-row="top" data-index="4"></div>
-    <div class="hole" data-row="top" data-index="5"></div>
-  </div>
-  <div class="row">
-    <div class="hole" data-row="bottom" data-index="0"></div>
-    <div class="hole" data-row="bottom" data-index="1"></div>
-    <div class="hole" data-row="bottom" data-index="2"></div>
-    <div class="hole" data-row="bottom" data-index="3"></div>
-    <div class="hole" data-row="bottom" data-index="4"></div>
-    <div class="hole" data-row="bottom" data-index="5"></div>
-  </div>
+    <div class="holes" data-bind="left">
+      <!-- 上段 -->
+      <div class="row">
+        <div class="hole" data-row="top" data-index="0"></div>
+        <div class="hole" data-row="top" data-index="1"></div>
+        <div class="hole" data-row="top" data-index="2"></div>
+        <div class="hole" data-row="top" data-index="3"></div>
+        <div class="hole" data-row="top" data-index="4"></div>
+        <div class="hole" data-row="top" data-index="5"></div>
+      </div>
+
+      <!-- 下段 -->
+      <div class="row">
+        <div class="hole" data-row="bottom" data-index="0"></div>
+        <div class="hole" data-row="bottom" data-index="1"></div>
+        <div class="hole" data-row="bottom" data-index="2"></div>
+        <div class="hole" data-row="bottom" data-index="3"></div>
+        <div class="hole" data-row="bottom" data-index="4"></div>
+        <div class="hole" data-row="bottom" data-index="5"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>右</h2>
+    <div class="angle">
+      角度：<input id="right-angle" placeholder="-9">
+    </div>
+
+    <div class="holes" data-bind="right">
+      <!-- 同じ構造 -->
+    </div>
+  </section>
 </div>
-
-  <div class="angle">
-  角度：<input type="text" id="front-angle" placeholder="+15">
-</div>
-
-
-<h2>後足</h2>
-
-<div class="holes" data-foot="back">
-  <div class="row">
-    <div class="hole" data-row="top" data-index="0"></div>
-    <div class="hole" data-row="top" data-index="1"></div>
-    <div class="hole" data-row="top" data-index="2"></div>
-    <div class="hole" data-row="top" data-index="3"></div>
-    <div class="hole" data-row="top" data-index="4"></div>
-    <div class="hole" data-row="top" data-index="5"></div>
-  </div>
-  <div class="row">
-    <div class="hole" data-row="bottom" data-index="0"></div>
-    <div class="hole" data-row="bottom" data-index="1"></div>
-    <div class="hole" data-row="bottom" data-index="2"></div>
-    <div class="hole" data-row="bottom" data-index="3"></div>
-    <div class="hole" data-row="bottom" data-index="4"></div>
-    <div class="hole" data-row="bottom" data-index="5"></div>
-  </div>
-</div>
-
-  <div class="angle">
-  角度：<input type="text" id="back-angle" placeholder="-9">
-</div>
-
   
 </body>
 <script src="script.js"></script>
