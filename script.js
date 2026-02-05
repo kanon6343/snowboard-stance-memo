@@ -40,10 +40,10 @@ function loadData() {
   document.getElementById("back-angle").value = data.angles.back || "";
 }
 
-function getFootData(foot) {
+function getBindData(side) {
   const holes = [];
   document
-    .querySelectorAll(`.holes[data-foot="${foot}"] .hole.active`)
+    .querySelectorAll(`.holes[data-bind="${side}"] .hole.active`)
     .forEach(hole => {
       holes.push({
         row: hole.dataset.row,
@@ -53,12 +53,17 @@ function getFootData(foot) {
   return holes;
 }
 
-function restoreFoot(foot, holes) {
-  holes.forEach(h => {
-    const selector = `.holes[data-foot="${foot}"] .hole[data-row="${h.row}"][data-index="${h.index}"]`;
-    const el = document.querySelector(selector);
-    if (el) el.classList.add("active");
-  });
+function loadData() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (!saved) return;
+
+  const data = JSON.parse(saved);
+
+  restoreBind("left", data.left);
+  restoreBind("right", data.right);
+
+  document.getElementById("left-angle").value = data.angles.left || "";
+  document.getElementById("right-angle").value = data.angles.right || "";
 }
 
 loadData();
