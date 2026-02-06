@@ -70,6 +70,7 @@ function restoreFoot(foot, holes) {
     if (el) el.classList.add("active");
   });
 }
+
 document.querySelectorAll("select").forEach(sel => {
   sel.addEventListener("change", saveData);
 });
