@@ -132,7 +132,7 @@ const list = (selectedBoard === "__ALL__")
       <div>${escapeHtml(angles)}</div>
 
       <div class="history-preview">
-        ${renderMini(item.holes || [])}
+        ${renderMini(item.holes || [], item.reference || { left: null, right: null })}
       </div>
       
       <button type="button" data-load="${idx}">読込</button>
