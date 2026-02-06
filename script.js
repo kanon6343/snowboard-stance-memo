@@ -74,9 +74,24 @@ function renderTabs() {
 
 function renderRefSlots() {
   document.querySelectorAll(".ref-line").forEach(line => {
-    line.innerHTML = Array.from({ length: 6 }, () =>
-      `<div class="ref-slot"></div>`
+    const side = line.dataset.side;
+
+    line.innerHTML = Array.from({ length: 6 }, (_, i) =>
+      `<div class="ref-slot" data-index="${i}" data-side="${side}"></div>`
     ).join("");
+  });
+
+  // クリックで × 表示（まだ保存しない）
+  document.querySelectorAll(".ref-slot").forEach(slot => {
+    slot.addEventListener("click", () => {
+      const parent = slot.parentElement;
+
+      // 同じ側の×を全部消す
+      parent.querySelectorAll(".ref-slot").forEach(s => s.textContent = "");
+
+      // クリックした所に ×
+      slot.textContent = "×";
+    });
   });
 }
 
