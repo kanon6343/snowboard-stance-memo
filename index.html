@@ -1,83 +1,63 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <title>スノボスタンスメモ</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ビス位置メモ</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  
-<div class="meta">
-  <div>
-    板名：
-    <input type="text" id="board-name" placeholder="例：FNTC TNT">
-  </div>
 
-  <div>
-    日付：
-    <input type="date" id="ride-date">
-  </div>
+<h1>ビス位置メモ</h1>
 
-  <div>
-    雪質：
-    <select id="snow-type">
-      <option value="">選択</option>
-      <option value="パウダー">パウダー</option>
-      <option value="圧雪">圧雪</option>
-      <option value="春雪">春雪</option>
-      <option value="アイス">アイス</option>
-    </select>
-  </div>
+<div class="bindings">
+
+  <section class="card">
+    <h2>左</h2>
+    <div class="holes" data-side="left">
+      <div class="row">
+        <div class="hole" data-row="top" data-index="0"></div>
+        <div class="hole" data-row="top" data-index="1"></div>
+        <div class="hole" data-row="top" data-index="2"></div>
+        <div class="hole" data-row="top" data-index="3"></div>
+        <div class="hole" data-row="top" data-index="4"></div>
+        <div class="hole" data-row="top" data-index="5"></div>
+      </div>
+      <div class="row">
+        <div class="hole" data-row="bottom" data-index="0"></div>
+        <div class="hole" data-row="bottom" data-index="1"></div>
+        <div class="hole" data-row="bottom" data-index="2"></div>
+        <div class="hole" data-row="bottom" data-index="3"></div>
+        <div class="hole" data-row="bottom" data-index="4"></div>
+        <div class="hole" data-row="bottom" data-index="5"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>右</h2>
+    <div class="holes" data-side="right">
+      <div class="row">
+        <div class="hole" data-row="top" data-index="0"></div>
+        <div class="hole" data-row="top" data-index="1"></div>
+        <div class="hole" data-row="top" data-index="2"></div>
+        <div class="hole" data-row="top" data-index="3"></div>
+        <div class="hole" data-row="top" data-index="4"></div>
+        <div class="hole" data-row="top" data-index="5"></div>
+      </div>
+      <div class="row">
+        <div class="hole" data-row="bottom" data-index="0"></div>
+        <div class="hole" data-row="bottom" data-index="1"></div>
+        <div class="hole" data-row="bottom" data-index="2"></div>
+        <div class="hole" data-row="bottom" data-index="3"></div>
+        <div class="hole" data-row="bottom" data-index="4"></div>
+        <div class="hole" data-row="bottom" data-index="5"></div>
+      </div>
+    </div>
+  </section>
+
 </div>
 
-<h2>前足</h2>
-
-<div class="holes" data-foot="front">
-  <div class="row">
-    <div class="hole" data-row="top" data-index="0"></div>
-    <div class="hole" data-row="top" data-index="1"></div>
-    <div class="hole" data-row="top" data-index="2"></div>
-    <div class="hole" data-row="top" data-index="3"></div>
-    <div class="hole" data-row="top" data-index="4"></div>
-    <div class="hole" data-row="top" data-index="5"></div>
-  </div>
-  <div class="row">
-    <div class="hole" data-row="bottom" data-index="0"></div>
-    <div class="hole" data-row="bottom" data-index="1"></div>
-    <div class="hole" data-row="bottom" data-index="2"></div>
-    <div class="hole" data-row="bottom" data-index="3"></div>
-    <div class="hole" data-row="bottom" data-index="4"></div>
-    <div class="hole" data-row="bottom" data-index="5"></div>
-  </div>
-</div>
-<div class="angle">
-  角度：<input type="text" id="front-angle" placeholder="+15">
-</div>
-
-<h2>後足</h2>
-
-<div class="holes" data-foot="back">
-  <div class="row">
-    <div class="hole" data-row="top" data-index="0"></div>
-    <div class="hole" data-row="top" data-index="1"></div>
-    <div class="hole" data-row="top" data-index="2"></div>
-    <div class="hole" data-row="top" data-index="3"></div>
-    <div class="hole" data-row="top" data-index="4"></div>
-    <div class="hole" data-row="top" data-index="5"></div>
-  </div>
-  <div class="row">
-    <div class="hole" data-row="bottom" data-index="0"></div>
-    <div class="hole" data-row="bottom" data-index="1"></div>
-    <div class="hole" data-row="bottom" data-index="2"></div>
-    <div class="hole" data-row="bottom" data-index="3"></div>
-    <div class="hole" data-row="bottom" data-index="4"></div>
-    <div class="hole" data-row="bottom" data-index="5"></div>
-  </div>
-</div>
-<div class="angle">
-  角度：<input type="text" id="back-angle" placeholder="-9">
-</div>
-  
 <script src="script.js"></script>
 </body>
 </html>
