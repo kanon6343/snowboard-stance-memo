@@ -72,6 +72,14 @@ function renderTabs() {
   });
 }
 
+function renderRefSlots() {
+  document.querySelectorAll(".ref-line").forEach(line => {
+    line.innerHTML = Array.from({ length: 6 }, () =>
+      `<div class="ref-slot"></div>`
+    ).join("");
+  });
+}
+
 function render() {
   const all = loadList();
 const list = (selectedBoard === "__ALL__")
