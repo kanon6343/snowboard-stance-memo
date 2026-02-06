@@ -99,3 +99,17 @@ h1 {
   background: #4caf50;
   border-color: #4caf50;
 }
+
+.meta { display: grid; gap: 10px; margin-bottom: 12px; }
+.meta input, .meta select { font-size: 16px; }
+#saveBtn { padding: 10px 12px; font-size: 16px; width: 100%; }
+
+#history { margin-top: 16px; display: grid; gap: 16px; }
+.history-preview { margin: 10px 0 12px; }
+
+.mini-bindings { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.mini-side { background: #fff; border-radius: 10px; padding: 8px; }
+.mini-label { text-align: center; font-weight: bold; margin-bottom: 6px; }
+.mini-row { display: flex; justify-content: center; gap: 4px; margin-bottom: 4px; }
+.mini-hole { width: 12px; height: 12px; border-radius: 50%; border: 1px solid #999; display: inline-block; }
+.mini-hole.active { background: #4caf50; border-color: #4caf50; }
