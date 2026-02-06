@@ -10,6 +10,8 @@ const leftAngleEl = document.getElementById("left-angle");
 const rightAngleEl = document.getElementById("right-angle");
 const saveBtn = document.getElementById("saveBtn");
 const clearBtn = document.getElementById("clearBtn"); // ← 追加
+const tabsDiv = document.getElementById("boardTabs");
+let selectedBoard = "";
 
 // 穴タップ
 holes.forEach(h => h.addEventListener("click", () => h.classList.toggle("active")));
@@ -47,9 +49,34 @@ function loadList() {
   catch { return []; }
 }
 
+function renderTabs() {
+  const list = loadList();
+
+  const boards = Array.from(
+    new Set(list.map(x => (x.board || "").trim()).filter(Boolean))
+  );
+
+  const items = ["", ...boards];
+
+  tabsDiv.innerHTML = items.map(b => {
+    const label = b === "" ? "全部" : b;
+    const active = b === selectedBoard ? "active" : "";
+    return `<button type="button" class="tab ${active}" data-board="${escapeHtml(b)}">${escapeHtml(label)}</button>`;
+  }).join("");
+
+  tabsDiv.querySelectorAll("button.tab").forEach(btn => {
+    btn.addEventListener("click", () => {
+      selectedBoard = btn.dataset.board || "";
+      render();
+    });
+  });
+}
+
 function render() {
   const list = loadList();
   historyDiv.innerHTML = "";
+  
+  renderTabs();
 
   list.forEach((item, idx) => {
     const card = document.createElement("section");
