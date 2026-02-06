@@ -26,6 +26,9 @@ clearBtn.addEventListener("click", () => {
   leftAngleEl.value = "";
   rightAngleEl.value = "";
   holes.forEach(h => h.classList.remove("active"));
+
+  reference = { left: null, right: null };
+renderRefSlots();
 });
 
 // 保存
