@@ -13,6 +13,8 @@ const clearBtn = document.getElementById("clearBtn"); // ← 追加
 const tabsDiv = document.getElementById("boardTabs");
 let selectedBoard = "__ALL__";
 
+let reference = { left: null, right: null };
+
 // 穴タップ
 holes.forEach(h => h.addEventListener("click", () => h.classList.toggle("active")));
 
@@ -91,6 +93,11 @@ function renderRefSlots() {
 
       // クリックした所に ×
       slot.textContent = "×";
+
+      const side = slot.dataset.side;            // "left" or "right"
+  const index = Number(slot.dataset.index);  // 0〜5
+  reference[side] = index;
+});
     });
   });
 }
