@@ -25,12 +25,12 @@ function saveData() {
   };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
+
 meta: {
   board: document.getElementById("board-name").value,
   date: document.getElementById("ride-date").value,
   snow: document.getElementById("snow-type").value
 }
-
 
 // 読み込み
 function loadData() {
