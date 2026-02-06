@@ -51,3 +51,9 @@ h1 {
     grid-template-columns: 1fr;
   }
 }
+
+#history {
+  margin-top: 20px;
+  display: grid;
+  gap: 16px;
+}
