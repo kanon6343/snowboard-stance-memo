@@ -166,10 +166,12 @@ h1 {
 }
 
 .mini-ref{
-  display:flex;
-  justify-content:repeat(6,12px);
-  gap:4px;
-  justify-content:center:
+  width: 100%; /* ← これ追加！ */
+  display: grid;
+  grid-template-columns: repeat(6, 12px);
+  gap: 4px;
+  justify-content: center;
+  margin: 2px 0;
 }
 
 .mini-x{
