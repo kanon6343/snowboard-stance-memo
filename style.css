@@ -123,3 +123,25 @@ h1 {
 #clearBtn {
   margin-top: 8px;
 }
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px 0 12px;
+}
+
+.tab {
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid #999;
+  background: #fff;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.tab.active {
+  background: #4caf50;
+  border-color: #4caf50;
+  color: #fff;
+}
