@@ -212,7 +212,7 @@ function miniSide(label, sideArr, refIndex) {
       </div>
     </div>
   `;
-　}
+}
 
 function escapeHtml(str) {
   return String(str)
