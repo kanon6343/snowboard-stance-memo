@@ -23,15 +23,16 @@ saveBtn.addEventListener("click", () => {
     rightAngle: rightAngleEl.value.trim(),
     holes: holes.map(h => h.classList.contains("active"))
   };
-  
-　const clearBtn = document.getElementById("clearBtn");
-  clearBtn.addEventListener("click", () => {
-  // 入力欄クリア
+
+clearBtn.addEventListener("click", () => {
+  alert("クリア押された！");
   boardEl.value = "";
   dateEl.value = "";
   snowEl.value = "";
   leftAngleEl.value = "";
   rightAngleEl.value = "";
+  holes.forEach(h => h.classList.remove("active"));
+});
 
   // 穴を全部OFF
   holes.forEach(h => h.classList.remove("active"));
