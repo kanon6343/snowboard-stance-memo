@@ -167,9 +167,9 @@ h1 {
 
 .mini-ref{
   display:flex;
-  justify-content:center;
+  justify-content:repeat(6,12px);
   gap:4px;
-  margin:2px 0;
+  justify-content:center:
 }
 
 .mini-x{
