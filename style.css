@@ -164,3 +164,22 @@ h1 {
   font-weight: bold;
   color: #e53935;
 }
+
+.mini-ref{
+  display:flex;
+  justify-content:center;
+  gap:4px;
+  margin:2px 0;
+}
+
+.mini-x{
+  width:12px;
+  height:12px;
+  display:inline-flex;      /* ← これ重要！空でも幅を持つ */
+  align-items:center;
+  justify-content:center;
+  font-size:10px;
+  color:#e53935;
+  font-weight:bold;
+  line-height:1;
+}
