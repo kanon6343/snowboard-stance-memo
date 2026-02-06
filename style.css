@@ -154,12 +154,13 @@ h1 {
 
 .ref-slot {
   width: 36px;
-  height: 18px;
-  border-top: 2px dashed #ccc;
+  height: 20px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  font-size: 18px;   /* ← 大きく */
   font-weight: bold;
   color: #e53935;
-  line-height: 1;
 }
