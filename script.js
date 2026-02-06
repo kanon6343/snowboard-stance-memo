@@ -23,7 +23,20 @@ saveBtn.addEventListener("click", () => {
     rightAngle: rightAngleEl.value.trim(),
     holes: holes.map(h => h.classList.contains("active"))
   };
+  
+　const clearBtn = document.getElementById("clearBtn");
+  clearBtn.addEventListener("click", () => {
+  // 入力欄クリア
+  boardEl.value = "";
+  dateEl.value = "";
+  snowEl.value = "";
+  leftAngleEl.value = "";
+  rightAngleEl.value = "";
 
+  // 穴を全部OFF
+  holes.forEach(h => h.classList.remove("active"));
+});
+  
   const list = loadList();
   list.unshift(item);
   localStorage.setItem(KEY, JSON.stringify(list));
