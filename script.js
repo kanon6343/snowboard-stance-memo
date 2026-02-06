@@ -11,9 +11,7 @@ const rightAngleEl = document.getElementById("right-angle");
 const saveBtn = document.getElementById("saveBtn");
 
 // 穴タップ
-holes.forEach(h => {
-  h.addEventListener("click", () => h.classList.toggle("active"));
-});
+holes.forEach(h => h.addEventListener("click", () => h.classList.toggle("active")));
 
 saveBtn.addEventListener("click", () => {
   const item = {
@@ -33,11 +31,8 @@ saveBtn.addEventListener("click", () => {
 });
 
 function loadList() {
-  try {
-    return JSON.parse(localStorage.getItem(KEY) || "[]");
-  } catch {
-    return [];
-  }
+  try { return JSON.parse(localStorage.getItem(KEY) || "[]"); }
+  catch { return []; }
 }
 
 function render() {
@@ -48,11 +43,8 @@ function render() {
     const card = document.createElement("section");
     card.className = "card";
 
-    const title =
-      `${item.date || "日付なし"} / ${item.snow || "雪質なし"} / ${item.board || "板名なし"}`;
-
-    const angles =
-      `左 ${item.leftAngle || "?"}°　右 ${item.rightAngle || "?"}°`;
+    const title = `${item.date || "日付なし"} / ${item.snow || "雪質なし"} / ${item.board || "板名なし"}`;
+    const angles = `左 ${item.leftAngle || "?"}°　右 ${item.rightAngle || "?"}°`;
 
     card.innerHTML = `
       <div><b>${escapeHtml(title)}</b></div>
@@ -79,12 +71,10 @@ function render() {
   });
 }
 
-// 履歴用ミニ表示（左右それぞれ：上段6＋下段6）
 function renderMini(holesState) {
   // 24個想定：左12(上6下6) + 右12(上6下6)
   const total = 24;
   const arr = Array.from({ length: total }, (_, i) => !!holesState[i]);
-
   const left = arr.slice(0, 12);
   const right = arr.slice(12, 24);
 
