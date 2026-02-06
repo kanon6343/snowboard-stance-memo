@@ -66,7 +66,7 @@ function renderTabs() {
 
   tabsDiv.querySelectorAll("button.tab").forEach(btn => {
     btn.addEventListener("click", () => {
-      selectedBoard = btn.dataset.board || "";
+      selectedBoard = btn.getAttribute("data-board")??"__ALL__";
       render();
     });
   });
