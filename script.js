@@ -81,7 +81,7 @@ function renderTabs() {
 }
 
 function renderRefSlots() {
-  // まず左右それぞれ6個のスロットを作る＋referenceを表示
+  // まず左右それぞれ6個のスロットを作る（×はactiveで表示）
   document.querySelectorAll(".ref-line").forEach(line => {
     const side = line.dataset.side;
 
@@ -89,26 +89,25 @@ function renderRefSlots() {
       `<div class="ref-slot" data-index="${i}" data-side="${side}"></div>`
     ).join("");
 
-    // ★ここで保存されているreferenceを反映して×を表示する
+    // 保存されているreferenceを反映（activeを付ける）
     const idx = reference?.[side];
     if (idx !== null && idx !== undefined) {
       const slot = line.querySelector(`.ref-slot[data-index="${idx}"]`);
-      if (slot) slot.textContent = "×";
+      if (slot) slot.classList.add("active");
     }
-  });
 
-  // クリックで×移動＆reference更新
-  document.querySelectorAll(".ref-slot").forEach(slot => {
-    slot.addEventListener("click", () => {
-      const parent = slot.parentElement;
+    // クリックでactiveを移動＆reference更新
+    line.querySelectorAll(".ref-slot").forEach(slot => {
+      slot.addEventListener("click", () => {
+        // 同じ側のactiveを全部外す
+        line.querySelectorAll(".ref-slot").forEach(s => s.classList.remove("active"));
 
-      parent.querySelectorAll(".ref-slot").forEach(s => s.classList.remove("active"));
-      
-      slot.classList.add("active");
-      
-      const side = slot.dataset.side;           // "left" or "right"
-      const index = Number(slot.dataset.index); // 0〜5
-      reference[side] = index;
+        // 押した所だけactive
+        slot.classList.add("active");
+
+        // 値を更新
+        reference[side] = Number(slot.dataset.index);
+      });
     });
   });
 }
