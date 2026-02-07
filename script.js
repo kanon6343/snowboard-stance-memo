@@ -142,15 +142,16 @@ function render() {
     historyDiv.appendChild(card);
   });
 
-  historyDiv.querySelectorAll("button[data-del]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const idx = Number(btn.dataset.del);
-      const list = loadList();
-      list.splice(idx, 1);
-      localStorage.setItem(KEY, JSON.stringify(list));
-      render();
-    });
+  historyDiv.querySelectorAll("button[data-del-id]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const id = btn.dataset.delId;
+
+    const list = loadList().filter(x => x.id !== id);
+
+    localStorage.setItem(KEY, JSON.stringify(list));
+    render();
   });
+});
 
   historyDiv.querySelectorAll("button[data-load]").forEach(btn => {
   btn.addEventListener("click", () => {
