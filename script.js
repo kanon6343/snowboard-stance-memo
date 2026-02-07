@@ -185,6 +185,11 @@ function render() {
     
     const title = `${time ? time + " / " : ""}${item.date || "日付なし"} / ${item.snow || "雪質なし"} / ${item.board || "板名なし"}`;
     const angles = `左 ${item.leftAngle || "?"}°　右 ${item.rightAngle || "?"}°`;
+    const leftDisk = item.disk?.left || "";
+    const rightDisk = item.disk?.right || "";
+
+    const setupLine =
+     `左 ${item.leftAngle || "?"}°${leftDisk}　右 ${item.rightAngle || "?"}°${rightDisk}`;
 
     card.innerHTML = `
       <div><b>${escapeHtml(title)}</b></div>
