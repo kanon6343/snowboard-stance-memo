@@ -193,15 +193,16 @@ h1{
 .ref-help{
   position: relative;
   width: 256px;
+  height: 26px;
+  line-height: 26px;
   margin: 4px auto 0;
   text-align: center;
   font-size: 11px;
   color: #aaa;
   opacity: 0.7;
-  height: 26px;
-  line-height: 26px;
 
-  pointer-events: none; /* 文字はクリック邪魔しない */
+  /* 文字はクリック邪魔しない */
+  pointer-events: none;
 }
 
 .ref-help.active::after{
@@ -213,28 +214,27 @@ h1{
   font-size: 33px;
   font-weight: bold;
   color: #e53935;
+
+  pointer-events: none;
 }
 
-/* 判定側：ref-helpと同じ幅・中央寄せ（安全） */
+/* ✅ オレンジ（判定）をref-helpにピッタリ重ねる */
 .ref-line{
-  width: 256px;
-  height: 26px;
-  margin: 0 auto;
-
+  position: absolute;
+  inset: 0;
   display: flex;
   justify-content: center;
   gap: 8px;
-
-  position: relative;
   z-index: 2;
+  background: transparent;
+
+  /* 判定は生かす */
+  pointer-events: auto;
 }
 
 .ref-slot{
   width: 36px;
-  height: 26px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  height: 100%;
 }
 
 /* =========================
