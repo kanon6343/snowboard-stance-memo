@@ -413,3 +413,44 @@ text-shadow:
 
 .ref-help { outline: 1px solid red; }
 .ref-help.active { outline: 2px solid green; }
+
+/* ===== mini表示を強制的に復元（style.cssの一番下に置く）===== */
+
+.mini-row {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.mini-hole {
+  width: 12px;
+  height: 12px;
+  border: 1px solid #999;     /* ←未選択でも枠が見える */
+  border-radius: 50%;         /* ←丸に戻す */
+  background: transparent;    /* ←未選択は透明 */
+  display: inline-block;
+  box-sizing: border-box;
+}
+
+.mini-hole.active{
+  background: #fc6a03;
+  border-color: #f5deb3;
+}
+
+/* ×はactiveだけ見える */
+.mini-x {
+  width: 12px;
+  height: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 900;           /* ←太くしたいならここ強め */
+  line-height: 1;
+  color: transparent;         /* ←普段は見えない */
+}
+
+.mini-x.active {
+  color: #e53935;             /* ←activeだけ赤 */
+}
