@@ -133,7 +133,7 @@ if (idx !== null && idx !== undefined) {
         const index = Number(slot.dataset.index);
         reference[side] = index;
 
-        setHelpX(side, idx);
+        setHelpX(side, index);
       });
     });
   });
