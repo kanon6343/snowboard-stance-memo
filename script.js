@@ -196,16 +196,18 @@ function render() {
      `左 ${item.leftAngle || "?"}°  ${leftDisk}　右 ${item.rightAngle || "?"}°  ${rightDisk}`;
 
     card.innerHTML = `
-      <div><b>${escapeHtml(title)}</b></div>
-      <div>${escapeHtml(setupLine)}</div>
+  <div><b>${escapeHtml(title)}</b></div>
+  <div>${escapeHtml(setupLine)}</div>
 
-      <div class="history-preview">
-        ${renderMini(item.holes || [], item.reference || { left: null, right: null })}
-      </div>
-      
-      <button type="button" data-load-id="${item.id}">読込</button>
-      <button type="button" data-del-id="${item.id}">削除</button>
-    `;
+  <div class="history-preview">
+    ${renderMini(item.holes || [], item.reference || { left: null, right: null })}
+  </div>
+
+  <div class="history-actions">
+    <button type="button" class="btn-load" data-load-id="${item.id}">読込</button>
+    <button type="button" class="btn-del" data-del-id="${item.id}">削除</button>
+  </div>
+`;
 
     historyDiv.appendChild(card);
   });
