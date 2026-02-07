@@ -59,8 +59,8 @@ h1{
 #clearBtn{ margin-top: 8px; }
 
 #saveBtn{
-  background: #4dabf7;   /* ← 読込と同じ色にする */
-  border: 1px solid #4dabf7;
+  background: #4caf50;   /* ← 読込と同じ色にする */
+  border: 1px solid #4caf50;
   color: #fff;
 }
 
