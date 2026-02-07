@@ -147,7 +147,8 @@ h1 {
 }
 .ref-line {
   display: flex;
-  justify-content: center;
+  width: 256px;
+  justify-content: flex-start;
   gap: 8px;
   position: relative;
   margin: 0px;
@@ -232,8 +233,8 @@ h1 {
 
   position: absolute;
   left: var(--ref-x, 50%);
-  top: 50%;
-  transform: translate(-50%, -50%);
+  top: 0;
+  transform: translate(-50%, -60%);
 
   font-size: 33px;
   font-weight: bold;
