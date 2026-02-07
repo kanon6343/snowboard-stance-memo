@@ -29,7 +29,7 @@ h1 {
 .row {
   display: flex;
   gap: 8px;
-  margin-bottom: 2px;
+  margin-bottom: 0px;
   justify-content: center;
 }
 
@@ -150,7 +150,7 @@ h1 {
   justify-content: center;
   gap: 8px;
   position: relative;
-  margin: 2px 0;
+  margin: 0px;
 }
 
 .ref-slot {
