@@ -95,10 +95,8 @@ function setHelpX(side, index) {
   if (!slot) return;
 
   const slotRect = slot.getBoundingClientRect();
-  const lineRect = line.getBoundingClientRect(); // ★追加
-
-  const x = (slotRect.left + slotRect.width / 2) - lineRect.left; // ★置き換え
-
+  const helpRect = help.getBoundingClientRect();
+  const x = (slotRect.left + slotRect.width / 2) - helpRect.left;
   help.classList.add("active");
   help.style.setProperty("--ref-x", `${x}px`);
 }
