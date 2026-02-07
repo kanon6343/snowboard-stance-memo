@@ -189,7 +189,7 @@ function render() {
     const rightDisk = item.disk?.right || "";
 
     const setupLine =
-     `左 ${item.leftAngle || "?"}°${leftDisk}　右 ${item.rightAngle || "?"}°${rightDisk}`;
+     `左 ${item.leftAngle || "?"}°  ${leftDisk}　右 ${item.rightAngle || "?"}°  ${rightDisk}`;
 
     card.innerHTML = `
       <div><b>${escapeHtml(title)}</b></div>
