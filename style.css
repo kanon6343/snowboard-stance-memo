@@ -240,3 +240,9 @@ h1 {
   font-weight: bold;
   color: #e53935;
 }
+
+/* debug: 見える化（あとで消してOK） */
+.row { outline: 1px dashed blue; }
+.ref-line { outline: 1px dashed orange; }
+.ref-help { outline: 1px dashed red; }
+.holes { outline: 1px dashed purple; }
