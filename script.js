@@ -193,7 +193,7 @@ function render() {
 
     card.innerHTML = `
       <div><b>${escapeHtml(title)}</b></div>
-      <div>${escapeHtml(angles)}</div>
+      <div>${escapeHtml(setupLine)}</div>
 
       <div class="history-preview">
         ${renderMini(item.holes || [], item.reference || { left: null, right: null })}
