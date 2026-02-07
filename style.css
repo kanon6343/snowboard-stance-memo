@@ -165,41 +165,33 @@ h1 {
   color: #e53935;
 }
 
-.mini-ref{
-  width: 100%; /* ← これ追加！ */
-  display: foex;
-  grid-template-columns: repeat(6, 12px);
-  gap: 4px;
-  justify-content: center;
-  margin: 2px 0;
-}
-
-.mini-x{
-  width:12px;
-  height:12px;
-  display:inline-flex;      /* ← これ重要！空でも幅を持つ */
-  align-items:center;
-  justify-content:center;
-  font-size:18px;
-  color:transparent;
-  font-weight:bold;
-  line-height:1;
-}
-
-.mini-x.active{
-  color:#e53935;
-}
-
+/* ===== ミニ表示：穴列と×列を完全に揃える ===== */
 /* 6穴(12px) + gap(4px)*5 = 92px */
 .mini-row,
 .mini-ref {
   width: 92px;
   margin-left: auto;
   margin-right: auto;
-  justify-content: flex-start; /* 左から並べる */
+  display: flex;
+  justify-content: flex-start; /* 左から並べる（箱自体は中央寄せ） */
   gap: 4px;
+  margin-bottom: 4px;
 }
 
-.mini-ref {
-  display: flex;
+.mini-x{
+  width: 12px;
+  height: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 18px;     /* ← ここで×の大きさ調整 */
+  font-weight: bold;
+  line-height: 1;
+
+  color: transparent;  /* 通常は見えない */
+}
+
+.mini-x.active{
+  color: #e53935;      /* activeだけ赤 */
 }
