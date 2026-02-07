@@ -135,8 +135,8 @@ function render() {
         ${renderMini(item.holes || [], item.reference || { left: null, right: null })}
       </div>
       
-      <button type="button" data-load="${idx}">読込</button>
-      <button type="button" data-del="${idx}">削除</button>
+      <button type="button" data-load-id="${item.id}">読込</button>
+      <button type="button" data-del-id="${item.id}">削除</button>
     `;
 
     historyDiv.appendChild(card);
