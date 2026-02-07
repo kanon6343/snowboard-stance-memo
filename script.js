@@ -91,26 +91,29 @@ function loadList() {
 }
 
 function renderTabs() {
-  const items = ["__FAV__", "__ALL__", ...boards];
+  const list = loadList();
 
   const boards = Array.from(
     new Set(list.map(x => (x.board || "").trim()))
   );
 
-  const items = ["__ALL__", ...boards];
+  // ★タブを先頭に追加
+  const items = ["__FAV__", "__ALL__", ...boards];
 
   tabsDiv.innerHTML = items.map(b => {
     const label =
-  b === "__FAV__" ? "★" :
-  b === "__ALL__" ? "全部" :
-  (b === "" ? "未入力" : b);
+      b === "__FAV__" ? "★" :
+      b === "__ALL__" ? "全部" :
+      (b === "" ? "未入力" : b);
+
     const active = b === selectedBoard ? "active" : "";
+
     return `<button type="button" class="tab ${active}" data-board="${escapeHtml(b)}">${escapeHtml(label)}</button>`;
   }).join("");
 
   tabsDiv.querySelectorAll("button.tab").forEach(btn => {
     btn.addEventListener("click", () => {
-      selectedBoard = btn.getAttribute("data-board")??"__ALL__";
+      selectedBoard = btn.getAttribute("data-board") ?? "__ALL__";
       render();
     });
   });
@@ -175,9 +178,10 @@ if (idx !== null && idx !== undefined) {
 
 function render() {
   const all = loadList();
-  const list = (selectedBoard === "__ALL__")
-   ? all
-   : all.filter(x => (x.board || "").trim() === selectedBoard);
+  const list =
+  (selectedBoard === "__ALL__") ? all
+: (selectedBoard === "__FAV__") ? all.filter(x => !!x.favorite)
+: all.filter(x => (x.board || "").trim() === selectedBoard);
 
 // ★★★★★ ここに追加 ★★★★★
 list.sort((a, b) => Number(!!b.favorite) - Number(!!a.favorite));
