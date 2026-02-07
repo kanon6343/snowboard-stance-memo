@@ -254,6 +254,67 @@ h1{
   height: 100%;
 }
 
+.side-row{
+  display: grid;
+  grid-template-columns: 34px 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.side-title{
+  font-weight: bold;
+  text-align: center;
+}
+
+.angle{
+  display: grid;
+  gap: 4px;
+}
+.angle input{
+  font-size: 16px;
+  width: 100%;
+}
+
+.disk{
+  display: grid;
+  gap: 4px;
+  justify-items: end;
+}
+.disk-label{
+  font-size: 12px;
+  color: #777;
+}
+
+.disk-group{
+  display: flex;
+  gap: 6px;
+}
+
+.chip{
+  border: 1px solid #999;
+  background: #fff;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 14px;
+}
+
+.chip.active{
+  background: #4caf50;
+  border-color: #4caf50;
+  color: #fff;
+}
+
+/* 画面狭い時は折り返し */
+@media (max-width: 420px){
+  .side-row{
+    grid-template-columns: 34px 1fr;
+  }
+  .disk{
+    grid-column: 1 / -1;
+    justify-items: start;
+  }
+}
+
 /* =========================
    Debug (必要なときだけON)
    使わないならこのブロック丸ごと消してOK
