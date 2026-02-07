@@ -82,8 +82,8 @@ h1{
 }
 
 .hole.active {
-  background: #ffb74d;
-  border-color: #ffb74d;
+  background: #fc6a03;
+  border-color: #f5deb3;
 }
 
 .row{
@@ -299,8 +299,8 @@ h1{
 }
 
 .chip.active{
-  background: #ffb74d;
-  border-color: #ffb74d;
+  background: #fc6a03;
+  border-color: #f5deb3;
   color: #fff;
 }
 
