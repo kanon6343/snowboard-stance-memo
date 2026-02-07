@@ -112,7 +112,7 @@ function renderRefSlots() {
 
 function render() {
   const all = loadList();
-const list = (selectedBoard === "__ALL__")
+  const list = (selectedBoard === "__ALL__")
   ? all
   : all.filter(x => (x.board || "").trim() === selectedBoard);
   historyDiv.innerHTML = "";
