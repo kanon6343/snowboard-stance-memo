@@ -208,6 +208,7 @@ h1{
   position: relative;
   margin: 0;
   pointer-events: auto;
+  margin-top: -2px; /* ←ここで上げる（-1〜-4くらいで調整） */
 }
 
 .ref-slot{
