@@ -435,5 +435,5 @@ h1{
 
 /* ref-line を ref-help の上に重ねる（兄弟構造のまま） */
 .ref-line{
-  margin-top: -26px !important; /* ← ref-help の高さぶん上に持ち上げる */
+  margin-top: -28px !important; /* ← ref-help の高さぶん上に持ち上げる */
 }
