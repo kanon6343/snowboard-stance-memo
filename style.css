@@ -149,6 +149,7 @@ h1 {
   display: flex;
   justify-content: center;
   gap: 8px;
+  position: relative;
   margin: 4px 0;
 }
 
@@ -161,6 +162,23 @@ h1 {
   justify-content: center;
 
   font-size: 30px;   /* ← 大きく */
+  font-weight: bold;
+  color: #e53935;
+}
+
+.ref-slot {
+  position: relative;
+}
+
+.ref-slot.active::after {
+  content: "×";
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  font-size: 33px;  /* 好きな大きさに調整OK */
   font-weight: bold;
   color: #e53935;
 }
