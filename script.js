@@ -203,7 +203,7 @@ function miniSide(label, sideArr, refIndex) {
 
       <div class="mini-ref">
         ${Array.from({ length: 6 }, (_, i) =>
-          `<span class="mini-x">${i === Number(refIndex) ? "×" : ""}</span>`
+          `<span class="mini-x ${i === Number(refIndex) ? "active" : ""}">×</span>`
         ).join("")}
       </div>
 
