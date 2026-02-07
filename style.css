@@ -224,7 +224,7 @@ h1{
   inset: 0;
   display: flex;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
   z-index: 2;
   background: transparent;
 
