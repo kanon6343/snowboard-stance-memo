@@ -81,9 +81,9 @@ h1{
   margin: 0 auto;
 }
 
-.hole.active{
-  background: #4caf50;
-  border-color: #4caf50;
+.hole.active {
+  background: #ffb74d;
+  border-color: #ffb74d;
 }
 
 .row{
@@ -117,9 +117,9 @@ h1{
   cursor: pointer;
 }
 
-.tab.active{
-  background: #4caf50;
-  border-color: #4caf50;
+.tab.active {
+  background: #64b5f6;
+  border-color: #64b5f6;
   color: #fff;
 }
 
@@ -291,7 +291,7 @@ h1{
 }
 
 .chip{
-  border: 1px solid #999;
+  border: 1px solid #bbb;
   background: #fff;
   border-radius: 999px;
   padding: 6px 10px;
@@ -299,8 +299,8 @@ h1{
 }
 
 .chip.active{
-  background: #4caf50;
-  border-color: #4caf50;
+  background: #ffb74d;
+  border-color: #ffb74d;
   color: #fff;
 }
 
