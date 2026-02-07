@@ -122,7 +122,7 @@ function render() {
   renderTabs();
   renderRefSlots();
 
-  list.forEach((item, idx) => {
+  list.forEach((item) => {
     const card = document.createElement("section");
     card.className = "card";
 
