@@ -413,3 +413,22 @@ h1{
 .ref-help  { outline: 2px solid red; }      /* ×表示エリア */
 .ref-line  { outline: 2px solid orange; }   /* タップ判定エリア */
 .ref-slot  { background: rgba(255,165,0,0.15); } /* 各スロット */
+
+/* ==== ref 判定帯を強制で26pxに固定（最終上書き用） ==== */
+.ref-line{
+  position: relative !important;
+  inset: auto !important;
+  top: auto !important;
+  left: auto !important;
+
+  width: 256px !important;
+  height: 26px !important;
+  margin: 0 auto !important;
+
+  display: flex !important;
+  justify-content: center !important;
+  gap: 10px !important;
+}
+.ref-slot{
+  height: 26px !important;
+}
