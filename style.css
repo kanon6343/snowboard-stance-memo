@@ -151,7 +151,7 @@ h1 {
   justify-content: flex-start;
   gap: 8px;
   position: relative;
-  margin: 0px;
+  margin: 0 auto;
 }
 
 .ref-slot {
