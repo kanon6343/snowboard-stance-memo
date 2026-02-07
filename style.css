@@ -170,6 +170,7 @@ h1 {
   position: relative;
 }
 
+/*
 .ref-slot.active::after {
   content: "×";
   position: absolute;
@@ -178,10 +179,11 @@ h1 {
   top: 50%;
   transform: translate(-50%, -50%);
 
-  font-size: 33px;  /* 好きな大きさに調整OK */
+  font-size: 33px;  
   font-weight: bold;
   color: #e53935;
 }
+*/
 
 /* ===== ミニ表示：穴列と×列を完全に揃える ===== */
 /* 6穴(12px) + gap(4px)*5 = 92px */
@@ -215,7 +217,7 @@ h1 {
 }
 
 .ref-help {
-  positon: relative;
+  position: relative;
   text-align: center;
   font-size: 11px;
   color: #aaa;
