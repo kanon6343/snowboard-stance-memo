@@ -145,9 +145,10 @@ h1 {
   border-color: #4caf50;
   color: #fff;
 }
+
 .ref-line {
   display: flex;
-  width: 256px;
+  width: 100%;
   justify-content: center;
   gap: 8px;
   position: relative;
