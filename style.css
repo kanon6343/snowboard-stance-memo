@@ -173,47 +173,36 @@ h1{
   margin-bottom: 6px;
 }
 
-.mini-row{
+/* ===== mini 共通レイアウト（色は触らない版）===== */
+
+.mini-row,
+.mini-ref {
+  width: calc(12px * 6 + 4px * 5);
+  margin-left: auto;
+  margin-right: auto;
+
   display: flex;
   justify-content: center;
   gap: 4px;
+
   margin-bottom: 4px;
 }
 
-.mini-hole{
+.mini-hole,
+.mini-x {
   width: 12px;
   height: 12px;
-  border-radius: 50%;
-  border: 1px solid #999;
-  display: inline-block;
+  flex: 0 0 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
+
+/* ← ここから下は今の色そのままにしてOK */
 
 .mini-hole.active{
   background: #fc6a03;
   border-color: #f5deb3;
-}
-
-/* mini: ×列（穴列と揃える） */
-.mini-ref{
-  width: 92px;                /* 12*6 + gap4*5 = 92 */
-  margin: 0 auto 4px;
-  display: flex;
-  justify-content: flex-start;
-  gap: 4px;
-}
-
-.mini-x{
-  width: 12px;
-  height: 12px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 21px;
-  font-weight: 900;
-  line-height: 1;
-
-  color: transparent;
 }
 
 .mini-x.active{
