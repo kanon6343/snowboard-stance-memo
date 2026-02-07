@@ -90,8 +90,11 @@ function setHelpX(side, index) {
     return;
   }
 
-  const x = 18 + 44 * Number(index) + 4; // 36 + gap8 = 44
+  const size = 36;
+  const gap = 8;
+  const offset = 6; // ← ここだけ微調整ポイント
 
+  const x = size/2 + (size+gap) * Number(index) + offset;
   help.classList.add("active");
   help.style.setProperty("--ref-x", `${x}px`);
 }
