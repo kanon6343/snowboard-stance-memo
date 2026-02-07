@@ -1,39 +1,74 @@
-
-body {
+/* =========================
+   Base
+========================= */
+body{
   font-family: sans-serif;
   padding: 16px;
 }
 
-h1 {
+h1{
   text-align: center;
   margin-bottom: 16px;
 }
 
-.bindings {
+/* =========================
+   Layout / Card
+========================= */
+.bindings{
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
 }
 
-.card {
+@media (max-width: 480px){
+  .bindings{ grid-template-columns: 1fr; }
+}
+
+.card{
   background: #f4f4f4;
   padding: 12px;
   border-radius: 12px;
 }
 
-.card h2 {
+.card h2{
   text-align: center;
   margin: 0 0 10px 0;
 }
 
-.row {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 0;
-  justify-content: center;
+/* =========================
+   Meta / Buttons
+========================= */
+.meta{
+  display: grid;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
-.hole {
+.meta input,
+.meta select{
+  font-size: 16px;
+}
+
+#saveBtn,
+#clearBtn{
+  padding: 10px 12px;
+  font-size: 16px;
+  width: 100%;
+}
+
+#clearBtn{ margin-top: 8px; }
+
+/* =========================
+   Holes (main)
+========================= */
+.row{
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 0;
+}
+
+.hole{
   width: 36px;
   height: 36px;
   border: 2px solid #999;
@@ -41,97 +76,22 @@ h1 {
   background: transparent;
 }
 
-.hole.active {
+.hole.active{
   background: #4caf50;
   border-color: #4caf50;
 }
 
-@media (max-width: 480px) {
-  .bindings {
-    grid-template-columns: 1fr;
-  }
-}
-
-#history {
-  margin-top: 20px;
-  display: grid;
-  gap: 16px;
-}
-
-.history-preview {
-  margin: 10px 0 12px;
-}
-
-.mini-bindings {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.mini-side {
-  background: #fff;
-  border-radius: 10px;
-  padding: 8px;
-}
-
-.mini-label {
-  text-align: center;
-  font-weight: bold;
-  margin-bottom: 6px;
-}
-
-.mini-row {
-  display: flex;
-  justify-content: center;
-  gap: 4px;
-  margin-bottom: 4px;
-}
-
-.mini-hole {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 1px solid #999;
-  display: inline-block;
-}
-
-.mini-hole.active {
-  background: #4caf50;
-  border-color: #4caf50;
-}
-
-.meta { display: grid; gap: 10px; margin-bottom: 12px; }
-.meta input, .meta select { font-size: 16px; }
-#saveBtn { padding: 10px 12px; font-size: 16px; width: 100%; }
-
-#history { margin-top: 16px; display: grid; gap: 16px; }
-.history-preview { margin: 10px 0 12px; }
-
-.mini-bindings { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.mini-side { background: #fff; border-radius: 10px; padding: 8px; }
-.mini-label { text-align: center; font-weight: bold; margin-bottom: 6px; }
-.mini-row { display: flex; justify-content: center; gap: 4px; margin-bottom: 4px; }
-.mini-hole { width: 12px; height: 12px; border-radius: 50%; border: 1px solid #999; display: inline-block; }
-.mini-hole.active { background: #4caf50; border-color: #4caf50; }
-
-#saveBtn, #clearBtn {
-  padding: 10px 12px;
-  font-size: 16px;
-  width: 100%;
-}
-
-#clearBtn {
-  margin-top: 8px;
-}
-
-.tabs {
+/* =========================
+   Tabs
+========================= */
+.tabs{
   display: flex;
   gap: 8px;
   overflow-x: auto;
   padding: 8px 0 12px;
 }
 
-.tab {
+.tab{
   padding: 8px 12px;
   border-radius: 999px;
   border: 1px solid #999;
@@ -140,38 +100,73 @@ h1 {
   cursor: pointer;
 }
 
-.tab.active {
+.tab.active{
   background: #4caf50;
   border-color: #4caf50;
   color: #fff;
 }
 
-/*
-.ref-slot.active::after {
-  content: "×";
-  position: absolute;
-
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-
-  font-size: 33px;  
-  font-weight: bold;
-  color: #e53935;
+/* =========================
+   History
+========================= */
+#history{
+  margin-top: 16px;
+  display: grid;
+  gap: 16px;
 }
-*/
 
-/* ===== ミニ表示：穴列と×列を完全に揃える ===== */
-/* 6穴(12px) + gap(4px)*5 = 92px */
-.mini-row,
-.mini-ref {
-  width: 92px;
-  margin-left: auto;
-  margin-right: auto;
+.history-preview{
+  margin: 10px 0 12px;
+}
+
+/* =========================
+   Mini preview
+========================= */
+.mini-bindings{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.mini-side{
+  background: #fff;
+  border-radius: 10px;
+  padding: 8px;
+}
+
+.mini-label{
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.mini-row{
   display: flex;
-  justify-content: flex-start; /* 左から並べる（箱自体は中央寄せ） */
+  justify-content: center;
   gap: 4px;
   margin-bottom: 4px;
+}
+
+.mini-hole{
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid #999;
+  display: inline-block;
+}
+
+.mini-hole.active{
+  background: #4caf50;
+  border-color: #4caf50;
+}
+
+/* mini: ×列（穴列と揃える） */
+.mini-ref{
+  width: 92px;                /* 12*6 + gap4*5 = 92 */
+  margin: 0 auto 4px;
+  display: flex;
+  justify-content: flex-start;
+  gap: 4px;
 }
 
 .mini-x{
@@ -180,42 +175,78 @@ h1 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
-  font-size: 18px;     /* ← ここで×の大きさ調整 */
+  font-size: 18px;
   font-weight: bold;
   line-height: 1;
-
-  color: transparent;  /* 通常は見えない */
+  color: transparent;
 }
 
 .mini-x.active{
-  color: #e53935;      /* activeだけ赤 */
+  color: #e53935;
 }
 
-.ref-line{
+/* =========================
+   Reference (help + tap slots)
+   ※いったん「兄弟構造」前提の安全版
+   （ref-lineをabsoluteにして全面化する事故を防ぐ）
+========================= */
+.ref-help{
+  position: relative;
+  width: 256px;
+  margin: 4px auto 0;
+  text-align: center;
+  font-size: 11px;
+  color: #aaa;
+  opacity: 0.7;
+  height: 26px;
+  line-height: 26px;
+
+  pointer-events: none; /* 文字はクリック邪魔しない */
+}
+
+.ref-help.active::after{
+  content: "×";
   position: absolute;
-  inset: 0;              /* ★ref-help の中だけにピッタリ重ねる */
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-
-  z-index: 2;
-  background: transparent;
-}
-
-.ref-slot {
-  width: 36px;
-  height: 100%;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 30px;   /* ← 大きく */
+  left: var(--ref-x, 50%);
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 33px;
   font-weight: bold;
   color: #e53935;
 }
 
+/* 判定側：ref-helpと同じ幅・中央寄せ（安全） */
+.ref-line{
+  width: 256px;
+  height: 26px;
+  margin: 0 auto;
+
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+
+  position: relative;
+  z-index: 2;
+}
+
+.ref-slot{
+  width: 36px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* =========================
+   Debug (必要なときだけON)
+   使わないならこのブロック丸ごと消してOK
+========================= */
+/*
+.row      { outline: 1px dashed blue; }
+.ref-line { outline: 1px dashed orange; }
+.ref-help { outline: 1px dashed red; }
+.holes    { outline: 1px dashed purple; }
+*/
 .ref-slot {
   position: relative;
 }
