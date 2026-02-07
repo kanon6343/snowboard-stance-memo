@@ -126,7 +126,8 @@ function render() {
     const card = document.createElement("section");
     card.className = "card";
 
-    const title = `${item.date || "日付なし"} / ${item.snow || "雪質なし"} / ${item.board || "板名なし"}`;
+    const time = item.dateTime ? item.dateTime.slice(11, 16) : "";
+    const title = `${time ? time + " / " : ""}${item.date || "日付なし"} / ${item.snow || "雪質なし"} / ${item.board || "板名なし"}`;
     const angles = `左 ${item.leftAngle || "?"}°　右 ${item.rightAngle || "?"}°`;
 
     card.innerHTML = `
