@@ -95,6 +95,7 @@ function setHelpX(side, index) {
   const offset = 6; // ← ここだけ微調整ポイント
 
   const x = size/2 + (size+gap) * Number(index) + offset;
+  
   help.classList.add("active");
   help.style.setProperty("--ref-x", `${x}px`);
 }
