@@ -41,7 +41,7 @@ saveBtn.addEventListener("click", () => {
     leftAngle: leftAngleEl.value.trim(),
     rightAngle: rightAngleEl.value.trim(),
     holes: holes.map(h => h.classList.contains("active")),
-    reference: { ...reference }
+    reference: { ...reference },
 
     dateTime: new Date().toISOString(),
   };
