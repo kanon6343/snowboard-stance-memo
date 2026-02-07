@@ -15,6 +15,8 @@ let selectedBoard = "__ALL__";
 
 let reference = { left: null, right: null };
 
+let disk = { left: "", right: "" };
+
 // 穴タップ
 holes.forEach(h => h.addEventListener("click", () => h.classList.toggle("active")));
 
@@ -28,7 +30,10 @@ clearBtn.addEventListener("click", () => {
   holes.forEach(h => h.classList.remove("active"));
 
   reference = { left: null, right: null };
-renderRefSlots();
+  renderRefSlots();
+
+  disk = { left: "", right: "" };
+  renderDiskUI();
 });
 
 // 保存
@@ -40,6 +45,7 @@ saveBtn.addEventListener("click", () => {
     snow: snowEl.value,
     leftAngle: leftAngleEl.value.trim(),
     rightAngle: rightAngleEl.value.trim(),
+    disk: { ...disk },
     holes: holes.map(h => h.classList.contains("active")),
     reference: { ...reference },
 
@@ -51,6 +57,28 @@ saveBtn.addEventListener("click", () => {
   localStorage.setItem(KEY, JSON.stringify(list));
   render();
 });
+
+document.querySelectorAll(".disk-group .chip").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const group = btn.closest(".disk-group");
+    const side = group.dataset.side;        // left / right
+    const value = btn.dataset.value;        // 前/中/後
+
+    group.querySelectorAll(".chip").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    disk[side] = value;
+  });
+});
+
+function renderDiskUI() {
+  document.querySelectorAll(".disk-group").forEach(group => {
+    const side = group.dataset.side;
+    group.querySelectorAll(".chip").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.value === disk[side]);
+    });
+  });
+}
 
 function loadList() {
   try { return JSON.parse(localStorage.getItem(KEY) || "[]"); }
@@ -201,6 +229,10 @@ function render() {
     // ×復元
     reference = item.reference || { left: null, right: null };
     renderRefSlots();
+
+    disk = item.disk || { left: "", right: "" };
+    renderDiskUI();
+    
   });
 });
 }
