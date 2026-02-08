@@ -35,6 +35,7 @@ if (sortModeEl) {
   sortModeEl.value = sortMode; // ← 初期表示を合わせる
   sortModeEl.addEventListener("change", () => {
     sortMode = sortModeEl.value;
+    saveUI();
     showToast(`ソート：${sortModeEl.options[sortModeEl.selectedIndex].text}`, "info");
     render();
   });
@@ -154,6 +155,7 @@ function renderTabs() {
       // ★タブは「絞り込み」じゃなく「★ソート切替」
       if (board === "__FAV__") {
         favSortOn = !favSortOn;
+        saveUI();
         showToast(
           favSortOn ? "★ソート：ON" : "★ソート：OFF",
           favSortOn ? "star" : "info"
