@@ -322,12 +322,6 @@ h1{
   border-radius: 6px;
 }
 
-.btn-del:disabled{
-  background: #ccc;
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
 /* =========================
    Favorite star button
 ========================= */
@@ -459,4 +453,10 @@ h1{
 /* 下の穴列だけ少し下げる *//*
 .holes > .row:last-child{
   margin-top: 26px;  /* 好きに調整（4〜10くらい） */
+}
+
+.btn-del:disabled{
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
