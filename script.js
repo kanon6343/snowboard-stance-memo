@@ -212,6 +212,10 @@ if (idx !== null && idx !== undefined) {
 function render() {
   const all = loadList();
 
+ const list =
+  (selectedBoard === "__ALL__") ? all
+  : all.filter(x => (x.board || "").trim() === selectedBoard);
+  
   // 文字比較（空は最後）
 const cmpStr = (a, b) => String(a || "").localeCompare(String(b || ""), "ja");
 const getTime = (x) => String(x?.dateTime || "");
