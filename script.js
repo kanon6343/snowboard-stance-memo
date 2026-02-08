@@ -267,8 +267,11 @@ function render() {
   // 削除（お気に入りは無視）
   historyDiv.querySelectorAll("button[data-del-id]").forEach(btn => {
     btn.addEventListener("click", () => {
-      if (btn.disabled) return;
-
+      if (btn.disabled) {
+  showToast("★お気に入りは削除できません", "error");
+  return;
+      }
+      
       const id = btn.dataset.delId;
       const next = loadList().filter(x => x.id !== id);
       localStorage.setItem(KEY, JSON.stringify(next));
