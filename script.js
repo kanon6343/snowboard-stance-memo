@@ -22,6 +22,14 @@ let selectedBoard = "__ALL__";
 let favSortOn = true;      // ★を上にするON/OFF（初期はONでもOFFでもOK）
 let sortMode = "savedDesc"; // メインソート（将来増やす）
 
+// --- UI状態を復元（タブ/★ソート/ソートモード）---
+try {
+  const ui = JSON.parse(localStorage.getItem(UI_KEY) || "{}");
+  if (typeof ui.selectedBoard === "string") selectedBoard = ui.selectedBoard;
+  if (typeof ui.favSortOn === "boolean") favSortOn = ui.favSortOn;
+  if (typeof ui.sortMode === "string") sortMode = ui.sortMode;
+} catch {}
+
 const sortModeEl = document.getElementById("sortMode");
 if (sortModeEl) {
   sortModeEl.value = sortMode; // ← 初期表示を合わせる
@@ -106,6 +114,14 @@ function renderDiskUI() {
 function loadList() {
   try { return JSON.parse(localStorage.getItem(KEY) || "[]"); }
   catch { return []; }
+}
+
+function saveUI(){
+  localStorage.setItem(UI_KEY, JSON.stringify({
+    selectedBoard,
+    favSortOn,
+    sortMode,
+  }));
 }
 
 function renderTabs() {
