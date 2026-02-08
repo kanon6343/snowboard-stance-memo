@@ -171,7 +171,10 @@ h1{
   margin: 4px auto 0;
 }
 
-
+/* ref-wrap の中にある “下の穴(row)” だけ下げる */
+.ref-wrap > .row{
+  margin-top: 26px; /* 好きに調整 */
+}
 
 /* 表示側 */
 .ref-help{
