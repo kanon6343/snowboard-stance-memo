@@ -57,7 +57,7 @@ saveBtn.addEventListener("click", () => {
   list.unshift(item);
   localStorage.setItem(KEY, JSON.stringify(list));
   render();
-  showToast("保存しました");
+  showToast("保存しました", "success");
 });
 
 document.querySelectorAll(".disk-group .chip").forEach(btn => {
@@ -261,7 +261,7 @@ function render() {
       item.favorite = !item.favorite;
       localStorage.setItem(KEY, JSON.stringify(list));
       render();
-      showToast(item.favorite ? "お気に入り追加 ⭐" : "お気に入り解除");
+      showToast(item.favorite ? ("お気に入り追加 ⭐","star") : ("お気に入り解除","info"));
     });
   });
 
@@ -269,7 +269,7 @@ function render() {
   historyDiv.querySelectorAll('button[data-del-id]').forEach(btn => {
   btn.addEventListener("click", () => {
     if (btn.dataset.protected === "1") {
-      showToast("★お気に入りは削除できません", 1600);
+      showToast("★お気に入りは削除できません",error);
       return;
     }
 
@@ -277,7 +277,7 @@ function render() {
     const next = loadList().filter(x => x.id !== id);
     localStorage.setItem(KEY, JSON.stringify(next));
     render();
-    showToast("削除しました", 1600);
+    showToast("削除しました", "error");
   });
 });
 
