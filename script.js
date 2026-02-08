@@ -210,35 +210,32 @@ if (idx !== null && idx !== undefined) {
 function render() {
   const all = loadList();
 
-  const list =
-  (selectedBoard === "__ALL__") ? all
-  : (selectedBoard === "__FAV__") ? all.filter(x => !!x.favorite)
-  : all.filter(x => (x.board || "").trim() === selectedBoard);
-  
+  // 文字比較（空は最後）
+const cmpStr = (a, b) => String(a || "").localeCompare(String(b || ""), "ja");
+const getTime = (x) => String(x?.dateTime || "");
+
+// ★ + メインソート を「1回の sort」に合成
+list.sort((a, b) => {
+  // 1) ★を上に（ONの時だけ）
   if (favSortOn) {
-  list.sort((a, b) => Number(!!b.favorite) - Number(!!a.favorite));
+    const favDiff = Number(!!b.favorite) - Number(!!a.favorite);
+    if (favDiff !== 0) return favDiff;
   }
 
-  const cmpStr = (a, b) => String(a || "").localeCompare(String(b || ""), "ja");
-
-// メインソート
-switch (sortMode) {
-  case "savedAsc":
-    list.sort((a, b) => String(a.dateTime||"").localeCompare(String(b.dateTime||"")));
-    break;
-
-  case "savedDesc":
-    list.sort((a, b) => String(b.dateTime||"").localeCompare(String(a.dateTime||"")));
-    break;
-
-  case "boardAsc":
-    list.sort((a, b) => cmpStr(a.board, b.board));
-    break;
-
-  case "snowAsc":
-    list.sort((a, b) => cmpStr(a.snow, b.snow));
-    break;
-}
+  // 2) メインソート
+  switch (sortMode) {
+    case "savedAsc":
+      return getTime(a).localeCompare(getTime(b));
+    case "savedDesc":
+      return getTime(b).localeCompare(getTime(a));
+    case "boardAsc":
+      return cmpStr(a.board, b.board);
+    case "snowAsc":
+      return cmpStr(a.snow, b.snow);
+    default:
+      return 0;
+  }
+});
 
   historyDiv.innerHTML = "";
 
