@@ -12,6 +12,16 @@ const saveBtn = document.getElementById("saveBtn");
 const clearBtn = document.getElementById("clearBtn"); // ← 追加
 const tabsDiv = document.getElementById("boardTabs");
 const sortModeEl = document.getElementById("sortMode");
+
+if (sortModeEl) {
+  sortModeEl.value = sortMode;
+  sortModeEl.addEventListener("change", () => {
+    sortMode = sortModeEl.value;
+    showToast(`ソート：${sortModeEl.options[sortModeEl.selectedIndex].text}`, "info");
+    render();
+  });
+}
+
 let selectedBoard = "__ALL__";
 
 let favSortOn = true;      // ★を上にするON/OFF（初期はONでもOFFでもOK）
@@ -132,18 +142,13 @@ function renderTabs() {
         return;
       }
 
-      sortModeEl?.addEventListener("change", () => {
-  sortMode = sortModeEl.value;
-  showToast(`ソート：${sortModeEl.options[sortModeEl.selectedIndex].text}`, "info");
-  render();
-});
-
       // それ以外は普通に絞り込み
       selectedBoard = board;
       render();
     });
   });
 }
+
 
 function setHelpX(side, index) {
   const help = document.querySelector(`.ref-help[data-side="${side}"]`);
@@ -206,8 +211,8 @@ function render() {
   const all = loadList();
 
   const list =
-    (selectedBoard === "__ALL__") ? all
-    : (selectedBoard === "__FAV__") ? all.filter(x => !!x.favorite)
+  (selectedBoard === "__ALL__")
+    ? all
     : all.filter(x => (x.board || "").trim() === selectedBoard);
 
   if (favSortOn) {
