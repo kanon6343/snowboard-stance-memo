@@ -209,6 +209,40 @@ historyDiv.innerHTML = "";
     const fav = !!item.favorite;
     const favLabel = fav ? "★" : "☆";
 
+    function render() {
+  const all = loadList();
+  const list =
+  (selectedBoard === "__ALL__") ? all
+: (selectedBoard === "__FAV__") ? all.filter(x => !!x.favorite)
+: all.filter(x => (x.board || "").trim() === selectedBoard);
+
+// ★★★★★ ここに追加 ★★★★★
+list.sort((a, b) => Number(!!b.favorite) - Number(!!a.favorite));
+
+historyDiv.innerHTML = "";
+  
+  renderTabs();
+  renderRefSlots();
+
+  list.forEach((item) => {
+    const card = document.createElement("section");
+    card.className = "card";
+
+    const time = item.dateTime
+  ? new Date(item.dateTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+  : "";
+    
+    const title = `${time ? time + " / " : ""}${item.date || "日付なし"} / ${item.snow || "雪質なし"} / ${item.board || "板名なし"}`;
+    const angles = `左 ${item.leftAngle || "?"}°　右 ${item.rightAngle || "?"}°`;
+    const leftDisk = item.disk?.left || "";
+    const rightDisk = item.disk?.right || "";
+
+    const setupLine =
+     `左 ${item.leftAngle || "?"}°  ${leftDisk}　右 ${item.rightAngle || "?"}°  ${rightDisk}`;
+
+    const fav = !!item.favorite;
+    const favLabel = fav ? "★" : "☆";
+
     card.innerHTML = `
      <div style="display:flex; justify-content:space-between; align-items:center;">
       <b>${escapeHtml(title)}</b>
@@ -231,6 +265,24 @@ historyDiv.innerHTML = "";
     <button type="button" class="btn-del" data-del-id="${item.id}">削除</button>
   </div>
 `;
+
+    historyDiv.appendChild(card);
+  });
+
+  historyDiv.querySelectorAll("[data-fav-id]").forEach(btn => {
+   btn.addEventListener("click", () => {
+    const id = btn.getAttribute("data-fav-id");
+    const list = loadList();
+
+    const item = list.find(x => x.id === id);
+    if (!item) return;
+
+    item.favorite = !item.favorite;
+
+    localStorage.setItem(KEY, JSON.stringify(list));
+    render();
+  });
+});
 
     historyDiv.appendChild(card);
   });
