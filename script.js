@@ -220,44 +220,42 @@ function render() {
     const favLabel = fav ? "★" : "☆";
 
     card.innerHTML = `
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <b>${escapeHtml(title)}</b>
+    card.innerHTML = `
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <b>${escapeHtml(title)}</b>
 
-        <button
-          type="button"
-          class="fav-btn ${fav ? "active" : ""}"
-          data-fav-id="${item.id}"
-          title="${fav ? "お気に入り解除" : "お気に入り登録"}"
-        >
-          ${favLabel}
-        </button>
-      </div>
+    <button
+      type="button"
+      class="fav-btn ${fav ? "active" : ""}"
+      data-fav-id="${item.id}"
+      title="${fav ? "お気に入り解除" : "お気に入り登録"}"
+    >
+      ${favLabel}
+    </button>
+  </div>
 
-      <div>${escapeHtml(setupLine)}</div>
-      <div>${escapeHtml(setupLine)}</div>
-${comment ? `<div class="comment">${escapeHtml(comment)}</div>` : ""}
-${commentText ? `<div class="comment">${escapeHtml(commentText)}</div>` : ""}
+  <div>${escapeHtml(setupLine)}</div>
 
-      const comment = (item.comment || "").trim();
+  ${commentText ? `<div class="comment">${escapeHtml(commentText)}</div>` : ""}
 
-      <div class="history-preview">
-        ${renderMini(item.holes || [], item.reference || { left: null, right: null })}
-      </div>
+  <div class="history-preview">
+    ${renderMini(item.holes || [], item.reference || { left: null, right: null })}
+  </div>
 
-      <div class="history-actions">
-  <button type="button" class="btn-load" data-load-id="${item.id}">読込</button>
+  <div class="history-actions">
+    <button type="button" class="btn-load" data-load-id="${item.id}">読込</button>
 
-  <button
-    type="button"
-    class="btn-del ${fav ? "is-protected" : ""}"
-    data-del-id="${item.id}"
-    data-protected="${fav ? "1" : "0"}"
-    title="${fav ? "お気に入りは削除できません" : "削除"}"
-  >
-    削除
-  </button>
-</div>
-    `;
+    <button
+      type="button"
+      class="btn-del ${fav ? "is-protected" : ""}"
+      data-del-id="${item.id}"
+      data-protected="${fav ? "1" : "0"}"
+      title="${fav ? "お気に入りは削除できません" : "削除"}"
+    >
+      削除
+    </button>
+  </div>
+`;
 
     historyDiv.appendChild(card);
   });
