@@ -304,6 +304,17 @@ historyDiv.innerHTML = "";
 
   historyDiv.querySelectorAll("button[data-del-id]").forEach(btn => {
   btn.addEventListener("click", () => {
+    if (btn.disabled) return; // ★お気に入りは削除しない
+
+    const id = btn.dataset.delId;
+    const next = loadList().filter(x => x.id !== id);
+    localStorage.setItem(KEY, JSON.stringify(next));
+    render();
+  });
+});
+  
+  historyDiv.querySelectorAll("button[data-del-id]").forEach(btn => {
+  btn.addEventListener("click", () => {
     const id = btn.dataset.delId;
     const next = loadList().filter(x => x.id !== id);
     localStorage.setItem(KEY, JSON.stringify(next));
