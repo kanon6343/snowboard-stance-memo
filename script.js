@@ -1,5 +1,7 @@
 const KEY = "snowboard-history-v1";
 
+const UI_KEY = "snowboard-ui-v1";
+
 const holes = [...document.querySelectorAll(".hole")];
 const historyDiv = document.getElementById("history");
 
