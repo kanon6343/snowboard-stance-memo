@@ -168,7 +168,7 @@ h1{
   position: relative;
   width: 256px;
   height: 26px;
-  margin: 4px auto 0;
+  margin: 0 auto 0;
 }
 
 /* ref-wrap の中にある “下の穴(row)” だけ下げる */
