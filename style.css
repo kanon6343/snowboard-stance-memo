@@ -168,13 +168,10 @@ h1{
   position: relative;
   width: 256px;
   height: 26px;
-  margin: 4px auto 6px;
+  margin: 4px auto 26px;
 }
 
-/* ref-wrap の直後にある下の row だけに余白を付ける */
-.ref-wrap + .row{
-  margin-top: 26px;
-}
+
 
 /* 表示側 */
 .ref-help{
