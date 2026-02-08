@@ -225,6 +225,10 @@ function render() {
       </div>
 
       <div>${escapeHtml(setupLine)}</div>
+      <div>${escapeHtml(setupLine)}</div>
+${comment ? `<div class="comment">${escapeHtml(comment)}</div>` : ""}
+
+      const comment = (item.comment || "").trim();
 
       <div class="history-preview">
         ${renderMini(item.holes || [], item.reference || { left: null, right: null })}
