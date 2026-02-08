@@ -38,12 +38,12 @@ let disk = { left: "", right: "" };
 holes.forEach(h => h.addEventListener("click", () => h.classList.toggle("active")));
 
 // ✅ クリア（保存の外に置く）
-clearBtn.addEventListener("click", () => {
-  boardEl.value = "";
-  snowEl.value = "";
-  commentEl.value = "";
-  leftAngleEl.value = "";
-  rightAngleEl.value = "";
+clearBtn?.addEventListener("click", () => {
+  if (boardEl) boardEl.value = "";
+  if (snowEl) snowEl.value = "";
+  if (commentEl) commentEl.value = "";
+  if (leftAngleEl) leftAngleEl.value = "";
+  if (rightAngleEl) rightAngleEl.value = "";
   holes.forEach(h => h.classList.remove("active"));
 
   reference = { left: null, right: null };
@@ -54,19 +54,18 @@ clearBtn.addEventListener("click", () => {
 });
 
 // 保存
-saveBtn.addEventListener("click", () => {
+saveBtn?.addEventListener("click", () => {
   const item = {
     id: String(Date.now()),
     favorite: false,
-    board: boardEl.value.trim(),
-    snow: snowEl.value,
-    comment: commentEl.value.trim(),
-    leftAngle: leftAngleEl.value.trim(),
-    rightAngle: rightAngleEl.value.trim(),
+    board: (boardEl?.value || "").trim(),
+    snow: snowEl?.value || "",
+    comment: (commentEl?.value || "").trim(),
+    leftAngle: (leftAngleEl?.value || "").trim(),
+    rightAngle: (rightAngleEl?.value || "").trim(),
     disk: { ...disk },
     holes: holes.map(h => h.classList.contains("active")),
     reference: { ...reference },
-
     dateTime: new Date().toISOString(),
   };
 
