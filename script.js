@@ -303,6 +303,7 @@ function render() {
 
       disk = item.disk || { left: "", right: "" };
       renderDiskUI();
+      showToast("読み込みました", "rode");
     });
   });
 }
