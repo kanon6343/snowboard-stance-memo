@@ -123,6 +123,11 @@ h1{
   border-color: var(--orange-border);
 }
 
+/* 下の穴列だけ少し下げる */
+.holes > .row:last-child{
+  margin-top: 6px;  /* 好きに調整（4〜10くらい） */
+}
+
 /* =========================
    Tabs
 ========================= */
