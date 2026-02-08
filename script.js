@@ -176,17 +176,19 @@ if (idx !== null && idx !== undefined) {
 }
 
 function render() {
+  function render() {
   const all = loadList();
+
   const list =
-  (selectedBoard === "__ALL__") ? all
-: (selectedBoard === "__FAV__") ? all.filter(x => !!x.favorite)
-: all.filter(x => (x.board || "").trim() === selectedBoard);
+    (selectedBoard === "__ALL__") ? all
+    : (selectedBoard === "__FAV__") ? all.filter(x => !!x.favorite)
+    : all.filter(x => (x.board || "").trim() === selectedBoard);
 
-// ★★★★★ ここに追加 ★★★★★
-list.sort((a, b) => Number(!!b.favorite) - Number(!!a.favorite));
+  // ★お気に入りを上に
+  list.sort((a, b) => Number(!!b.favorite) - Number(!!a.favorite));
 
-historyDiv.innerHTML = "";
-  
+  historyDiv.innerHTML = "";
+
   renderTabs();
   renderRefSlots();
 
@@ -195,158 +197,108 @@ historyDiv.innerHTML = "";
     card.className = "card";
 
     const time = item.dateTime
-  ? new Date(item.dateTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-  : "";
-    
+      ? new Date(item.dateTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+      : "";
+
     const title = `${time ? time + " / " : ""}${item.date || "日付なし"} / ${item.snow || "雪質なし"} / ${item.board || "板名なし"}`;
-    const angles = `左 ${item.leftAngle || "?"}°　右 ${item.rightAngle || "?"}°`;
+
     const leftDisk = item.disk?.left || "";
     const rightDisk = item.disk?.right || "";
 
-    const setupLine =
-     `左 ${item.leftAngle || "?"}°  ${leftDisk}　右 ${item.rightAngle || "?"}°  ${rightDisk}`;
-
-    const fav = !!item.favorite;
-    const favLabel = fav ? "★" : "☆";
-
-    function render() {
-  const all = loadList();
-  const list =
-  (selectedBoard === "__ALL__") ? all
-: (selectedBoard === "__FAV__") ? all.filter(x => !!x.favorite)
-: all.filter(x => (x.board || "").trim() === selectedBoard);
-
-// ★★★★★ ここに追加 ★★★★★
-list.sort((a, b) => Number(!!b.favorite) - Number(!!a.favorite));
-
-historyDiv.innerHTML = "";
-  
-  renderTabs();
-  renderRefSlots();
-
-  list.forEach((item) => {
-    const card = document.createElement("section");
-    card.className = "card";
-
-    const time = item.dateTime
-  ? new Date(item.dateTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-  : "";
-    
-    const title = `${time ? time + " / " : ""}${item.date || "日付なし"} / ${item.snow || "雪質なし"} / ${item.board || "板名なし"}`;
-    const angles = `左 ${item.leftAngle || "?"}°　右 ${item.rightAngle || "?"}°`;
-    const leftDisk = item.disk?.left || "";
-    const rightDisk = item.disk?.right || "";
-
-    const setupLine =
-     `左 ${item.leftAngle || "?"}°  ${leftDisk}　右 ${item.rightAngle || "?"}°  ${rightDisk}`;
+    const setupLine = `左 ${item.leftAngle || "?"}°  ${leftDisk}　右 ${item.rightAngle || "?"}°  ${rightDisk}`;
 
     const fav = !!item.favorite;
     const favLabel = fav ? "★" : "☆";
 
     card.innerHTML = `
-     <div style="display:flex; justify-content:space-between; align-items:center;">
-      <b>${escapeHtml(title)}</b>
-      <button type="button"
-  class="btn-del"
-  data-del-id="${item.id}"
-  ${fav ? "disabled title='お気に入りは削除できません'" : ""}>
-  削除
-</button>
-     </div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <b>${escapeHtml(title)}</b>
 
-     <div>${escapeHtml(setupLine)}</div>
+        <button
+          type="button"
+          class="fav-btn ${fav ? "active" : ""}"
+          data-fav-id="${item.id}"
+          title="${fav ? "お気に入り解除" : "お気に入り登録"}"
+        >
+          ${favLabel}
+        </button>
+      </div>
 
-  <div class="history-preview">
-    ${renderMini(item.holes || [], item.reference || { left: null, right: null })}
-  </div>
+      <div>${escapeHtml(setupLine)}</div>
 
-  <div class="history-actions">
-    <button type="button" class="btn-load" data-load-id="${item.id}">読込</button>
-    <button type="button" class="btn-del" data-del-id="${item.id}">削除</button>
-  </div>
-`;
+      <div class="history-preview">
+        ${renderMini(item.holes || [], item.reference || { left: null, right: null })}
+      </div>
 
-    historyDiv.appendChild(card);
-  });
+      <div class="history-actions">
+        <button type="button" class="btn-load" data-load-id="${item.id}">読込</button>
 
-  historyDiv.querySelectorAll("[data-fav-id]").forEach(btn => {
-   btn.addEventListener("click", () => {
-    const id = btn.getAttribute("data-fav-id");
-    const list = loadList();
-
-    const item = list.find(x => x.id === id);
-    if (!item) return;
-
-    item.favorite = !item.favorite;
-
-    localStorage.setItem(KEY, JSON.stringify(list));
-    render();
-  });
-});
+        <button
+          type="button"
+          class="btn-del"
+          data-del-id="${item.id}"
+          ${fav ? "disabled title='お気に入りは削除できません'" : ""}
+        >
+          削除
+        </button>
+      </div>
+    `;
 
     historyDiv.appendChild(card);
   });
 
+  // ===== イベント付け（ここから下は1回だけ） =====
+
+  // ★お気に入り切替
   historyDiv.querySelectorAll("[data-fav-id]").forEach(btn => {
-   btn.addEventListener("click", () => {
-    const id = btn.getAttribute("data-fav-id");
-    const list = loadList();
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-fav-id");
+      const list = loadList();
+      const item = list.find(x => x.id === id);
+      if (!item) return;
 
-    const item = list.find(x => x.id === id);
-    if (!item) return;
-
-    item.favorite = !item.favorite;
-
-    localStorage.setItem(KEY, JSON.stringify(list));
-    render();
-  });
-});
-
-  historyDiv.querySelectorAll("button[data-del-id]").forEach(btn => {
-  btn.addEventListener("click", () => {
-    if (btn.disabled) return; // ★お気に入りは削除しない
-
-    const id = btn.dataset.delId;
-    const next = loadList().filter(x => x.id !== id);
-    localStorage.setItem(KEY, JSON.stringify(next));
-    render();
-  });
-});
-  
-  historyDiv.querySelectorAll("button[data-del-id]").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const id = btn.dataset.delId;
-    const next = loadList().filter(x => x.id !== id);
-    localStorage.setItem(KEY, JSON.stringify(next));
-    render();
-  });
-});
-
-  historyDiv.querySelectorAll("button[data-load-id]").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const id = btn.dataset.loadId;
-    const item = loadList().find(x => x.id === id);
-    if (!item) return;
-
-    boardEl.value = item.board || "";
-    dateEl.value = item.date || "";
-    snowEl.value = item.snow || "";
-    leftAngleEl.value = item.leftAngle || "";
-    rightAngleEl.value = item.rightAngle || "";
-
-    holes.forEach((h, i) => {
-      h.classList.toggle("active", !!item.holes?.[i]);
+      item.favorite = !item.favorite;
+      localStorage.setItem(KEY, JSON.stringify(list));
+      render();
     });
-
-    // ×復元
-    reference = item.reference || { left: null, right: null };
-    renderRefSlots();
-
-    disk = item.disk || { left: "", right: "" };
-    renderDiskUI();
-    
   });
-});
+
+  // 削除（お気に入りは無視）
+  historyDiv.querySelectorAll("button[data-del-id]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (btn.disabled) return;
+
+      const id = btn.dataset.delId;
+      const next = loadList().filter(x => x.id !== id);
+      localStorage.setItem(KEY, JSON.stringify(next));
+      render();
+    });
+  });
+
+  // 読込
+  historyDiv.querySelectorAll("button[data-load-id]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.loadId;
+      const item = loadList().find(x => x.id === id);
+      if (!item) return;
+
+      boardEl.value = item.board || "";
+      dateEl.value = item.date || "";
+      snowEl.value = item.snow || "";
+      leftAngleEl.value = item.leftAngle || "";
+      rightAngleEl.value = item.rightAngle || "";
+
+      holes.forEach((h, i) => {
+        h.classList.toggle("active", !!item.holes?.[i]);
+      });
+
+      reference = item.reference || { left: null, right: null };
+      renderRefSlots();
+
+      disk = item.disk || { left: "", right: "" };
+      renderDiskUI();
+    });
+  });
 }
 
 function renderMini(holesState, ref) {
