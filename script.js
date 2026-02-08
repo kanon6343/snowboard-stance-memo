@@ -235,7 +235,7 @@ list.sort((a, b) => {
     default:
       return 0;
   }
-}/*);*/
+});
 
   historyDiv.innerHTML = "";
 
