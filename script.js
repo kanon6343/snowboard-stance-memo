@@ -349,33 +349,31 @@ list.sort((a, b) => {
 });
 
   // 読込
-  historyDiv.querySelectorAll("button[data-load-id]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = btn.dataset.loadId;
-      const item = loadList().find(x => x.id === id);
-      if (!item) return;
+historyDiv.querySelectorAll('button[data-load-id]').forEach(btn => {
+  btn.addEventListener("click", () => {
+    const id = btn.dataset.loadId;
+    const item = loadList().find(x => x.id === id);
+    if (!item) return;
 
-      boardEl.value = item.board || "";
-      snowEl.value = item.snow || "";
-      
-      commentEl.value = item.comment || "";
-      if (commentEl) commentEl.value = item.comment || "";
-      
-      leftAngleEl.value = item.leftAngle || "";
-      rightAngleEl.value = item.rightAngle || "";
+    boardEl && (boardEl.value = item.board || "");
+    snowEl  && (snowEl.value  = item.snow  || "");
+    commentEl && (commentEl.value = item.comment || "");
+    leftAngleEl && (leftAngleEl.value = item.leftAngle || "");
+    rightAngleEl && (rightAngleEl.value = item.rightAngle || "");
 
-      holes.forEach((h, i) => {
-        h.classList.toggle("active", !!item.holes?.[i]);
-      });
-
-      reference = item.reference || { left: null, right: null };
-      renderRefSlots();
-
-      disk = item.disk || { left: "", right: "" };
-      renderDiskUI();
-      showToast("読み込みました", "rode");
+    holes.forEach((h, i) => {
+      h.classList.toggle("active", !!item.holes?.[i]);
     });
+
+    reference = item.reference || { left: null, right: null };
+    renderRefSlots();
+
+    disk = item.disk || { left: "", right: "" };
+    renderDiskUI();
+
+    showToast("読み込みました", "rode");
   });
+});
 }
 
 function showToast(message, type = "info", time = 1600){
