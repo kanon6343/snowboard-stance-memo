@@ -261,7 +261,7 @@ function render() {
       item.favorite = !item.favorite;
       localStorage.setItem(KEY, JSON.stringify(list));
       render();
-      showToast(item.favorite ? ("お気に入り追加 ⭐","star") : ("お気に入り解除","info"));
+      showToast(item.favorite ? ("お気に入り追加 ⭐", "star") : ("お気に入り解除", "info"));
     });
   });
 
