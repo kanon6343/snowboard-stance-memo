@@ -132,6 +132,12 @@ function renderTabs() {
         return;
       }
 
+      sortModeEl?.addEventListener("change", () => {
+  sortMode = sortModeEl.value;
+  showToast(`ソート：${sortModeEl.options[sortModeEl.selectedIndex].text}`, "info");
+  render();
+});
+
       // それ以外は普通に絞り込み
       selectedBoard = board;
       render();
@@ -207,6 +213,27 @@ function render() {
   if (favSortOn) {
   list.sort((a, b) => Number(!!b.favorite) - Number(!!a.favorite));
   }
+
+  const cmpStr = (a, b) => String(a || "").localeCompare(String(b || ""), "ja");
+
+// メインソート
+switch (sortMode) {
+  case "savedAsc":
+    list.sort((a, b) => String(a.dateTime||"").localeCompare(String(b.dateTime||"")));
+    break;
+
+  case "savedDesc":
+    list.sort((a, b) => String(b.dateTime||"").localeCompare(String(a.dateTime||"")));
+    break;
+
+  case "boardAsc":
+    list.sort((a, b) => cmpStr(a.board, b.board));
+    break;
+
+  case "snowAsc":
+    list.sort((a, b) => cmpStr(a.snow, b.snow));
+    break;
+}
 
   historyDiv.innerHTML = "";
 
