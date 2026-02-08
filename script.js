@@ -211,10 +211,10 @@ function render() {
   const all = loadList();
 
   const list =
-  (selectedBoard === "__ALL__")
-    ? all
-    : all.filter(x => (x.board || "").trim() === selectedBoard);
-
+  (selectedBoard === "__ALL__") ? all
+  : (selectedBoard === "__FAV__") ? all.filter(x => !!x.favorite)
+  : all.filter(x => (x.board || "").trim() === selectedBoard);
+  
   if (favSortOn) {
   list.sort((a, b) => Number(!!b.favorite) - Number(!!a.favorite));
   }
