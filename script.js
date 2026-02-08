@@ -11,8 +11,13 @@ const rightAngleEl = document.getElementById("right-angle");
 const saveBtn = document.getElementById("saveBtn");
 const clearBtn = document.getElementById("clearBtn"); // ← 追加
 const tabsDiv = document.getElementById("boardTabs");
-const sortModeEl = document.getElementById("sortMode");
 
+let selectedBoard = "__ALL__";
+
+let favSortOn = true;      // ★を上にするON/OFF（初期はONでもOFFでもOK）
+let sortMode = "savedDesc"; // メインソート（将来増やす）
+
+const sortModeEl = document.getElementById("sortMode");
 if (sortModeEl) {
   sortModeEl.value = sortMode; // ← 初期表示を合わせる
   sortModeEl.addEventListener("change", () => {
@@ -21,11 +26,6 @@ if (sortModeEl) {
     render();
   });
 }
-
-let selectedBoard = "__ALL__";
-
-let favSortOn = true;      // ★を上にするON/OFF（初期はONでもOFFでもOK）
-let sortMode = "savedDesc"; // メインソート（将来増やす）
 
 let reference = { left: null, right: null };
 
