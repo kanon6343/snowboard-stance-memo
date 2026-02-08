@@ -176,7 +176,6 @@ if (idx !== null && idx !== undefined) {
 }
 
 function render() {
-  function render() {
   const all = loadList();
 
   const list =
