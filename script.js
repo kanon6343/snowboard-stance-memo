@@ -210,6 +210,7 @@ if (idx !== null && idx !== undefined) {
 function render() {
   const all = loadList();
 
+  /*
   const list =
   (selectedBoard === "__ALL__")
     ? all
@@ -239,6 +240,36 @@ switch (sortMode) {
     list.sort((a, b) => cmpStr(a.snow, b.snow));
     break;
 }
+*/
+
+  // 文字比較（空は最後）
+const cmpStr = (a, b) =>
+  String(a || "").localeCompare(String(b || ""), "ja");
+
+const getTime = (x) => String(x?.dateTime || "");
+
+// ★ + メインソート を合成
+list.sort((a, b) => {
+  // 1) ★を上に（ONの時だけ）
+  if (favSortOn) {
+    const favDiff = Number(!!b.favorite) - Number(!!a.favorite);
+    if (favDiff !== 0) return favDiff;
+  }
+
+  // 2) メインソート
+  switch (sortMode) {
+    case "savedAsc":
+      return getTime(a).localeCompare(getTime(b));
+    case "savedDesc":
+      return getTime(b).localeCompare(getTime(a));
+    case "boardAsc":
+      return cmpStr(a.board, b.board);
+    case "snowAsc":
+      return cmpStr(a.snow, b.snow);
+    default:
+      return 0;
+  }
+});
 
   historyDiv.innerHTML = "";
 
