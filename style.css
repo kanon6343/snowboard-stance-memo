@@ -163,19 +163,25 @@ h1{
    Reference (help + tap slots)
    兄弟構造前提：ref-lineはabsolute禁止
 ========================= */
-.ref-help{
+/* 追加：重ねるための箱 */
+.ref-wrap{
   position: relative;
   width: 256px;
   height: 26px;
-  line-height: 26px;
   margin: 4px auto 0;
+}
 
+/* 表示側 */
+.ref-help{
+  position: absolute;
+  inset: 0;
   text-align: center;
   font-size: 11px;
   color: #aaa;
   opacity: 0.7;
+  line-height: 26px;
 
-  /* help文字はクリック邪魔しない */
+  /* 文字はクリック邪魔しない */
   pointer-events: none;
 }
 
@@ -190,35 +196,30 @@ h1{
   font-weight: 900;
   color: var(--red);
 
-  /* 太く見せる（必要なら消してOK） */
   text-shadow:
     1px 0 currentColor,
    -1px 0 currentColor,
     0 1px currentColor,
     0 -1px currentColor;
-
-  pointer-events: none;
 }
 
-/* タップ判定（オレンジ枠＝デバッグ） */
+/* タップ判定（×と同じ場所に重なる） */
 .ref-line{
-  position: relative;   /* ← absoluteやめる */
-  width: 256px;
-  height: 26px;         /* ← helpと同じ高さ */
-  margin: 0 auto;
-
+  position: absolute;
+  inset: 0;
   display: flex;
   justify-content: center;
   gap: 10px;
-
   z-index: 2;
+
+  /* 判定は生かす */
+  pointer-events: auto;
 }
 
 .ref-slot{
   width: 40px;
   height: 26px;
 }
-
 /* =========================
    Disk UI
 ========================= */
