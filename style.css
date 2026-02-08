@@ -413,11 +413,11 @@ h1{
    DEBUG MODE（位置確認用）
    使うときだけON
 ========================= */
-
-.holes     { outline: 2px dashed purple; }  /* 穴エリア全体 */
-.row       { outline: 1px dashed blue; }    /* 穴の列 */
-.ref-help  { outline: 2px solid red; }      /* ×表示エリア */
-.ref-line  { outline: 2px solid orange; }   /* タップ判定エリア */
+/*
+.holes     { outline: 2px dashed purple; }  /* 穴エリア全体 *//*
+.row       { outline: 1px dashed blue; }    /* 穴の列 *//*
+.ref-help  { outline: 2px solid red; }      /* ×表示エリア *//*
+.ref-line  { outline: 2px solid orange; }   /* タップ判定エリア *//*
 .ref-slot  { background: rgba(255,165,0,0.15); } /* 各スロット */
 
 /* ==== ref 判定帯を強制で26pxに固定（最終上書き用） ==== *//*
