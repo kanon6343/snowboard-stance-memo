@@ -570,3 +570,14 @@ function formatDateJP(iso){
 }
 
 render();
+
+// ===== dev専用：localStorage リセット =====
+if (IS_DEV) {
+  window.resetDevStorage = () => {
+    Object.keys(localStorage)
+      .filter(k => k.startsWith("dev:"))
+      .forEach(k => localStorage.removeItem(k));
+
+    alert("dev localStorage をリセットしたよ！");
+  };
+}
