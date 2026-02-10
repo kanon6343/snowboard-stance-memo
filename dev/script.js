@@ -510,8 +510,19 @@ function exportBackup() {
   const json = JSON.stringify(payload, null, 2);
   const blob = new Blob([json], { type: "application/json" });
 
-  const date = new Date().toISOString().slice(0, 10);
-  const filename = `snowboard-stance-memo_${IS_DEV ? "dev" : "prod"}_${date}.json`;
+  const now = new Date();
+
+// 例: 2026-02-10_18-42-05
+  const stamp =
+  now.getFullYear() + "-" +
+  String(now.getMonth() + 1).padStart(2, "0") + "-" +
+  String(now.getDate()).padStart(2, "0") + "_" +
+  String(now.getHours()).padStart(2, "0") + "-" +
+  String(now.getMinutes()).padStart(2, "0") + "-" +
+  String(now.getSeconds()).padStart(2, "0");
+
+  const filename =
+  `snowboard-stance-memo_${IS_DEV ? "dev" : "prod"}_${stamp}.json`;
 
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
