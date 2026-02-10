@@ -477,7 +477,7 @@ h1{
 
 #toast{
   position: fixed;
-  top: calc(env(safe-area-inset-top, 0px) + 64px);
+  top: calc(env(safe-area-inset-top, 0px) + 64px); /* ←ここを増やすと下がる */
   left: 50%;
   transform: translateX(-50%) translateY(-12px);
 
@@ -497,26 +497,16 @@ h1{
   text-align: center;
 }
 
-  /* ちょいリッチ（読みやすさUP） */
-  box-shadow: 0 10px 24px rgba(0,0,0,0.18);
-  max-width: min(92vw, 520px);
-  text-align: center;
-}
-
-/* 表示 */
 #toast.show{
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
 
-/* 色バリエーション */
 #toast.success { background: var(--green); }
 #toast.error   { background: var(--red); }
 #toast.star    { background: var(--star); color:#333; }
 #toast.info    { background: #555; }
-#toast.rode    { background: var(--green); }/* =========================
-   Toast（上に表示 / 邪魔になりにくい）
-========================= */
+#toast.rode    { background: var(--green); }
 
 .tabs-bar{
   display: flex;
