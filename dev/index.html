@@ -42,7 +42,6 @@
     <button type="button" data-stance="forward">前振り</button>
     <button type="button" data-stance="back">後振り</button>
   </div>
-</label>
     
     <div class="side-row">
   <div class="side-title">左</div>
@@ -130,24 +129,24 @@
 <div class="tabs-bar">
   <div class="tabs-stack">
     <div id="boardTabs" class="tabs"></div>
-   <div class="stance-row">
-  <div class="stance-tabs" id="stanceTabs">
-    <!-- 🦆 △ ▽ ー -->
+
+    <div class="stance-row">
+      <div class="stance-tabs" id="stanceTabs">
+        <!-- 🦆 △ ▽ ー -->
+      </div>
+
+      <div class="angle-filter" aria-label="角度検索">
+        <input id="angleLeft" class="angle-in" type="number" placeholder="L">
+        <input id="angleRight" class="angle-in" type="number" placeholder="R">
+
+        <span class="angle-pm">±</span>
+        <input id="angleTol" class="angle-tol" type="number" value="2" min="0">
+
+        <button id="angleClear" class="angle-clear" type="button">×</button>
+      </div>
+    </div>
   </div>
 
-  <!-- 角度検索 -->
-  <div class="angle-filter" aria-label="角度検索">
-    <input id="angleLeft"  class="angle-in" type="number" placeholder="L">
-    <input id="angleRight" class="angle-in" type="number" placeholder="R">
-
-    <span class="angle-pm">±</span>
-    <input id="angleTol"   class="angle-tol" type="number" value="2" min="0">
-
-    <button id="angleClear" class="angle-clear" type="button">×</button>
-  </div>
-</div>
-
-  
   <select id="sortMode" class="sort-select">
     <option value="savedDesc">保存日↓</option>
     <option value="savedAsc">保存日↑</option>
@@ -155,8 +154,9 @@
     <option value="snowAsc">雪質</option>
   </select>
 </div>
-  
+
 <div id="history"></div>
+
   
 <!-- ===== dev専用フッター（JSで dev のときだけ表示する） ===== -->
 <div id="devFooter" class="dev-footer" hidden>
