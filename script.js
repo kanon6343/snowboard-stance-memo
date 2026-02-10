@@ -198,38 +198,49 @@ function renderRefSlots() {
   document.querySelectorAll(".ref-line").forEach(line => {
     const side = line.dataset.side;
 
+    // スロット生成
     line.innerHTML = Array.from({ length: 6 }, (_, i) =>
       `<div class="ref-slot" data-index="${i}" data-side="${side}"></div>`
     ).join("");
 
-    // 保存済みを反映
+    // ===== 保存済みを反映 =====
     const idx = reference?.[side];
 
-if (idx !== null && idx !== undefined) {
-  const slot = line.querySelector(`.ref-slot[data-index="${idx}"]`);
-  if (slot) {
-    slot.classList.add("active");
-    setHelpX(side, idx); // ← 実測に変更
-  }
-} else {
-  setHelpX(side, null); // ← 消すときも実測版
-}
+    if (idx !== null && idx !== undefined) {
+      const slot = line.querySelector(`.ref-slot[data-index="${idx}"]`);
+      if (slot) {
+        slot.classList.add("active");
+        setHelpX(side, idx);
+      }
+    } else {
+      setHelpX(side, null);
+    }
 
-    // クリック
+    // ===== クリック処理（★ここが進化ポイント） =====
     line.querySelectorAll(".ref-slot").forEach(slot => {
       slot.addEventListener("click", () => {
+        const index = Number(slot.dataset.index);
+
+        // 同じ場所を押したら解除
+        if (reference[side] === index) {
+          reference[side] = null;
+
+          line.querySelectorAll(".ref-slot").forEach(s => s.classList.remove("active"));
+          setHelpX(side, null);
+          return;
+        }
+
+        // 通常選択
+        reference[side] = index;
+
         line.querySelectorAll(".ref-slot").forEach(s => s.classList.remove("active"));
         slot.classList.add("active");
-
-        const index = Number(slot.dataset.index);
-        reference[side] = index;
 
         setHelpX(side, index);
       });
     });
   });
 }
-
 function render() {
   const all = loadList();
 
