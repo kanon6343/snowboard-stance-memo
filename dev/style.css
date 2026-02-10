@@ -479,7 +479,7 @@ h1{
   position: fixed;
 
   /* ここがA：上から出す（ノッチにも対応） */
-  top: calc(env(safe-area-inset-top, 0px) + 12px);
+  top: calc(env(safe-area-inset-top, 0px) + 128px);
   left: 50%;
   transform: translateX(-50%) translateY(-12px);
 
