@@ -641,7 +641,7 @@ function exportBackup() {
   showToast("バックアップを書き出しました", "success");
 }
 
-// ===== 右スライドメニュー（UIだけ）=====
+// ===== 右スライドメニュー（A+ 完全版）=====
 (function setupSlideMenu(){
   const btn = document.getElementById("menuBtn");
   const closeBtn = document.getElementById("menuCloseBtn");
@@ -649,19 +649,25 @@ function exportBackup() {
   const overlay = document.getElementById("menuOverlay");
   if (!btn || !panel || !overlay || !closeBtn) return;
 
-  const open = () => {
+  function open(){
     overlay.hidden = false;
     panel.classList.add("open");
     panel.setAttribute("aria-hidden", "false");
     btn.setAttribute("aria-expanded", "true");
-  };
+  }
 
+  function close(){
+    panel.classList.remove("open");
+    panel.setAttribute("aria-hidden", "true");
+    btn.setAttribute("aria-expanded", "false");
+    setTimeout(() => { overlay.hidden = true; }, 220);
+  }
+
+  // ===== export =====
   const exportBtn = document.getElementById("btnExport");
-exportBtn?.addEventListener("click", () => {
-  exportBackup();
-});
+  exportBtn?.addEventListener("click", exportBackup);
 
-    // ===== import UI wiring =====
+  // ===== import UI wiring (A+ 完全版) =====
   const fileEl = document.getElementById("importFile");
   const previewEl = document.getElementById("importPreview");
   const errEl = document.getElementById("importError");
@@ -687,8 +693,27 @@ exportBtn?.addEventListener("click", () => {
     if (btnReplace) btnReplace.disabled = !on;
   };
 
-  setImportButtonsEnabled(false);
-  setError("");
+  function resetImportUI(){
+    pendingImport = null;
+    setError("");
+    setImportButtonsEnabled(false);
+    if (fileEl) fileEl.value = ""; // ★ファイル選択クリア
+    setPreview(`<div class="import-muted">※ ここにプレビューが出るよ</div>`);
+  }
+
+  resetImportUI();
+
+  const fmtDateTimeJP = (iso) => {
+    if (!iso) return "不明";
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return "不明";
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    const day = String(d.getDate()).padStart(2,"0");
+    const hh = String(d.getHours()).padStart(2,"0");
+    const mm = String(d.getMinutes()).padStart(2,"0");
+    return `${y}-${m}-${day} ${hh}:${mm}`;
+  };
 
   fileEl?.addEventListener("change", async () => {
     setImportButtonsEnabled(false);
@@ -697,7 +722,7 @@ exportBtn?.addEventListener("click", () => {
 
     const f = fileEl.files?.[0];
     if (!f) {
-      setPreview(`<div class="import-muted">※ ここにプレビューが出るよ</div>`);
+      resetImportUI();
       return;
     }
 
@@ -720,18 +745,26 @@ exportBtn?.addEventListener("click", () => {
     const isOurApp = parsed.meta.app === "snowboard-stance-memo" || parsed.meta.app === "";
     if (!isOurApp) {
       setError("このファイルは別アプリの可能性があるよ（復元はおすすめしない）");
+    } else {
+      setError("");
     }
 
     const sum = summarizeItems(parsed.items);
+
     const boardsLine = sum.topBoards.length
       ? sum.topBoards.map(([b,c]) => `${escapeHtml(b)}（${c}）`).join(" / ")
       : "なし";
+
+    const envLabel = parsed.meta.env ? String(parsed.meta.env) : "不明";
+    const exportedAtLabel = fmtDateTimeJP(parsed.meta.exportedAt);
 
     setPreview(`
       <div><b>ファイル：</b>${escapeHtml(f.name)}</div>
       <div><b>件数：</b>${sum.count}</div>
       <div><b>期間：</b>${escapeHtml(sum.range)}</div>
       <div><b>板（上位）：</b>${boardsLine}</div>
+      <div><b>環境：</b>${escapeHtml(envLabel)}</div>
+      <div><b>作成：</b>${escapeHtml(exportedAtLabel)}</div>
       <div><b>形式：</b>app=${escapeHtml(parsed.meta.app || "不明")} / v=${escapeHtml(String(parsed.meta.dataVersion || "不明"))}</div>
     `);
 
@@ -766,35 +799,40 @@ exportBtn?.addEventListener("click", () => {
     const next = mergeItems(cur, pendingImport.items);
 
     localStorage.setItem(KEY, JSON.stringify(next));
+
     render();
-    showToast(`追加で復元しました（+${pendingImport.items.length}件）`, "success");
+    showToast(`追加で復元（+${pendingImport.items.length}件 / 合計${next.length}件）`, "success");
+
+    resetImportUI();
+    close();
   });
 
   btnReplace?.addEventListener("click", () => {
     if (!pendingImport) return;
 
-    const ok = confirm("⚠️ 上書きで復元するよ？（今のデータは消える）");
-    if (!ok) return;
+    const ok1 = confirm("⚠️ 上書きで復元するよ？（今のデータは消える）");
+    if (!ok1) return;
+
+    const ok2 = prompt("本当に上書きするなら「OK」と入力してね");
+    if (ok2 !== "OK") {
+      showToast("上書きをキャンセルしました", "info");
+      return;
+    }
 
     localStorage.setItem(KEY, JSON.stringify(pendingImport.items));
 
-    // UIも復元（上書き時のみ）
     if (pendingImport.ui && typeof pendingImport.ui === "object") {
       localStorage.setItem(UI_KEY, JSON.stringify(pendingImport.ui));
     }
 
     showToast("上書きで復元しました", "success");
+
+    resetImportUI();
+    close();
     location.reload();
   });
 
-  const close = () => {
-    panel.classList.remove("open");
-    panel.setAttribute("aria-hidden", "true");
-    btn.setAttribute("aria-expanded", "false");
-    // アニメ終わってから隠す
-    setTimeout(() => { overlay.hidden = true; }, 220);
-  };
-
+  // ===== open/close wiring =====
   btn.addEventListener("click", () => {
     const isOpen = panel.classList.contains("open");
     isOpen ? close() : open();
@@ -803,11 +841,11 @@ exportBtn?.addEventListener("click", () => {
   closeBtn.addEventListener("click", close);
   overlay.addEventListener("click", close);
 
-  // Escで閉じる（PC用）
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && panel.classList.contains("open")) close();
   });
 })();
+
 
 function showToast(message, type = "info", time = 1600){
   const el = document.getElementById("toast");
