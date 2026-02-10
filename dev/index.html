@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ビス位置メモ</title>
+  <link rel="stylesheet" href="style.css?v=30">
+</head>
+<body>
+
+<h1>ビス位置メモ</h1>
+
+<section class="card">
+  <h2>セッティング情報</h2>
+
+  <div class="meta">
+    <label>板名：<input id="board" type="text" placeholder="例：TNT"></label>
+
+    <label>雪質：
+      <select id="snow">
+        <option value="">選択</option>
+        <option value="パウダー">パウダー</option>
+        <option value="圧雪">圧雪</option>
+        <option value="春雪">春雪</option>
+        <option value="アイス">アイス</option>
+      </select>
+    </label>
+    
+    <label>コメント：
+  <textarea id="comment" rows="2" placeholder="例：カービング気持ちいい / 右足が疲れる など"></textarea>
+    </label>
+
+    <div class="stance-quick">
+    <button type="button" data-stance="duck">ダック</button>
+    <button type="button" data-stance="forward">前振り</button>
+    <button type="button" data-stance="back">後振り</button>
+  </div>
+</label>
+    
+    <div class="side-row">
+  <div class="side-title">左</div>
+
+  <label class="angle">
+    角度
+    <input id="left-angle" type="number" placeholder="+15">
+  </label>
+
+  <div class="disk">
+    <div class="disk-label">ディスク</div>
+    <div class="disk-group" data-side="left">
+      <button type="button" class="chip" data-value="前">前</button>
+      <button type="button" class="chip" data-value="中">中</button>
+      <button type="button" class="chip" data-value="後">後</button>
+    </div>
+  </div>
+</div>
+
+<div class="side-row">
+  <div class="side-title">右</div>
+
+  <label class="angle">
+    角度
+    <input id="right-angle" type="number" placeholder="-9">
+  </label>
+
+  <div class="disk">
+    <div class="disk-label">ディスク</div>
+    <div class="disk-group" data-side="right">
+      <button type="button" class="chip" data-value="前">前</button>
+      <button type="button" class="chip" data-value="中">中</button>
+      <button type="button" class="chip" data-value="後">後</button>
+    </div>
+  </div>
+</div>
+  </div>
+
+  <button id="saveBtn" type="button">保存</button>
+  <button id="clearBtn" type="button">クリア</button>
+</section>
+
+<div class="bindings">
+  <section class="card">
+    <h2>左</h2>
+    <div class="holes" data-side="left">
+      <div class="row">
+        <div class="hole"></div><div class="hole"></div><div class="hole"></div>
+        <div class="hole"></div><div class="hole"></div><div class="hole"></div>
+      </div>
+
+    <div class="ref-wrap" data-side="left">
+     <div class="ref-help" data-side="left">タップして推奨位置追加</div>
+       <div class="ref-line" data-side="left"></div>
+     </div>
+      
+      <div class="row">
+        <div class="hole"></div><div class="hole"></div><div class="hole"></div>
+        <div class="hole"></div><div class="hole"></div><div class="hole"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>右</h2>
+    <div class="holes" data-side="right">
+      <div class="row">
+        <div class="hole"></div><div class="hole"></div><div class="hole"></div>
+        <div class="hole"></div><div class="hole"></div><div class="hole"></div>
+      </div>
+
+    <div class="ref-wrap" data-side="right">
+     <div class="ref-help" data-side="right">タップして推奨位置追加</div>
+       <div class="ref-line" data-side="right"></div>
+     </div>
+      
+      <div class="row">
+        <div class="hole"></div><div class="hole"></div><div class="hole"></div>
+        <div class="hole"></div><div class="hole"></div><div class="hole"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="tabs-bar">
+  <div id="boardTabs" class="tabs"></div>
+
+  <select id="sortMode" class="sort-select">
+    <option value="savedDesc">保存日↓</option>
+    <option value="savedAsc">保存日↑</option>
+    <option value="boardAsc">板名</option>
+    <option value="snowAsc">雪質</option>
+  </select>
+</div>
+  
+<div id="history"></div>
+
+<script src="script.js?v=30"></script>
+
+<div id="toast"></div>
+  
+</body>
+</html>
