@@ -487,6 +487,43 @@ historyDiv.querySelectorAll('button[data-load-id]').forEach(btn => {
 });
 }
 
+// ===== バックアップ（エクスポート）=====
+function exportBackup() {
+  // 履歴（メイン）
+  const items = loadList();
+
+  // UI状態（タブ/ソート等）も一緒に入れると復元がラク
+  let ui = {};
+  try { ui = JSON.parse(localStorage.getItem(UI_KEY) || "{}"); } catch {}
+
+  const payload = {
+    app: "snowboard-stance-memo",
+    dataVersion: 1,
+    exportedAt: new Date().toISOString(),
+    env: IS_DEV ? "dev" : "prod",
+    items,
+    ui,
+  };
+
+  const json = JSON.stringify(payload, null, 2);
+  const blob = new Blob([json], { type: "application/json" });
+
+  const date = new Date().toISOString().slice(0, 10);
+  const filename = `snowboard-stance-memo_${IS_DEV ? "dev" : "prod"}_${date}.json`;
+
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+
+  // iOS/Android対策で DOM に挿してクリック
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  showToast("バックアップを書き出しました", "success");
+}
+
 // ===== 右スライドメニュー（UIだけ）=====
 (function setupSlideMenu(){
   const btn = document.getElementById("menuBtn");
@@ -501,6 +538,11 @@ historyDiv.querySelectorAll('button[data-load-id]').forEach(btn => {
     panel.setAttribute("aria-hidden", "false");
     btn.setAttribute("aria-expanded", "true");
   };
+
+  const exportBtn = document.getElementById("btnExport");
+exportBtn?.addEventListener("click", () => {
+  exportBackup();
+});
 
   const close = () => {
     panel.classList.remove("open");
