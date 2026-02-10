@@ -788,3 +788,38 @@ h1 { color:#e53935; }
   color: #b71c1c;
   font-size: 12px;
 }
+
+.tabs-bar{
+  display: flex;
+  align-items: flex-start; /* ←縦に2段あるから上揃え */
+  gap: 8px;
+}
+
+.tabs-stack{
+  flex: 1;
+  min-width: 0;
+}
+
+.stance-tabs{
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 0 0 12px;
+}
+
+/* スタンス用タブも boardタブと同じ見た目で統一 */
+.stance-tab{
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid #999;
+  background: #fff;
+  white-space: nowrap;
+  cursor: pointer;
+  font-size: 16px; /* 絵文字見やすく */
+}
+
+.stance-tab.active{
+  background: var(--blue);
+  border-color: var(--blue-border);
+  color: #fff;
+}
