@@ -8,7 +8,14 @@
 </head>
 <body>
 
-<h1>開発用</h1>
+<header class="topbar">
+  <h1 class="title">開発用</h1>
+
+  <button id="menuBtn" class="menu-btn" type="button" aria-label="メニュー" aria-expanded="false">
+    ☰
+  </button>
+</header>
+
 
 <section class="card">
   <h2>セッティング情報</h2>
@@ -148,6 +155,30 @@
 </div>
   
 <script src="script.js?v=30"></script>
+
+<!-- 右から出るメニュー -->
+<div id="menuOverlay" class="menu-overlay" hidden></div>
+
+<aside id="menuPanel" class="menu-panel" aria-hidden="true">
+  <div class="menu-head">
+    <div class="menu-title">⚙ 設定 / データ管理</div>
+    <button id="menuCloseBtn" class="menu-close" type="button" aria-label="閉じる">×</button>
+  </div>
+
+  <div class="menu-body">
+    <section class="menu-card">
+      <h3>📦 データ管理</h3>
+      <button type="button" class="menu-action" disabled>📤 バックアップを書き出す（後で実装）</button>
+      <button type="button" class="menu-action" disabled>📥 バックアップから復元（後で実装）</button>
+      <p class="menu-note">※いまはUIだけ。次で機能をつなぐよ。</p>
+    </section>
+
+    <section class="menu-card">
+      <h3>🎛 表示・操作</h3>
+      <button type="button" class="menu-action" disabled>（今後追加）</button>
+    </section>
+  </div>
+</aside>
 
 <div id="toast"></div>
   
