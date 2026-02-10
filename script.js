@@ -436,27 +436,36 @@ function miniSide(label, sideArr, refIndex) {
   const top = sideArr.slice(0, 6);
   const bottom = sideArr.slice(6, 12);
 
+  // ← ここがポイント（有効値だけ許可）
+  const idx =
+    (refIndex !== null && refIndex !== undefined && !isNaN(Number(refIndex)))
+      ? Number(refIndex)
+      : -1;
+
   return `
     <div class="mini-side">
       <div class="mini-label">${label}</div>
 
       <div class="mini-row">
-        ${top.map(on => `<span class="mini-hole ${on ? "active" : ""}"></span>`).join("")}
+        ${top.map(on =>
+          `<span class="mini-hole ${on ? "active" : ""}"></span>`
+        ).join("")}
       </div>
 
-       <div class="mini-ref">
+      <div class="mini-ref">
         ${Array.from({ length: 6 }, (_, i) =>
-          `<span class="mini-x ${i === Number(refIndex) ? "active" : ""}">×</span>`
+          `<span class="mini-x ${i === idx ? "active" : ""}">×</span>`
         ).join("")}
       </div>
 
       <div class="mini-row">
-        ${bottom.map(on => `<span class="mini-hole ${on ? "active" : ""}"></span>`).join("")}
+        ${bottom.map(on =>
+          `<span class="mini-hole ${on ? "active" : ""}"></span>`
+        ).join("")}
       </div>
     </div>
   `;
 }
-
 function escapeHtml(str) {
   return String(str)
     .replaceAll("&", "&amp;")
