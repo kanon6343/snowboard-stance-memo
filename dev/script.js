@@ -571,11 +571,65 @@ function formatDateJP(iso){
 
 render();
 
-const IS_DEV =
-  location.hostname === "localhost" ||
-  location.hostname === "127.0.0.1" ||
-  location.pathname.includes("/dev/");
+// ===== dev footer（devのときだけ表示）=====
+(function setupDevFooter(){
+  const footer = document.getElementById("devFooter");
+  if (!footer) return;
 
-const KEY_PREFIX = IS_DEV ? "dev:" : "prod:";
-const KEY    = `${KEY_PREFIX}snowboard-history-v1`;
-const UI_KEY = `${KEY_PREFIX}snowboard-ui-v1`;
+  if (!IS_DEV) {
+    footer.hidden = true;
+    return;
+  }
+
+  footer.hidden = false;
+
+  const btnReset = document.getElementById("btnDevReset");
+  const btnCopy  = document.getElementById("btnDevCopyProd");
+
+  // devデータ削除
+  btnReset?.addEventListener("click", () => {
+    const ok = confirm("devのデータ（履歴・UI）を全部消すよ？");
+    if (!ok) return;
+
+    Object.keys(localStorage)
+      .filter(k => k.startsWith("dev:"))
+      .forEach(k => localStorage.removeItem(k));
+
+    showToast("devデータを削除しました", "error");
+    location.reload();
+  });
+
+  // 本番データ取り込み（?copyProd の代わり）
+  btnCopy?.addEventListener("click", () => {
+    const ok = confirm("本番データを dev にコピーするよ？（dev側は上書きされます）");
+    if (!ok) return;
+
+    // 本番キー候補：
+    // 1) 旧方式（prefixなし） ← いま本番で使ってた可能性が高い
+    // 2) 新方式（prod: prefix）
+    const PROD_KEYS = ["snowboard-history-v1", "prod:snowboard-history-v1"];
+    const PROD_UI_KEYS = ["snowboard-ui-v1", "prod:snowboard-ui-v1"];
+
+    const findFirst = (keys) => {
+      for (const k of keys) {
+        const v = localStorage.getItem(k);
+        if (v !== null) return { key: k, value: v };
+      }
+      return null;
+    };
+
+    const srcData = findFirst(PROD_KEYS);
+    const srcUI   = findFirst(PROD_UI_KEYS);
+
+    if (!srcData && !srcUI) {
+      alert("本番データが見つからなかったよ（まだ保存したことないかも）");
+      return;
+    }
+
+    if (srcData) localStorage.setItem(KEY, srcData.value);
+    if (srcUI)   localStorage.setItem(UI_KEY, srcUI.value);
+
+    showToast("本番データを取り込みました", "success");
+    location.reload();
+  });
+})();
