@@ -344,8 +344,8 @@ h1{
   border: 1px solid #bbb;
   background: #fff;
   align-self: start;
-  justify-self: end
   margin-top: 6px; /* 好みで微調整 */
+  .angle-filter{ justify-self: end; }
 }
 
 /* スマホだけ：角度フィルターが下段になっても左寄せにできる */
