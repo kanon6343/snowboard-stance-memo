@@ -551,6 +551,15 @@ h1{
   transform:scale(0.95);
 }
 
+.stance-btn{
+  border: 1px solid #bbb;
+  background: #fff;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
 .stance-btn.active{
   background: var(--orange);
   border-color: var(--blue-border);
