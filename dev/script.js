@@ -1,6 +1,15 @@
-const IS_DEV = location.pathname.includes("/dev/");
-const KEY = IS_DEV ? "snowboard-history-dev-v1" : "snowboard-history-v1";
-const UI_KEY = IS_DEV ? "snowboard-ui-dev-v1" : "snowboard-ui-v1";
+// ===== env 判定（/dev/ or localhost を dev 扱い）=====
+const IS_DEV =
+  location.hostname === "localhost" ||
+  location.hostname === "127.0.0.1" ||
+  location.pathname.includes("/dev/");
+
+// ===== Key prefix（環境で分ける）=====
+const KEY_PREFIX = IS_DEV ? "dev:" : "prod:";
+
+// 既存キー名は維持しつつ prefix だけ付ける
+const KEY    = `${KEY_PREFIX}snowboard-history-v1`;
+const UI_KEY = `${KEY_PREFIX}snowboard-ui-v1`;
 
 const holes = [...document.querySelectorAll(".hole")];
 const historyDiv = document.getElementById("history");
