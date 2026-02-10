@@ -752,3 +752,55 @@ button{
   opacity: 0.7;
   text-align: center;
 }
+
+/* スタンス + 角度検索 横並び */
+.stance-row{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 12px;
+}
+
+/* スタンスは横スクロールOKのまま */
+.stance-tabs{
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+/* 角度検索は控えめ */
+.angle-filter{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0; /* ← ここ重要：潰れない */
+}
+
+.angle-in,
+.angle-tol{
+  width: 46px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  border: 1px solid #bbb;
+  background: #fff;
+  font-size: 12px;
+  text-align: center;
+}
+
+.angle-tol{ width: 38px; }
+
+.angle-pm{
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.angle-clear{
+  width: 28px;
+  height: 26px;
+  border-radius: 999px;
+  border: 1px solid #bbb;
+  background: #fff;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
