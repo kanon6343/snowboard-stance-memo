@@ -260,25 +260,31 @@ h1{
 }
 
 /* =========================
-   Tabs（板タブ + スタンス絞り込み）
+   Tabs / Filters / Sort
 ========================= */
+
+/* 全体は縦積みで余白を統一 */
 .tabs-bar{
   display: flex;
-  align-items: flex-start; /* 2段なので上揃え */
-  gap: 8px;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
 }
 
 .tabs-stack{
-  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   min-width: 0;
 }
 
+/* 板タブ */
 .tabs{
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  padding: 8px 0 12px;
-  flex: 1;
+  padding: 6px 0 0;
+  margin: 0;
 }
 
 .tab{
@@ -307,14 +313,25 @@ h1{
   color: #fff;
 }
 
-/* スタンスタブ（小さめ） */
-.stance-tabs{
+/* スタンス(絵文字) + 角度検索 */
+.stance-row{
   display: flex;
+  align-items: center;
   gap: 8px;
-  overflow-x: auto;
-  padding: 0 0 12px;
+  min-width: 0;
 }
 
+.stance-tabs{
+  display:flex;
+  gap: 8px;
+  overflow-x: auto;
+  min-width: 0;
+  flex: 1;
+  padding: 0;
+  margin: 0;
+}
+
+/* スタンスタブ（小さめ） */
 .stance-tab{
   padding: 6px 10px;
   border-radius: 999px;
@@ -335,11 +352,80 @@ h1{
   transform: scale(1.05);
 }
 
-/* ソート */
-.sort-select{
-  font-size: 12px;
+/* 角度検索 */
+.angle-filter{
+  display:flex;
+  align-items:center;
+  gap: 6px;
+  flex: 0 0 auto;
+
   padding: 6px 8px;
-  border-radius: 10px;
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+/* 2桁想定 */
+.angle-in,
+.angle-tol{
+  width: 42px;
+  text-align: center;
+  font-size: 12px;
+  padding: 6px 6px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background: #fff;
+  box-sizing: border-box;
+
+  outline: none;
+  box-shadow: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.angle-in:focus,
+.angle-tol:focus{
+  border-color: #bbb;
+  outline: none;
+  box-shadow: none;
+}
+
+.angle-pm{
+  font-size: 12px;
+  color: #777;
+}
+
+.angle-clear{
+  width: 32px;
+  height: 30px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+
+  outline: none;
+  box-shadow: none;
+}
+
+/* スマホだけ角度検索を1段下げ（被り回避） */
+@media (max-width: 520px){
+  .stance-row{
+    flex-wrap: wrap;
+  }
+  .angle-filter{
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: 6px;
+  }
+}
+
+/* ソート（板タブと同じ“上の余白感”で並ぶように） */
+.sort-select{
+  width: 100%;
+  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: 14px;
   border: 1px solid #bbb;
   background: #fff;
 }
@@ -387,6 +473,8 @@ h1{
   margin: 0 auto 0;
 }
 
+/* NOTE: HTML側では ref-wrap の中に row が無いので、
+   ここは残しても害なし（将来row入れた時用） */
 .ref-wrap > .row{
   margin-top: 26px;
 }
@@ -751,219 +839,4 @@ button{
   font-size: 11px;
   opacity: 0.7;
   text-align: center;
-}
-
-/* スタンス + 角度検索 横並び */
-.stance-row{
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding-bottom: 12px;
-  flex-wrap: wrap;
-}
-
-/* スタンスは横スクロールOKのまま */
-.stance-tabs{
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-}
-
-/* 角度検索は控えめ */
-.angle-filter{
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0; /* ← ここ重要：潰れない */
-  margin-left: auto; /* 2段目になった時も右寄せ */
-}
-
-.angle-in,
-.angle-tol{
-  width: 46px;
-  padding: 5px 8px;
-  border-radius: 999px;
-  border: 1px solid #bbb;
-  background: #fff;
-  font-size: 12px;
-  text-align: center;
-}
-
-.angle-tol{ width: 38px; }
-
-.angle-pm{
-  font-size: 12px;
-  opacity: 0.6;
-}
-
-.angle-clear{
-  width: 28px;
-  height: 26px;
-  border-radius: 999px;
-  border: 1px solid #bbb;
-  background: #fff;
-  font-size: 16px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-/* =========================
-   Angle Filter（コンパクト化）
-========================= */
-.stance-row{
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: nowrap; /* まずは横1列を維持 */
-}
-
-.stance-tabs{
-  flex: 1;
-  min-width: 0;
-  overflow-x: auto; /* ここはスクロールできるように保険 */
-}
-
-.angle-filter{
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* 2桁ぶんだけ表示できればOKな幅 */
-.angle-filter .angle-in,
-.angle-filter .angle-tol{
-  width: 2.6em;           /* ←2桁+ちょい余白 */
-  padding: 6px 8px;
-  font-size: 12px;
-  text-align: center;
-}
-
-/* ± と × も小さめに */
-.angle-filter .angle-pm{
-  font-size: 12px;
-  opacity: 0.8;
-}
-
-.angle-filter .angle-clear{
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  border-radius: 10px;
-  font-size: 16px;
-  line-height: 1;
-}
-
-/* stance + angle の横並び */
-.stance-row{
-  display:flex;
-  align-items:center;
-  gap: 8px;
-}
-
-/* スタンスは横スクロールで潰れないように */
-.stance-tabs{
-  flex: 1;
-  min-width: 0;
-  overflow-x: auto;
-}
-
-/* 角度検索は自動幅 */
-.angle-filter{
-  flex: 0 0 auto;
-  display:flex;
-  align-items:center;
-  gap: 6px;
-}
-
-/* ===== スマホだけ角度検索を1段下げる ===== */
-@media (max-width: 520px){
-  .stance-row{
-    flex-wrap: wrap;
-  }
-  .angle-filter{
-    width: 100%;
-    justify-content: flex-end; /* 右寄せで綺麗 */
-    margin-top: 6px;
-  }
-}
-
-/* tabs + filters + sort を“同じルールの余白”にする */
-.tabs-bar{
-  display: grid;
-  gap: 8px;              /* ← 全部この余白で統一 */
-  margin-top: 12px;      /* ← 上のカードとの距離（好みで） */
-}
-
-.tabs-stack{
-  display: grid;
-  gap: 8px;              /* ← boardTabs / stance-row / sort を同じ間隔に */
-}
-
-/* board tabs の上下余白を安定させる（既存tabsのpaddingは消してOK） */
-.tabs{
-  padding: 0;            /* ← 既存の 8px 0 12px をやめる */
-  margin: 0;
-}
-
-/* stance-row 全体：左右端を揃える */
-.stance-row{
-  display:flex;
-  align-items:center;
-  gap: 8px;
-  padding: 0;        /* ← 余計な段差をなくす */
-  margin: 0;
-}
-
-/* stance-tabs は“中身が横スクロールする箱”として整える */
-.stance-tabs{
-  flex: 1;
-  min-width: 0;
-  padding: 0;        /* ← tabsと同じくpaddingを消す */
-  margin: 0;
-}
-
-/* angle-filter：高さ/角丸/余白を他と合わせる */
-.angle-filter{
-  display:flex;
-  align-items:center;
-  gap: 6px;
-
-  padding: 6px 8px;
-  border: 1px solid #bbb;
-  border-radius: 12px;
-  background: #fff;
-}
-
-/* 2桁想定で入力幅を固定（被りにくく＆統一感UP） */
-.angle-in{
-  width: 44px;
-  text-align: center;
-  font-size: 12px;
-  padding: 6px 6px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-}
-
-.angle-tol{
-  width: 44px;
-  text-align: center;
-  font-size: 12px;
-  padding: 6px 6px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-}
-
-.angle-pm{
-  font-size: 12px;
-  color: #666;
-}
-
-.angle-clear{
-  width: 34px;
-  height: 32px;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-  background: #fff;
-  cursor: pointer;
 }
