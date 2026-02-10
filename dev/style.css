@@ -345,14 +345,14 @@ h1{
   background: #fff;
   align-self: start;
   margin-top: 6px; /* 好みで微調整 */
-  .angle-filter{ justify-self: end; }
+  justify-self: end;
 }
 
 /* スマホだけ：角度フィルターが下段になっても左寄せにできる */
 @media (max-width: 400px){
   .angle-filter{ justify-self: start; } /* ←折り返した時だけ左寄せ */
   width: 6.5em;        /* ←細くする */
-    justify-self: end;   /* ←右に寄せたいなら追加（好み） */
+  .sort-select{ justify-self: start; }  /* ←右に寄せたいなら追加（好み） */
   /* .tabs-bar{ grid-template-columns: 1fr; grid-template-areas:
       "boards"
       "sort"
