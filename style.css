@@ -567,3 +567,9 @@ h1{
    
   transform: scale(0.95);
 }
+
+.stance-quick button.active{
+  background: var(--orange);
+  border-color: var(--orange-border);
+  color: #fff;
+}
