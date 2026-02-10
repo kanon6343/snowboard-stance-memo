@@ -337,6 +337,7 @@ h1{
 
 /* ソート：右上固定＆サイズ安定 */
 .sort-select{
+  width: 6.5em;   /* ←まずはこれ。6〜7emがちょうどいい */
   font-size: 12px;
   padding: 6px 8px;
   border-radius: 10px;
