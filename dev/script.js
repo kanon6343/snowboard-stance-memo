@@ -1,6 +1,6 @@
-const KEY = "snowboard-history-v1";
-
-const UI_KEY = "snowboard-ui-v1";
+const IS_DEV = location.pathname.includes("/dev/");
+const KEY = IS_DEV ? "snowboard-history-dev-v1" : "snowboard-history-v1";
+const UI_KEY = IS_DEV ? "snowboard-ui-dev-v1" : "snowboard-ui-v1";
 
 const holes = [...document.querySelectorAll(".hole")];
 const historyDiv = document.getElementById("history");
