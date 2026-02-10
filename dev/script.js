@@ -305,6 +305,7 @@ function renderRefSlots() {
     });
   });
 }
+
 function render() {
   const all = loadList();
 
@@ -485,6 +486,43 @@ historyDiv.querySelectorAll('button[data-load-id]').forEach(btn => {
   });
 });
 }
+
+// ===== 右スライドメニュー（UIだけ）=====
+(function setupSlideMenu(){
+  const btn = document.getElementById("menuBtn");
+  const closeBtn = document.getElementById("menuCloseBtn");
+  const panel = document.getElementById("menuPanel");
+  const overlay = document.getElementById("menuOverlay");
+  if (!btn || !panel || !overlay || !closeBtn) return;
+
+  const open = () => {
+    overlay.hidden = false;
+    panel.classList.add("open");
+    panel.setAttribute("aria-hidden", "false");
+    btn.setAttribute("aria-expanded", "true");
+  };
+
+  const close = () => {
+    panel.classList.remove("open");
+    panel.setAttribute("aria-hidden", "true");
+    btn.setAttribute("aria-expanded", "false");
+    // アニメ終わってから隠す
+    setTimeout(() => { overlay.hidden = true; }, 220);
+  };
+
+  btn.addEventListener("click", () => {
+    const isOpen = panel.classList.contains("open");
+    isOpen ? close() : open();
+  });
+
+  closeBtn.addEventListener("click", close);
+  overlay.addEventListener("click", close);
+
+  // Escで閉じる（PC用）
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && panel.classList.contains("open")) close();
+  });
+})();
 
 function showToast(message, type = "info", time = 1600){
   const el = document.getElementById("toast");
