@@ -1,6 +1,5 @@
 /* =========================
    Theme / Variables
-   （カラーコードで合わせたいならここだけ変えればOK）
 ========================= */
 :root{
   --blue: #0077b6;        /* タブ選択 */
@@ -33,16 +32,6 @@ h1{
 /* =========================
    Layout / Card
 ========================= */
-.bindings{
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-@media (max-width: 480px){
-  .bindings{ grid-template-columns: 1fr; }
-}
-
 .card{
   background: var(--card);
   padding: 8px;
@@ -54,8 +43,179 @@ h1{
   margin: 0 0 10px 0;
 }
 
+.bindings{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 480px){
+  .bindings{ grid-template-columns: 1fr; }
+}
+
 /* =========================
-   Meta / Buttons
+   Topbar + Slide Menu
+========================= */
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.title{
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+/* ☰ボタン */
+.menu-btn{
+  flex: 0 0 auto;
+  font-size: 22px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid #bbb;
+  background: #fff;
+  cursor: pointer;
+  line-height: 1;
+}
+
+/* 右パネル表示時の背景暗転 */
+.menu-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 900;
+}
+
+/* 右から出るパネル */
+.menu-panel{
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100dvh;
+  width: min(86vw, 360px);
+
+  background: #fff;
+  box-shadow: -12px 0 28px rgba(0,0,0,0.18);
+  z-index: 901;
+
+  transform: translateX(100%);
+  transition: transform 0.22s ease;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+.menu-panel.open{ transform: translateX(0); }
+
+.menu-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 14px 14px 10px;
+  border-bottom: 1px solid #eee;
+}
+.menu-title{ font-weight: 800; }
+
+.menu-close{
+  font-size: 22px;
+  padding: 6px 10px;
+  border-radius: 12px;
+  border: 1px solid #bbb;
+  background: #fff;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.menu-body{
+  padding: 14px;
+  overflow: auto;
+  display: grid;
+  gap: 12px;
+}
+
+.menu-card{
+  background: #f6f6f6;
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.menu-card h3{
+  margin: 0 0 10px 0;
+  font-size: 14px;
+}
+
+.menu-action{
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  background: #fff;
+  margin-bottom: 8px;
+}
+.menu-action:disabled{ opacity: 0.55; }
+
+.menu-action.danger{
+  border-color: rgba(229,57,53,0.55);
+  background: rgba(229,57,53,0.12);
+}
+
+.menu-note{
+  font-size: 12px;
+  color: #777;
+  margin: 0;
+}
+
+/* =========================
+   Import UI
+========================= */
+.import-box{
+  margin-top: 10px;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 14px;
+  padding: 10px;
+}
+
+.import-title{
+  font-weight: 800;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.import-file{
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.import-preview{
+  background: #f7f7f7;
+  border-radius: 12px;
+  padding: 10px;
+  font-size: 12px;
+  line-height: 1.45;
+  margin-bottom: 10px;
+}
+.import-muted{ color:#777; }
+
+.import-actions{
+  display: grid;
+  gap: 8px;
+}
+
+.import-error{
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 12px;
+  background: rgba(229,57,53,0.12);
+  border: 1px solid rgba(229,57,53,0.35);
+  color: #b71c1c;
+  font-size: 12px;
+}
+
+/* =========================
+   Meta / Inputs
 ========================= */
 .meta{
   display: grid;
@@ -94,10 +254,94 @@ h1{
   color: #fff;
 }
 
-/* 押してる間だけ薄く＆ちょい縮む */
 #saveBtn:active{
   filter: brightness(1.15);
   transform: scale(0.97);
+}
+
+/* =========================
+   Tabs（板タブ + スタンス絞り込み）
+========================= */
+.tabs-bar{
+  display: flex;
+  align-items: flex-start; /* 2段なので上揃え */
+  gap: 8px;
+}
+
+.tabs-stack{
+  flex: 1;
+  min-width: 0;
+}
+
+.tabs{
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px 0 12px;
+  flex: 1;
+}
+
+.tab{
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid #999;
+  background: #fff;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.tab.active{
+  background: var(--blue);
+  border-color: var(--blue-border);
+  color: #fff;
+}
+
+/* ★タブ */
+.tab[data-board="__FAV__"]{
+  color: var(--star);
+  font-weight: 700;
+}
+.tab[data-board="__FAV__"].active{
+  background: var(--star);
+  border-color: var(--star);
+  color: #fff;
+}
+
+/* スタンスタブ（小さめ） */
+.stance-tabs{
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 0 0 12px;
+}
+
+.stance-tab{
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #bbb;
+  background: #fff;
+  white-space: nowrap;
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0.9;
+  transition: all 0.15s ease;
+}
+
+.stance-tab.active{
+  background: var(--blue);
+  border-color: var(--blue-border);
+  color: #fff;
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+/* ソート */
+.sort-select{
+  font-size: 12px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  border: 1px solid #bbb;
+  background: #fff;
 }
 
 /* =========================
@@ -134,46 +378,8 @@ h1{
 }
 
 /* =========================
-   Tabs
-========================= */
-.tabs{
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding: 8px 0 12px;
-}
-
-.tab{
-  padding: 8px 12px;
-  border-radius: 999px;
-  border: 1px solid #999;
-  background: #fff;
-  white-space: nowrap;
-  cursor: pointer;
-}
-
-.tab.active{
-  background: var(--blue);
-  border-color: var(--blue-border);
-  color: #fff;
-}
-
-/* ★タブ */
-.tab[data-board="__FAV__"]{
-  color: var(--star);
-  font-weight: 700;
-}
-.tab[data-board="__FAV__"].active{
-  background: var(--star);
-  border-color: var(--star);
-  color: #fff;
-}
-
-/* =========================
    Reference (help + tap slots)
-   兄弟構造前提：ref-lineはabsolute禁止
 ========================= */
-/* 追加：重ねるための箱 */
 .ref-wrap{
   position: relative;
   width: 256px;
@@ -181,12 +387,10 @@ h1{
   margin: 0 auto 0;
 }
 
-/* ref-wrap の中にある “下の穴(row)” だけ下げる */
 .ref-wrap > .row{
-  margin-top: 26px; /* 好きに調整 */
+  margin-top: 26px;
 }
 
-/* 表示側 */
 .ref-help{
   position: absolute;
   inset: 0;
@@ -195,8 +399,6 @@ h1{
   color: #aaa;
   opacity: 0.7;
   line-height: 26px;
-
-  /* 文字はクリック邪魔しない */
   pointer-events: none;
 }
 
@@ -218,7 +420,6 @@ h1{
     0 -1px currentColor;
 }
 
-/* タップ判定（×と同じ場所に重なる） */
 .ref-line{
   position: absolute;
   inset: 0;
@@ -226,8 +427,6 @@ h1{
   justify-content: center;
   gap: 10px;
   z-index: 2;
-
-  /* 判定は生かす */
   pointer-events: auto;
 }
 
@@ -235,6 +434,7 @@ h1{
   width: 40px;
   height: 26px;
 }
+
 /* =========================
    Disk UI
 ========================= */
@@ -298,6 +498,34 @@ h1{
 }
 
 /* =========================
+   Stance quick buttons（入力側）
+========================= */
+.stance-quick{
+  display:flex;
+  gap:6px;
+  margin-top:6px;
+}
+
+.stance-quick button{
+  font-size:12px;
+  padding:6px 12px;
+  border-radius:999px;
+  border:1px solid #bbb;
+  background:#fff;
+  cursor:pointer;
+}
+
+.stance-quick button:active{
+  transform: scale(0.95);
+}
+
+.stance-quick button.active{
+  background: var(--orange);
+  border-color: var(--orange-border);
+  color: #fff;
+}
+
+/* =========================
    History
 ========================= */
 #history{
@@ -331,10 +559,18 @@ h1{
   border: none;
   border-radius: 6px;
 }
+.btn-del:disabled{
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
 
-/* =========================
-   Favorite star button
-========================= */
+.btn-del.is-protected{
+  opacity: 0.45;
+  filter: grayscale(0.2);
+}
+
+/* Favorite star button */
 .fav-btn{
   border: none;
   background: transparent;
@@ -395,7 +631,6 @@ h1{
   box-sizing: border-box;
 }
 
-/* 穴（未選択でも枠が見える） */
 .mini-hole{
   border: 1px solid #999;
   border-radius: 50%;
@@ -407,7 +642,6 @@ h1{
   border-color: var(--orange-border);
 }
 
-/* ×（activeだけ見える） */
 .mini-x{
   font-size: 18px;
   font-weight: 900;
@@ -420,64 +654,11 @@ h1{
 }
 
 /* =========================
-   DEBUG MODE（位置確認用）
-   使うときだけON
+   Toast（上に表示）
 ========================= */
-/*
-.holes     { outline: 2px dashed purple; }  /* 穴エリア全体 *//*
-.row       { outline: 1px dashed blue; }    /* 穴の列 *//*
-.ref-help  { outline: 2px solid red; }      /* ×表示エリア *//*
-.ref-line  { outline: 2px solid orange; }   /* タップ判定エリア *//*
-.ref-slot  { background: rgba(255,165,0,0.15); } /* 各スロット */
-
-/* ==== ref 判定帯を強制で26pxに固定（最終上書き用） ==== *//*
-.ref-line{
-  position: relative !important;
-  inset: auto !important;
-  top: auto !important;
-  left: auto !important;
-
-  width: 256px !important;
-  height: 26px !important;
-  margin: 0 auto !important;
-
-  display: flex !important;
-  justify-content: center !important;
-  gap: 10px !important;
-}
-*/
-
-/*
-.ref-slot{
-  height: 26px !important;
-}
-
-/* ref-line を ref-help の上に重ねる（兄弟構造のまま） *//*
-.ref-line{
-  margin-top: -28px !important; /* ← ref-help の高さぶん上に持ち上げる */
-}
-
-.ref-help{ transform: translateY(-1px); }
-.ref-line{ transform: translateY(-1px); }
-
-/* 下の穴列だけ少し下げる *//*
-.holes > .row:last-child{
-  margin-top: 26px;  /* 好きに調整（4〜10くらい） */
-}
-
-.btn-del:disabled{
-  background: #ccc;
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-/* =========================
-   Toast（上に表示 / 邪魔になりにくい）
-========================= */
-
 #toast{
   position: fixed;
-  top: calc(env(safe-area-inset-top, 0px) + 64px); /* ←ここを増やすと下がる */
+  top: calc(env(safe-area-inset-top, 0px) + 64px);
   left: 50%;
   transform: translateX(-50%) translateY(-12px);
 
@@ -508,58 +689,15 @@ h1{
 #toast.info    { background: #555; }
 #toast.rode    { background: var(--green); }
 
-.tabs-bar{
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.tabs{
-  flex: 1;
-}
-
-.sort-select{
-  font-size: 12px;
-  padding: 6px 8px;
-  border-radius: 10px;
-  border: 1px solid #bbb;
-  background: #fff;
-}
-
-.stance-quick{
-  display:flex;
-  gap:6px;
-  margin-top:6px;
-}
-
-.stance-quick button{
-  font-size:12px;
-  padding:6px 12px;
-  border-radius:999px;
-  border:1px solid #bbb;
-  background:#fff;
-  cursor:pointer;
-/*  transition: 0.15s;*/
-}
-
-.stance-quick button:active{
-  transform: scale(0.95);
-}
-
-.stance-quick button.active{
-  background: var(--orange);         /* ←ここが色 */
-  border-color: var(--orange-border);
-  color: #fff;
-}
-
-/* ===== タップ時の青枠・ハイライト完全無効 ===== */
+/* =========================
+   Tap highlight OFF
+========================= */
 button,
 button:focus,
 button:active{
   outline: none;
 }
 
-/* iOS / Android のタップ時ハイライト */
 button{
   -webkit-tap-highlight-color: transparent;
 }
@@ -613,215 +751,4 @@ button{
   font-size: 11px;
   opacity: 0.7;
   text-align: center;
-}
-
-h1 { color:#e53935; }
-
-/* =========================
-   Topbar + Slide Menu
-========================= */
-.topbar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap: 10px;
-  margin-bottom: 16px;
-}
-
-.title{
-  margin: 0;
-  flex: 1;
-  text-align: center;
-}
-
-/* ☰ボタン */
-.menu-btn{
-  flex: 0 0 auto;
-  font-size: 22px;
-  padding: 8px 12px;
-  border-radius: 12px;
-  border: 1px solid #bbb;
-  background: #fff;
-  cursor: pointer;
-  line-height: 1;
-}
-
-/* 右パネル表示時の背景暗転 */
-.menu-overlay{
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.35);
-  z-index: 900;
-}
-
-/* 右から出るパネル */
-.menu-panel{
-  position: fixed;
-  top: 0;
-  right: 0;
-  height: 100dvh;
-  width: min(86vw, 360px);
-
-  background: #fff;
-  box-shadow: -12px 0 28px rgba(0,0,0,0.18);
-  z-index: 901;
-
-  transform: translateX(100%);
-  transition: transform 0.22s ease;
-  display: grid;
-  grid-template-rows: auto 1fr;
-}
-
-/* 開いてる状態 */
-.menu-panel.open{
-  transform: translateX(0);
-}
-
-.menu-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding: 14px 14px 10px;
-  border-bottom: 1px solid #eee;
-}
-
-.menu-title{
-  font-weight: 800;
-}
-
-.menu-close{
-  font-size: 22px;
-  padding: 6px 10px;
-  border-radius: 12px;
-  border: 1px solid #bbb;
-  background: #fff;
-  cursor: pointer;
-  line-height: 1;
-}
-
-.menu-body{
-  padding: 14px;
-  overflow: auto;
-  display: grid;
-  gap: 12px;
-}
-
-.menu-card{
-  background: #f6f6f6;
-  border-radius: 14px;
-  padding: 12px;
-}
-
-.menu-card h3{
-  margin: 0 0 10px 0;
-  font-size: 14px;
-}
-
-.menu-action{
-  width: 100%;
-  text-align: left;
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid #ccc;
-  background: #fff;
-  margin-bottom: 8px;
-}
-
-.menu-action:disabled{
-  opacity: 0.55;
-}
-
-.menu-note{
-  font-size: 12px;
-  color: #777;
-  margin: 0;
-}
-
-.import-box{
-  margin-top: 10px;
-  background: #fff;
-  border: 1px solid #e5e5e5;
-  border-radius: 14px;
-  padding: 10px;
-}
-
-.import-title{
-  font-weight: 800;
-  font-size: 13px;
-  margin-bottom: 8px;
-}
-
-.import-file{
-  width: 100%;
-  margin-bottom: 10px;
-}
-
-.import-preview{
-  background: #f7f7f7;
-  border-radius: 12px;
-  padding: 10px;
-  font-size: 12px;
-  line-height: 1.45;
-  margin-bottom: 10px;
-}
-
-.import-muted{ color:#777; }
-
-.import-actions{
-  display: grid;
-  gap: 8px;
-}
-
-.menu-action.danger{
-  border-color: rgba(229,57,53,0.55);
-  background: rgba(229,57,53,0.12);
-}
-
-.import-error{
-  margin-top: 10px;
-  padding: 10px;
-  border-radius: 12px;
-  background: rgba(229,57,53,0.12);
-  border: 1px solid rgba(229,57,53,0.35);
-  color: #b71c1c;
-  font-size: 12px;
-}
-
-.tabs-bar{
-  display: flex;
-  align-items: flex-start; /* ←縦に2段あるから上揃え */
-  gap: 8px;
-}
-
-.tabs-stack{
-  flex: 1;
-  min-width: 0;
-}
-
-.stance-tabs{
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding: 0 0 12px;
-}
-
-/* スタンス用タブも boardタブと同じ見た目で統一 */
-.stance-tab{
-  padding: 6px 10px;             /* ← 少しコンパクトに */
-  border-radius: 999px;
-  border: 1px solid #bbb;        /* ← 色もやや軽めに */
-  background: #fff;
-  white-space: nowrap;
-  cursor: pointer;
-  font-size: 14px;               /* ← 絵文字サイズ小さめ */
-  opacity: 0.9;                  /* ← 少し控えめな印象 */
-  transition: all 0.15s ease;    /* ← 押したときの軽いアニメ */
-}
-
-.stance-tab.active{
-  background: var(--blue);
-  border-color: var(--blue-border);
-  color: #fff;
-  opacity: 1;                    /* ← ON時だけくっきり */
-  transform: scale(1.05);        /* ← ONで少し強調 */
 }
