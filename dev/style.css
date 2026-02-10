@@ -887,3 +887,83 @@ button{
     margin-top: 6px;
   }
 }
+
+/* tabs + filters + sort を“同じルールの余白”にする */
+.tabs-bar{
+  display: grid;
+  gap: 8px;              /* ← 全部この余白で統一 */
+  margin-top: 12px;      /* ← 上のカードとの距離（好みで） */
+}
+
+.tabs-stack{
+  display: grid;
+  gap: 8px;              /* ← boardTabs / stance-row / sort を同じ間隔に */
+}
+
+/* board tabs の上下余白を安定させる（既存tabsのpaddingは消してOK） */
+.tabs{
+  padding: 0;            /* ← 既存の 8px 0 12px をやめる */
+  margin: 0;
+}
+
+/* stance-row 全体：左右端を揃える */
+.stance-row{
+  display:flex;
+  align-items:center;
+  gap: 8px;
+  padding: 0;        /* ← 余計な段差をなくす */
+  margin: 0;
+}
+
+/* stance-tabs は“中身が横スクロールする箱”として整える */
+.stance-tabs{
+  flex: 1;
+  min-width: 0;
+  padding: 0;        /* ← tabsと同じくpaddingを消す */
+  margin: 0;
+}
+
+/* angle-filter：高さ/角丸/余白を他と合わせる */
+.angle-filter{
+  display:flex;
+  align-items:center;
+  gap: 6px;
+
+  padding: 6px 8px;
+  border: 1px solid #bbb;
+  border-radius: 12px;
+  background: #fff;
+}
+
+/* 2桁想定で入力幅を固定（被りにくく＆統一感UP） */
+.angle-in{
+  width: 44px;
+  text-align: center;
+  font-size: 12px;
+  padding: 6px 6px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+}
+
+.angle-tol{
+  width: 44px;
+  text-align: center;
+  font-size: 12px;
+  padding: 6px 6px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+}
+
+.angle-pm{
+  font-size: 12px;
+  color: #666;
+}
+
+.angle-clear{
+  width: 34px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+}
