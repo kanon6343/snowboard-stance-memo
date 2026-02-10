@@ -604,7 +604,7 @@ function exportBackup() {
 
   const payload = {
     app: "snowboard-stance-memo",
-    dataVersion: 1,
+    dataVersion: 2,
     exportedAt: new Date().toISOString(),
     env: IS_DEV ? "dev" : "prod",
     items,
