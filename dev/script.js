@@ -29,6 +29,7 @@ if (IS_DEV) {
   }
 }
 
+// ===== DOM =====
 const holes = [...document.querySelectorAll(".hole")];
 const historyDiv = document.getElementById("history");
 
@@ -41,11 +42,71 @@ if (commentEl) commentEl.value = "";
 const leftAngleEl = document.getElementById("left-angle");
 const rightAngleEl = document.getElementById("right-angle");
 const saveBtn = document.getElementById("saveBtn");
-const clearBtn = document.getElementById("clearBtn"); // ← 追加
+const clearBtn = document.getElementById("clearBtn");
 const tabsDiv = document.getElementById("boardTabs");
 
 const stanceTabsDiv = document.getElementById("stanceTabs");
 
+// 角度検索UI
+const angleLeftEl  = document.getElementById("angleLeft");
+const angleRightEl = document.getElementById("angleRight");
+const angleTolEl   = document.getElementById("angleTol");
+const angleClearEl = document.getElementById("angleClear");
+
+// ===== state =====
+let selectedBoard = "__ALL__";
+let stanceFilter = ""; // ""=未選択 / "duck" / "forward" / "back" / "none"(未設定)
+
+let favSortOn = true;       // ★を上に
+let sortMode = "savedDesc"; // メインソート
+
+// 角度検索：片方だけでも両方でもOK
+let angleFilter = {
+  left: null,   // number|null
+  right: null,  // number|null
+  tol: 2        // number
+};
+
+// --- UI状態を復元 ---
+try {
+  const ui = JSON.parse(localStorage.getItem(UI_KEY) || "{}");
+  if (typeof ui.selectedBoard === "string") selectedBoard = ui.selectedBoard;
+  if (typeof ui.stanceFilter === "string") stanceFilter = ui.stanceFilter;
+  if (typeof ui.favSortOn === "boolean") favSortOn = ui.favSortOn;
+  if (typeof ui.sortMode === "string") sortMode = ui.sortMode;
+
+  // 角度検索
+  if (ui.angleFilter && typeof ui.angleFilter === "object") {
+    const L = Number(ui.angleFilter.left);
+    const R = Number(ui.angleFilter.right);
+    const T = Number(ui.angleFilter.tol);
+
+    angleFilter.left  = Number.isFinite(L) ? L : null;
+    angleFilter.right = Number.isFinite(R) ? R : null;
+    angleFilter.tol   = Number.isFinite(T) ? Math.max(0, T) : 2;
+  }
+} catch {}
+
+// UIへ反映（初期表示）
+if (angleLeftEl)  angleLeftEl.value  = (angleFilter.left  ?? "") === "" ? "" : String(angleFilter.left);
+if (angleRightEl) angleRightEl.value = (angleFilter.right ?? "") === "" ? "" : String(angleFilter.right);
+if (angleTolEl)   angleTolEl.value   = String(angleFilter.tol ?? 2);
+
+function saveUI(){
+  localStorage.setItem(UI_KEY, JSON.stringify({
+    selectedBoard,
+    stanceFilter,
+    favSortOn,
+    sortMode,
+    angleFilter: {
+      left: angleFilter.left,
+      right: angleFilter.right,
+      tol: angleFilter.tol
+    }
+  }));
+}
+
+// ===== stance tabs =====
 function renderStanceTabs(){
   if (!stanceTabsDiv) return;
 
@@ -74,24 +135,10 @@ function renderStanceTabs(){
   });
 }
 
-let selectedBoard = "__ALL__";
-let stanceFilter = ""; // ""=未選択 / "duck" / "forward" / "back" / "none"(未設定)
-
-let favSortOn = true;      // ★を上にするON/OFF（初期はONでもOFFでもOK）
-let sortMode = "savedDesc"; // メインソート（将来増やす）
-
-// --- UI状態を復元（タブ/★ソート/ソートモード）---
-try {
-  const ui = JSON.parse(localStorage.getItem(UI_KEY) || "{}");
-  if (typeof ui.selectedBoard === "string") selectedBoard = ui.selectedBoard;
-  if (typeof ui.stanceFilter === "string") stanceFilter = ui.stanceFilter;
-  if (typeof ui.favSortOn === "boolean") favSortOn = ui.favSortOn;
-  if (typeof ui.sortMode === "string") sortMode = ui.sortMode;
-} catch {}
-
+// ===== sort select =====
 const sortModeEl = document.getElementById("sortMode");
 if (sortModeEl) {
-  sortModeEl.value = sortMode; // ← 初期表示を合わせる
+  sortModeEl.value = sortMode;
   sortModeEl.addEventListener("change", () => {
     sortMode = sortModeEl.value;
     saveUI();
@@ -100,11 +147,55 @@ if (sortModeEl) {
   });
 }
 
-let reference = { left: null, right: null };
+// ===== angle filter wiring =====
+let angleInputTimer = null;
 
-let stance = ""; // "duck" | "forward" | "back" | ""
+function readAngleFilterFromUI(){
+  const Lraw = angleLeftEl?.value ?? "";
+  const Rraw = angleRightEl?.value ?? "";
+  const Traw = angleTolEl?.value ?? "";
+
+  const L = Number(Lraw);
+  const R = Number(Rraw);
+  const T = Number(Traw);
+
+  angleFilter.left  = (Lraw === "" || !Number.isFinite(L)) ? null : L;
+  angleFilter.right = (Rraw === "" || !Number.isFinite(R)) ? null : R;
+
+  const tol = Number.isFinite(T) ? Math.max(0, T) : 2;
+  angleFilter.tol = tol;
+}
+
+function scheduleAngleRender(){
+  if (angleInputTimer) clearTimeout(angleInputTimer);
+  angleInputTimer = setTimeout(() => {
+    readAngleFilterFromUI();
+    saveUI();
+    render();
+  }, 120);
+}
+
+angleLeftEl?.addEventListener("input", scheduleAngleRender);
+angleRightEl?.addEventListener("input", scheduleAngleRender);
+angleTolEl?.addEventListener("input", scheduleAngleRender);
+
+angleClearEl?.addEventListener("click", () => {
+  if (angleLeftEl) angleLeftEl.value = "";
+  if (angleRightEl) angleRightEl.value = "";
+  if (angleTolEl) angleTolEl.value = "2";
+
+  angleFilter = { left: null, right: null, tol: 2 };
+  saveUI();
+  render();
+  showToast("角度検索：クリア", "info");
+});
+
+// ===== setup state for form =====
+let reference = { left: null, right: null };
+let stance = ""; // 入力側のスタンス（保存用）
 let disk = { left: "", right: "" };
 
+// stance quick buttons (入力側)
 const stanceBtns = [...document.querySelectorAll("[data-stance]")];
 
 function renderStanceUI(){
@@ -118,29 +209,24 @@ function renderStanceUI(){
 stanceBtns.forEach(btn => {
   btn.addEventListener("click", () => {
     const v = btn.dataset.stance ?? "";
-
-    // OFF扱い（"off" でも "" でも解除）
     const next = (v === "off" || v === "") ? "" : v;
-
-    // 同じのをもう一回押したら解除（ON/OFF）
     stance = (stance === next) ? "" : next;
 
     renderStanceUI();
 
-    // トースト任意
     const label =
       stance === "duck" ? "ダック" :
       stance === "forward" ? "前振り" :
       stance === "back" ? "後振り" :
       "解除";
-    showToast(`スタンス：${label}`, stance ? "info" : "info");
+    showToast(`スタンス：${label}`, "info");
   });
 });
 
 // 穴タップ
 holes.forEach(h => h.addEventListener("click", () => h.classList.toggle("active")));
 
-// ✅ クリア（保存の外に置く）
+// クリア（入力）
 clearBtn?.addEventListener("click", () => {
   if (boardEl) boardEl.value = "";
   if (snowEl) snowEl.value = "";
@@ -184,18 +270,17 @@ saveBtn?.addEventListener("click", () => {
   showToast("保存しました", "success");
 });
 
+// disk chips
 document.querySelectorAll(".disk-group .chip").forEach(btn => {
   btn.addEventListener("click", () => {
     const group = btn.closest(".disk-group");
-    if (!group) return; // ★追加：構造が違っても落ちない
+    if (!group) return;
 
     const side = group.dataset.side;   // left / right
     const value = btn.dataset.value;   // 前/中/後
     if (!side) return;
 
-    // 同じのをもう一回押したら解除
     disk[side] = (disk[side] === value) ? "" : value;
-
     renderDiskUI();
   });
 });
@@ -214,15 +299,7 @@ function loadList() {
   catch { return []; }
 }
 
-function saveUI(){
-  localStorage.setItem(UI_KEY, JSON.stringify({
-    selectedBoard,
-    stanceFilter,
-    favSortOn,
-    sortMode,
-  }));
-}
-
+// ===== board tabs =====
 function renderTabs() {
   const list = loadList();
 
@@ -238,7 +315,6 @@ function renderTabs() {
       b === "__ALL__" ? "全部" :
       (b === "" ? "未入力" : b);
 
-    // ★タブだけ特別：favSortOn が true のとき active
     const active =
       (b === "__FAV__") ? (favSortOn ? "active" : "") :
       (b === selectedBoard ? "active" : "");
@@ -250,19 +326,14 @@ function renderTabs() {
     btn.addEventListener("click", () => {
       const board = btn.getAttribute("data-board") ?? "__ALL__";
 
-      // ★タブは「絞り込み」じゃなく「★ソート切替」
       if (board === "__FAV__") {
         favSortOn = !favSortOn;
         saveUI();
-        showToast(
-          favSortOn ? "★ソート：ON" : "★ソート：OFF",
-          favSortOn ? "star" : "info"
-        );
+        showToast(favSortOn ? "★ソート：ON" : "★ソート：OFF", favSortOn ? "star" : "info");
         render();
         return;
       }
 
-      // それ以外は普通に絞り込み
       selectedBoard = board;
       saveUI();
       render();
@@ -270,7 +341,7 @@ function renderTabs() {
   });
 }
 
-
+// ===== reference slots =====
 function setHelpX(side, index) {
   const help = document.querySelector(`.ref-help[data-side="${side}"]`);
   const line = document.querySelector(`.ref-line[data-side="${side}"]`);
@@ -287,7 +358,8 @@ function setHelpX(side, index) {
 
   const slotRect = slot.getBoundingClientRect();
   const lineRect = line.getBoundingClientRect();
-const x = (slotRect.left + slotRect.width / 2) - lineRect.left;
+  const x = (slotRect.left + slotRect.width / 2) - lineRect.left;
+
   help.classList.add("active");
   help.style.setProperty("--ref-x", `${x}px`);
 }
@@ -296,12 +368,10 @@ function renderRefSlots() {
   document.querySelectorAll(".ref-line").forEach(line => {
     const side = line.dataset.side;
 
-    // スロット生成
     line.innerHTML = Array.from({ length: 6 }, (_, i) =>
       `<div class="ref-slot" data-index="${i}" data-side="${side}"></div>`
     ).join("");
 
-    // ===== 保存済みを反映 =====
     const idx = reference?.[side];
 
     if (idx !== null && idx !== undefined) {
@@ -314,75 +384,84 @@ function renderRefSlots() {
       setHelpX(side, null);
     }
 
-    // ===== クリック処理（★ここが進化ポイント） =====
     line.querySelectorAll(".ref-slot").forEach(slot => {
       slot.addEventListener("click", () => {
         const index = Number(slot.dataset.index);
 
-        // 同じ場所を押したら解除
         if (reference[side] === index) {
           reference[side] = null;
-
           line.querySelectorAll(".ref-slot").forEach(s => s.classList.remove("active"));
           setHelpX(side, null);
           return;
         }
 
-        // 通常選択
         reference[side] = index;
-
         line.querySelectorAll(".ref-slot").forEach(s => s.classList.remove("active"));
         slot.classList.add("active");
-
         setHelpX(side, index);
       });
     });
   });
 }
 
+// ===== render =====
 function render() {
   const all = loadList();
 
-let list =
-  (selectedBoard === "__ALL__") ? all
-  : all.filter(x => (x.board || "").trim() === selectedBoard);
+  let list =
+    (selectedBoard === "__ALL__") ? all
+    : all.filter(x => (x.board || "").trim() === selectedBoard);
 
-// スタンス絞り込み（未選択なら何もしない）
-if (stanceFilter) {
-  list = list.filter(x => {
-    const s = x.stance || "";
-    if (stanceFilter === "none") return s === "";
-    return s === stanceFilter;
+  // スタンス絞り込み
+  if (stanceFilter) {
+    list = list.filter(x => {
+      const s = x.stance || "";
+      if (stanceFilter === "none") return s === "";
+      return s === stanceFilter;
+    });
+  }
+
+  // 角度検索（片方だけでもOK）
+  const tol = Number.isFinite(Number(angleFilter.tol)) ? Number(angleFilter.tol) : 2;
+
+  const matchAngle = (valueStr, target) => {
+    const v = Number(valueStr);
+    if (!Number.isFinite(v)) return false;
+    return Math.abs(v - target) <= tol;
+  };
+
+  if (angleFilter.left !== null) {
+    const targetL = Number(angleFilter.left);
+    list = list.filter(x => matchAngle(x.leftAngle, targetL));
+  }
+  if (angleFilter.right !== null) {
+    const targetR = Number(angleFilter.right);
+    list = list.filter(x => matchAngle(x.rightAngle, targetR));
+  }
+
+  // ソート
+  const cmpStr = (a, b) => String(a || "").localeCompare(String(b || ""), "ja");
+  const getTime = (x) => String(x?.dateTime || "");
+
+  list.sort((a, b) => {
+    if (favSortOn) {
+      const favDiff = Number(!!b.favorite) - Number(!!a.favorite);
+      if (favDiff !== 0) return favDiff;
+    }
+
+    switch (sortMode) {
+      case "savedAsc":
+        return getTime(a).localeCompare(getTime(b));
+      case "savedDesc":
+        return getTime(b).localeCompare(getTime(a));
+      case "boardAsc":
+        return cmpStr(a.board, b.board);
+      case "snowAsc":
+        return cmpStr(a.snow, b.snow);
+      default:
+        return 0;
+    }
   });
-}
-
-  
-  // 文字比較（空は最後）
-const cmpStr = (a, b) => String(a || "").localeCompare(String(b || ""), "ja");
-const getTime = (x) => String(x?.dateTime || "");
-
-// ★ + メインソート を「1回の sort」に合成
-list.sort((a, b) => {
-  // 1) ★を上に（ONの時だけ）
-  if (favSortOn) {
-    const favDiff = Number(!!b.favorite) - Number(!!a.favorite);
-    if (favDiff !== 0) return favDiff;
-  }
-
-  // 2) メインソート
-  switch (sortMode) {
-    case "savedAsc":
-      return getTime(a).localeCompare(getTime(b));
-    case "savedDesc":
-      return getTime(b).localeCompare(getTime(a));
-    case "boardAsc":
-      return cmpStr(a.board, b.board);
-    case "snowAsc":
-      return cmpStr(a.snow, b.snow);
-    default:
-      return 0;
-  }
-});
 
   historyDiv.innerHTML = "";
 
@@ -394,14 +473,10 @@ list.sort((a, b) => {
     const card = document.createElement("section");
     card.className = "card";
 
-    const time = item.dateTime
-      ? new Date(item.dateTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-      : "";
-
     const dateLabel = item.dateTime ? formatDateJP(item.dateTime) : "日付なし";
     const timeLabel = item.dateTime
-     ? new Date(item.dateTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-     : "";
+      ? new Date(item.dateTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+      : "";
 
     const boardLabel = item.board || "板名なし";
     const snowLabel  = item.snow  || "雪質なし";
@@ -416,55 +491,52 @@ list.sort((a, b) => {
       item.stance === "duck" ? "ダック" :
       item.stance === "forward" ? "前振り" :
       item.stance === "back" ? "後振り" : "";
-    
+
     const setupLine = `左 ${item.leftAngle || "?"}°  ${leftDisk}　右 ${item.rightAngle || "?"}°  ${rightDisk}`;
 
     const fav = !!item.favorite;
     const favLabel = fav ? "★" : "☆";
 
     card.innerHTML = `
-  <div style="display:flex; justify-content:space-between; align-items:center;">
-    <b>${escapeHtml(title)}</b>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <b>${escapeHtml(title)}</b>
 
-    <button
-      type="button"
-      class="fav-btn ${fav ? "active" : ""}"
-      data-fav-id="${item.id}"
-      title="${fav ? "お気に入り解除" : "お気に入り登録"}"
-    >
-      ${favLabel}
-    </button>
-  </div>
+        <button
+          type="button"
+          class="fav-btn ${fav ? "active" : ""}"
+          data-fav-id="${item.id}"
+          title="${fav ? "お気に入り解除" : "お気に入り登録"}"
+        >
+          ${favLabel}
+        </button>
+      </div>
 
-  <div>${escapeHtml(setupLine)}</div>
-  
-  ${stanceLabel ? `<div class="stance-tag">${escapeHtml(stanceLabel)}</div>` : ""}
+      <div>${escapeHtml(setupLine)}</div>
 
-  ${commentText ? `<div class="comment">${escapeHtml(commentText)}</div>` : ""}
+      ${stanceLabel ? `<div class="stance-tag">${escapeHtml(stanceLabel)}</div>` : ""}
+      ${commentText ? `<div class="comment">${escapeHtml(commentText)}</div>` : ""}
 
-  <div class="history-preview">
-    ${renderMini(item.holes || [], item.reference || { left: null, right: null })}
-  </div>
+      <div class="history-preview">
+        ${renderMini(item.holes || [], item.reference || { left: null, right: null })}
+      </div>
 
-  <div class="history-actions">
-    <button type="button" class="btn-load" data-load-id="${item.id}">読込</button>
+      <div class="history-actions">
+        <button type="button" class="btn-load" data-load-id="${item.id}">読込</button>
 
-    <button
-      type="button"
-      class="btn-del ${fav ? "is-protected" : ""}"
-      data-del-id="${item.id}"
-      data-protected="${fav ? "1" : "0"}"
-      title="${fav ? "お気に入りは削除できません" : "削除"}"
-    >
-      削除
-    </button>
-  </div>
-`;
+        <button
+          type="button"
+          class="btn-del ${fav ? "is-protected" : ""}"
+          data-del-id="${item.id}"
+          data-protected="${fav ? "1" : "0"}"
+          title="${fav ? "お気に入りは削除できません" : "削除"}"
+        >
+          削除
+        </button>
+      </div>
+    `;
 
     historyDiv.appendChild(card);
   });
-
-  // ===== イベント付け（ここから下は1回だけ） =====
 
   // ★お気に入り切替
   historyDiv.querySelectorAll("[data-fav-id]").forEach(btn => {
@@ -477,60 +549,56 @@ list.sort((a, b) => {
       item.favorite = !item.favorite;
       localStorage.setItem(KEY, JSON.stringify(list));
       render();
-      showToast(
-       item.favorite ? "お気に入り追加 ⭐" : "お気に入り解除",
-       item.favorite ? "star" : "info"
-      
-    );
+      showToast(item.favorite ? "お気に入り追加 ⭐" : "お気に入り解除", item.favorite ? "star" : "info");
     });
   });
 
   // 削除（お気に入りは無視）
   historyDiv.querySelectorAll('button[data-del-id]').forEach(btn => {
-  btn.addEventListener("click", () => {
-    if (btn.dataset.protected === "1") {
-      showToast("★お気に入りは削除できません", "error");
-      return;
-    }
+    btn.addEventListener("click", () => {
+      if (btn.dataset.protected === "1") {
+        showToast("★お気に入りは削除できません", "error");
+        return;
+      }
 
-    const id = btn.dataset.delId;
-    const next = loadList().filter(x => x.id !== id);
-    localStorage.setItem(KEY, JSON.stringify(next));
-    render();
-    showToast("削除しました", "error");
+      const id = btn.dataset.delId;
+      const next = loadList().filter(x => x.id !== id);
+      localStorage.setItem(KEY, JSON.stringify(next));
+      render();
+      showToast("削除しました", "error");
+    });
   });
-});
 
   // 読込
-historyDiv.querySelectorAll('button[data-load-id]').forEach(btn => {
-  btn.addEventListener("click", () => {
-    const id = btn.dataset.loadId;
-    const item = loadList().find(x => x.id === id);
-    if (!item) return;
+  historyDiv.querySelectorAll('button[data-load-id]').forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.loadId;
+      const item = loadList().find(x => x.id === id);
+      if (!item) return;
 
-    boardEl && (boardEl.value = item.board || "");
-    snowEl  && (snowEl.value  = item.snow  || "");
-    commentEl && (commentEl.value = item.comment || "");
-    leftAngleEl && (leftAngleEl.value = item.leftAngle || "");
-    rightAngleEl && (rightAngleEl.value = item.rightAngle || "");
+      boardEl && (boardEl.value = item.board || "");
+      snowEl  && (snowEl.value  = item.snow  || "");
+      commentEl && (commentEl.value = item.comment || "");
+      leftAngleEl && (leftAngleEl.value = item.leftAngle || "");
+      rightAngleEl && (rightAngleEl.value = item.rightAngle || "");
 
-    const holesArr = getHolesAsV1(item);
-    holes.forEach((h, i) => {
-      h.classList.toggle("active", !!holesArr[i]);
+      const holesArr = getHolesAsV1(item);
+      holes.forEach((h, i) => {
+        h.classList.toggle("active", !!holesArr[i]);
+      });
+
+      stance = item.stance || "";
+      renderStanceUI();
+
+      reference = item.reference || { left: null, right: null };
+      renderRefSlots();
+
+      disk = item.disk || { left: "", right: "" };
+      renderDiskUI();
+
+      showToast("読み込みました", "rode");
     });
-
-    stance = item.stance || "";
-    renderStanceUI();
-
-    reference = item.reference || { left: null, right: null };
-    renderRefSlots();
-
-    disk = item.disk || { left: "", right: "" };
-    renderDiskUI();
-
-    showToast("読み込みました", "rode");
   });
-});
 }
 
 // ===== import helpers =====
@@ -545,12 +613,9 @@ function normalizeItem(x){
 
   const item = { ...x };
 
-  // id が無いなら作る（衝突しにくい）
   if (!item.id) item.id = String(Date.now()) + "-" + Math.random().toString(16).slice(2);
-
   item.favorite = !!item.favorite;
 
-  // holes: v1配列なら v2へ寄せる（保存側はv2）
   if (Array.isArray(item.holes)) {
     item.holes = holesV1ToV2(item.holes);
     item.dataVersion = item.dataVersion || 2;
@@ -577,7 +642,6 @@ function normalizeItem(x){
 
 // payload から items/ui/meta を取り出す（新形式・旧形式どっちも対応）
 function parseBackupPayload(obj){
-  // 推奨形式：{ app, dataVersion, exportedAt, env, items, ui }
   if (obj && typeof obj === "object" && Array.isArray(obj.items)) {
     const items = obj.items.map(normalizeItem).filter(Boolean);
     const ui = (obj.ui && typeof obj.ui === "object") ? obj.ui : null;
@@ -590,7 +654,6 @@ function parseBackupPayload(obj){
     return { items, ui, meta };
   }
 
-  // 旧形式：配列だけ
   if (Array.isArray(obj)) {
     const items = obj.map(normalizeItem).filter(Boolean);
     return { items, ui: null, meta: { app:"", dataVersion:0, exportedAt:"", env:"" } };
@@ -639,10 +702,8 @@ function summarizeItems(items){
 
 // ===== バックアップ（エクスポート）=====
 function exportBackup() {
-  // 履歴（メイン）
   const items = loadList();
 
-  // UI状態（タブ/ソート等）も一緒に入れると復元がラク
   let ui = {};
   try { ui = JSON.parse(localStorage.getItem(UI_KEY) || "{}"); } catch {}
 
@@ -659,24 +720,21 @@ function exportBackup() {
   const blob = new Blob([json], { type: "application/json" });
 
   const now = new Date();
-
-// 例: 2026-02-10_18-42-05
   const stamp =
-  now.getFullYear() + "-" +
-  String(now.getMonth() + 1).padStart(2, "0") + "-" +
-  String(now.getDate()).padStart(2, "0") + "_" +
-  String(now.getHours()).padStart(2, "0") + "-" +
-  String(now.getMinutes()).padStart(2, "0") + "-" +
-  String(now.getSeconds()).padStart(2, "0");
+    now.getFullYear() + "-" +
+    String(now.getMonth() + 1).padStart(2, "0") + "-" +
+    String(now.getDate()).padStart(2, "0") + "_" +
+    String(now.getHours()).padStart(2, "0") + "-" +
+    String(now.getMinutes()).padStart(2, "0") + "-" +
+    String(now.getSeconds()).padStart(2, "0");
 
   const filename =
-  `snowboard-stance-memo_v${payload.dataVersion}_${IS_DEV ? "dev" : "prod"}_${stamp}.json`;
+    `snowboard-stance-memo_v${payload.dataVersion}_${IS_DEV ? "dev" : "prod"}_${stamp}.json`;
 
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = filename;
 
-  // iOS/Android対策で DOM に挿してクリック
   document.body.appendChild(a);
   a.click();
   a.remove();
@@ -707,11 +765,11 @@ function exportBackup() {
     setTimeout(() => { overlay.hidden = true; }, 220);
   }
 
-  // ===== export =====
+  // export
   const exportBtn = document.getElementById("btnExport");
   exportBtn?.addEventListener("click", exportBackup);
 
-  // ===== import UI wiring (A+ 完全版) =====
+  // import UI wiring
   const fileEl = document.getElementById("importFile");
   const previewEl = document.getElementById("importPreview");
   const errEl = document.getElementById("importError");
@@ -741,7 +799,7 @@ function exportBackup() {
     pendingImport = null;
     setError("");
     setImportButtonsEnabled(false);
-    if (fileEl) fileEl.value = ""; // ★ファイル選択クリア
+    if (fileEl) fileEl.value = "";
     setPreview(`<div class="import-muted">※ ここにプレビューが出るよ</div>`);
   }
 
@@ -785,7 +843,6 @@ function exportBackup() {
       return;
     }
 
-    // アプリ判定（違っても“警告”に留める）
     const isOurApp = parsed.meta.app === "snowboard-stance-memo" || parsed.meta.app === "";
     if (!isOurApp) {
       setError("このファイルは別アプリの可能性があるよ（復元はおすすめしない）");
@@ -794,7 +851,6 @@ function exportBackup() {
     }
 
     const sum = summarizeItems(parsed.items);
-
     const boardsLine = sum.topBoards.length
       ? sum.topBoards.map(([b,c]) => `${escapeHtml(b)}（${c}）`).join(" / ")
       : "なし";
@@ -822,8 +878,6 @@ function exportBackup() {
 
     for (const it0 of incoming) {
       let it = it0;
-
-      // id衝突したら新しいidを振る（安全に追加できる）
       if (byId.has(it.id)) {
         it = { ...it, id: it.id + "-" + Math.random().toString(16).slice(2) };
       }
@@ -876,7 +930,6 @@ function exportBackup() {
     location.reload();
   });
 
-  // ===== open/close wiring =====
   btn.addEventListener("click", () => {
     const isOpen = panel.classList.contains("open");
     isOpen ? close() : open();
@@ -890,14 +943,13 @@ function exportBackup() {
   });
 })();
 
-
+// ===== toast =====
 let toastTimer = null;
 
 function showToast(message, type = "info", time){
   const el = document.getElementById("toast");
   if (!el) return;
 
-  // C：表示時間をタイプで自動調整（time指定があればそれ優先）
   const defaultTime =
     type === "success" ? 1200 :
     type === "info"    ? 1500 :
@@ -908,15 +960,10 @@ function showToast(message, type = "info", time){
 
   const duration = (typeof time === "number") ? time : defaultTime;
 
-  // 連打でも挙動安定させる（前のタイマー解除）
   if (toastTimer) clearTimeout(toastTimer);
 
   el.textContent = message;
-
-  // 色クラス全部リセット
   el.className = "";
-
-  // 表示
   el.classList.add("show", type);
 
   toastTimer = setTimeout(() => {
@@ -924,6 +971,7 @@ function showToast(message, type = "info", time){
   }, duration);
 }
 
+// ===== mini preview =====
 function renderMini(holesState, ref) {
   const total = 24;
   const v1 = Array.isArray(holesState) ? holesState : holesV2ToV1(holesState);
@@ -943,7 +991,6 @@ function miniSide(label, sideArr, refIndex) {
   const top = sideArr.slice(0, 6);
   const bottom = sideArr.slice(6, 12);
 
-  // ← ここがポイント（有効値だけ許可）
   const idx =
     (refIndex !== null && refIndex !== undefined && !isNaN(Number(refIndex)))
       ? Number(refIndex)
@@ -975,8 +1022,6 @@ function miniSide(label, sideArr, refIndex) {
 }
 
 // ===== holes v1/v2 互換 =====
-
-// v1(24個boolean) -> v2({left,right} index配列)
 function holesV1ToV2(arr24){
   const left = [];
   const right = [];
@@ -990,7 +1035,6 @@ function holesV1ToV2(arr24){
   return { left, right };
 }
 
-// v2({left,right}) -> v1(24個boolean)  ※UI表示用
 function holesV2ToV1(obj){
   const out = Array.from({length:24}, () => false);
   if (!obj || typeof obj !== "object") return out;
@@ -1011,14 +1055,14 @@ function holesV2ToV1(obj){
   return out;
 }
 
-// item.holes が v1でもv2でも 24boolean に揃える（表示・読込で使う）
 function getHolesAsV1(item){
   const h = item?.holes;
-  if (Array.isArray(h)) return h;                 // v1
-  if (h && typeof h === "object") return holesV2ToV1(h); // v2
+  if (Array.isArray(h)) return h;
+  if (h && typeof h === "object") return holesV2ToV1(h);
   return Array.from({length:24}, () => false);
 }
 
+// ===== utils =====
 function escapeHtml(str) {
   return String(str)
     .replaceAll("&", "&amp;")
@@ -1036,6 +1080,7 @@ function formatDateJP(iso){
   return `${y}-${m}-${day}`;
 }
 
+// ===== start =====
 render();
 
 // ===== dev footer（devのときだけ表示）=====
@@ -1053,7 +1098,6 @@ render();
   const btnReset = document.getElementById("btnDevReset");
   const btnCopy  = document.getElementById("btnDevCopyProd");
 
-  // devデータ削除
   btnReset?.addEventListener("click", () => {
     const ok = confirm("devのデータ（履歴・UI）を全部消すよ？");
     if (!ok) return;
@@ -1066,14 +1110,10 @@ render();
     location.reload();
   });
 
-  // 本番データ取り込み（?copyProd の代わり）
   btnCopy?.addEventListener("click", () => {
     const ok = confirm("本番データを dev にコピーするよ？（dev側は上書きされます）");
     if (!ok) return;
 
-    // 本番キー候補：
-    // 1) 旧方式（prefixなし） ← いま本番で使ってた可能性が高い
-    // 2) 新方式（prod: prefix）
     const PROD_KEYS = ["snowboard-history-v1", "prod:snowboard-history-v1"];
     const PROD_UI_KEYS = ["snowboard-ui-v1", "prod:snowboard-ui-v1"];
 
