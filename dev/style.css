@@ -809,17 +809,21 @@ h1 { color:#e53935; }
 
 /* スタンス用タブも boardタブと同じ見た目で統一 */
 .stance-tab{
-  padding: 8px 12px;
+  padding: 6px 10px;             /* ← 少しコンパクトに */
   border-radius: 999px;
-  border: 1px solid #999;
+  border: 1px solid #bbb;        /* ← 色もやや軽めに */
   background: #fff;
   white-space: nowrap;
   cursor: pointer;
-  font-size: 16px; /* 絵文字見やすく */
+  font-size: 14px;               /* ← 絵文字サイズ小さめ */
+  opacity: 0.9;                  /* ← 少し控えめな印象 */
+  transition: all 0.15s ease;    /* ← 押したときの軽いアニメ */
 }
 
 .stance-tab.active{
   background: var(--blue);
   border-color: var(--blue-border);
   color: #fff;
+  opacity: 1;                    /* ← ON時だけくっきり */
+  transform: scale(1.05);        /* ← ONで少し強調 */
 }
