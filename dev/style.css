@@ -310,7 +310,7 @@ h1{
 
 .angle-in,
 .angle-tol{
-  width: 2.6em;           /* 2桁想定 */
+  width: 1.6em;           /* 2桁想定 */
   padding: 6px 6px;
   border-radius: 999px;
   border: 1px solid #bbb;
