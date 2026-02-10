@@ -527,3 +527,22 @@ h1{
   border: 1px solid #bbb;
   background: #fff;
 }
+
+.stance-quick{
+  display:flex;
+  gap:6px;
+  margin-top:6px;
+}
+
+.stance-quick button{
+  font-size:12px;
+  padding:4px 8px;
+  border-radius:999px;
+  border:1px solid #bbb;
+  background:#fff;
+  cursor:pointer;
+}
+
+.stance-quick button:active{
+  transform:scale(0.95);
+}
