@@ -287,14 +287,14 @@ h1{
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  padding: 8px 0 12px;
+  padding: 8px 0 6px;
   margin: 0;
 }
 
 /* スタンスタブ（昔の見た目維持） */
 .stance-tabs{
   display: flex;
-  gap: 6px;
+  gap: 5px;
   overflow-x: auto;
   padding: 0 0 12px;
   margin: 0;
@@ -344,7 +344,7 @@ h1{
   border: 1px solid #bbb;
   background: #fff;
   align-self: start;
-  margin-top: 8px; /* 好みで微調整 */
+  margin-top: 6px; /* 好みで微調整 */
 }
 
 /* スマホだけ：角度フィルターが下段になっても左寄せにできる */
