@@ -364,10 +364,10 @@ list.sort((a, b) => {
   </div>
 
   <div>${escapeHtml(setupLine)}</div>
+  
+  ${stanceLabel ? `<div class="stance-tag">${escapeHtml(stanceLabel)}</div>` : ""}
 
   ${commentText ? `<div class="comment">${escapeHtml(commentText)}</div>` : ""}
-
-  ${stanceLabel ? `<div class="stance-tag">${escapeHtml(stanceLabel)}</div>` : ""}
 
   <div class="history-preview">
     ${renderMini(item.holes || [], item.reference || { left: null, right: null })}
