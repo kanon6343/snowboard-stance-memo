@@ -494,11 +494,4 @@ function formatDateJP(iso){
   return `${y}-${m}-${day}`;
 }
 
-<div class="stance-quick">
-    <button type="button" data-stance="duck">ダック</button>
-    <button type="button" data-stance="forward">前振り</button>
-    <button type="button" data-stance="back">後振り</button>
-  </div>
-</label>
-
 render();
