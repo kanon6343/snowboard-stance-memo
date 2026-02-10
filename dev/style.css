@@ -327,7 +327,7 @@ button.tab[data-board="__FAV__"].active{
 /* スタンスタブ（←昔の“丸くて小さめ”の見た目を復活） */
 .stance-tabs{
   display: flex;
-  gap: 8px;
+  gap: 6px;
   overflow-x: auto;
   padding: 0 0 12px;     /* 昔っぽい余白 */
   margin-top: -10px;   /* ← これ追加（-2〜-6で微調整OK） */
@@ -363,13 +363,13 @@ button.stance-tab.active{
   margin-left: auto;     /* ← これが右詰めの正体 */
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   flex: 0 0 auto;
 }
 
 .angle-in,
 .angle-tol{
-  width: 2em;            /* 2桁想定 */
+  width: 1.6em;            /* 2桁想定 */
   padding: 6px 6px;
   border-radius: 999px;
   border: 1px solid #bbb;
