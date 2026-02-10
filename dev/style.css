@@ -367,6 +367,53 @@ input[type="number"]::-webkit-inner-spin-button{
   margin: 0;
 }
 
+/* ===== 板タブ：昔の見た目を強制で戻す ===== */
+.tab{
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid #999;
+  background: #fff;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.tab.active{
+  background: var(--blue);
+  border-color: var(--blue-border);
+  color: #fff;
+}
+
+/* ★タブ */
+.tab[data-board="__FAV__"]{
+  color: var(--star);
+  font-weight: 700;
+}
+.tab[data-board="__FAV__"].active{
+  background: var(--star);
+  border-color: var(--star);
+  color: #fff;
+}
+
+/* ===== スタンスタブ：昔の見た目を戻す ===== */
+.stance-tab{
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid #bbb;
+  background: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0.9;
+  transition: all 0.15s ease;
+}
+
+.stance-tab.active{
+  background: var(--blue);
+  border-color: var(--blue-border);
+  color: #fff;
+  opacity: 1;
+  transform: scale(1.05);
+}
+
 /* =========================
    Holes (main)
 ========================= */
@@ -787,6 +834,3 @@ input[type="number"]::-webkit-inner-spin-button{
   -webkit-appearance: none;
   margin: 0;
 }
-
-button.tab{ border-radius: 999px !important; }
-button.stance-tab{ border-radius: 999px !important; }
