@@ -265,7 +265,7 @@ h1{
 
 /* 全体は縦積みで余白を統一 */
 .tabs-bar{
-  display: flex;
+  display: grid;
   flex-direction: column;
   gap: 10px;
   margin-top: 12px;
@@ -424,8 +424,8 @@ h1{
 .sort-select{
   width: 100%;
   font-size: 14px;
-  padding: 10px 12px;
-  border-radius: 14px;
+  padding: 12px 14px;
+  border-radius: 18px;
   border: 1px solid #bbb;
   background: #fff;
 }
@@ -839,4 +839,14 @@ button{
   font-size: 11px;
   opacity: 0.7;
   text-align: center;
+}
+
+/* numberのスピナーで幅崩れするのを抑える */
+input[type="number"]{
+  appearance: textfield;
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button{
+  -webkit-appearance: none;
+  margin: 0;
 }
