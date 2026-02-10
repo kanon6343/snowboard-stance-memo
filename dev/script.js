@@ -891,21 +891,37 @@ function exportBackup() {
 })();
 
 
-function showToast(message, type = "info", time = 1600){
+let toastTimer = null;
+
+function showToast(message, type = "info", time){
   const el = document.getElementById("toast");
   if (!el) return;
+
+  // C：表示時間をタイプで自動調整（time指定があればそれ優先）
+  const defaultTime =
+    type === "success" ? 1200 :
+    type === "info"    ? 1500 :
+    type === "star"    ? 1500 :
+    type === "error"   ? 2200 :
+    type === "rode"    ? 1300 :
+    1600;
+
+  const duration = (typeof time === "number") ? time : defaultTime;
+
+  // 連打でも挙動安定させる（前のタイマー解除）
+  if (toastTimer) clearTimeout(toastTimer);
 
   el.textContent = message;
 
   // 色クラス全部リセット
   el.className = "";
 
-  // 表示 + 色
+  // 表示
   el.classList.add("show", type);
 
-  setTimeout(() => {
+  toastTimer = setTimeout(() => {
     el.classList.remove("show", type);
-  }, time);
+  }, duration);
 }
 
 function renderMini(holesState, ref) {
