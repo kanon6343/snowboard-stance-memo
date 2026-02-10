@@ -522,7 +522,7 @@ function exportBackup() {
   String(now.getSeconds()).padStart(2, "0");
 
   const filename =
-  `snowboard-stance-memo_${IS_DEV ? "dev" : "prod"}_${stamp}.json`;
+  `snowboard-stance-memo_v${payload.dataVersion}_${IS_DEV ? "dev" : "prod"}_${stamp}.json`;
 
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
