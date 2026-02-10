@@ -445,19 +445,17 @@ function miniSide(label, sideArr, refIndex) {
       </div>
 
       <div class="mini-ref">
-        ${Array.from({ length: 6 }, (_, i) =>
-       /*   `<span class="mini-x ${i === Number(refIndex) ? "active" : ""}">×</span>`
-        ).join("")}*/
-       ${(() => {
-  const idx =
-    (refIndex === 0 || refIndex === "0" || (Number(refIndex) >= 0 && Number(refIndex) <= 5))
-      ? Number(refIndex)
-      : -1;
+  ${(() => {
+    const idx =
+      (refIndex === 0 || refIndex === "0" || (Number(refIndex) >= 0 && Number(refIndex) <= 5))
+        ? Number(refIndex)
+        : -1;
 
-  return Array.from({ length: 6 }, (_, i) =>
-    `<span class="mini-x ${i === idx ? "active" : ""}">×</span>`
-  ).join("");
-})()}  
+    return Array.from({ length: 6 }, (_, i) =>
+      `<span class="mini-x ${i === idx ? "active" : ""}">×</span>`
+    ).join("");
+  })()}
+</div>
       </div>
 
       <div class="mini-row">
