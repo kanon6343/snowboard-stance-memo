@@ -489,6 +489,110 @@ historyDiv.querySelectorAll('button[data-load-id]').forEach(btn => {
 });
 }
 
+// ===== import helpers =====
+function safeParseJSON(text){
+  try { return JSON.parse(text); }
+  catch { return null; }
+}
+
+// v1 item / v2 item / 旧形式 をそれっぽく受け止めて、アプリの item 形式に寄せる
+function normalizeItem(x){
+  if (!x || typeof x !== "object") return null;
+
+  const item = { ...x };
+
+  // id が無いなら作る（衝突しにくい）
+  if (!item.id) item.id = String(Date.now()) + "-" + Math.random().toString(16).slice(2);
+
+  item.favorite = !!item.favorite;
+
+  // holes: v1配列なら v2へ寄せる（保存側はv2）
+  if (Array.isArray(item.holes)) {
+    item.holes = holesV1ToV2(item.holes);
+    item.dataVersion = item.dataVersion || 2;
+  } else if (item.holes && typeof item.holes === "object") {
+    item.dataVersion = item.dataVersion || 2;
+  } else {
+    item.holes = { left: [], right: [] };
+    item.dataVersion = item.dataVersion || 2;
+  }
+
+  if (!item.reference) item.reference = { left: null, right: null };
+  if (!item.disk) item.disk = { left: "", right: "" };
+  if (!item.dateTime) item.dateTime = new Date().toISOString();
+
+  item.board = (item.board || "").toString();
+  item.snow = (item.snow || "").toString();
+  item.comment = (item.comment || "").toString();
+  item.leftAngle = (item.leftAngle || "").toString();
+  item.rightAngle = (item.rightAngle || "").toString();
+  item.stance = (item.stance || "").toString();
+
+  return item;
+}
+
+// payload から items/ui/meta を取り出す（新形式・旧形式どっちも対応）
+function parseBackupPayload(obj){
+  // 推奨形式：{ app, dataVersion, exportedAt, env, items, ui }
+  if (obj && typeof obj === "object" && Array.isArray(obj.items)) {
+    const items = obj.items.map(normalizeItem).filter(Boolean);
+    const ui = (obj.ui && typeof obj.ui === "object") ? obj.ui : null;
+    const meta = {
+      app: obj.app || "",
+      dataVersion: Number(obj.dataVersion || obj.version || 0),
+      exportedAt: obj.exportedAt || "",
+      env: obj.env || ""
+    };
+    return { items, ui, meta };
+  }
+
+  // 旧形式：配列だけ
+  if (Array.isArray(obj)) {
+    const items = obj.map(normalizeItem).filter(Boolean);
+    return { items, ui: null, meta: { app:"", dataVersion:0, exportedAt:"", env:"" } };
+  }
+
+  return null;
+}
+
+// プレビュー用：件数・期間・板上位
+function summarizeItems(items){
+  const n = items.length;
+
+  let min = null, max = null;
+  const boards = new Map();
+
+  for (const it of items) {
+    const t = it.dateTime ? new Date(it.dateTime).getTime() : NaN;
+    if (!Number.isNaN(t)) {
+      if (min === null || t < min) min = t;
+      if (max === null || t > max) max = t;
+    }
+
+    const b = (it.board || "").trim() || "未入力";
+    boards.set(b, (boards.get(b) || 0) + 1);
+  }
+
+  const topBoards = [...boards.entries()]
+    .sort((a,b)=>b[1]-a[1])
+    .slice(0,3);
+
+  const fmt = (ms) => {
+    if (ms === null) return "不明";
+    const d = new Date(ms);
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    const day = String(d.getDate()).padStart(2,"0");
+    return `${y}-${m}-${day}`;
+  };
+
+  return {
+    count: n,
+    range: `${fmt(min)} 〜 ${fmt(max)}`,
+    topBoards
+  };
+}
+
 // ===== バックアップ（エクスポート）=====
 function exportBackup() {
   // 履歴（メイン）
@@ -556,6 +660,132 @@ function exportBackup() {
 exportBtn?.addEventListener("click", () => {
   exportBackup();
 });
+
+    // ===== import UI wiring =====
+  const fileEl = document.getElementById("importFile");
+  const previewEl = document.getElementById("importPreview");
+  const errEl = document.getElementById("importError");
+  const btnMerge = document.getElementById("btnImportMerge");
+  const btnReplace = document.getElementById("btnImportReplace");
+
+  let pendingImport = null; // { items, ui, meta }
+
+  const setError = (msg) => {
+    if (!errEl) return;
+    if (!msg) { errEl.hidden = true; errEl.textContent = ""; return; }
+    errEl.hidden = false;
+    errEl.textContent = msg;
+  };
+
+  const setPreview = (html) => {
+    if (!previewEl) return;
+    previewEl.innerHTML = html;
+  };
+
+  const setImportButtonsEnabled = (on) => {
+    if (btnMerge) btnMerge.disabled = !on;
+    if (btnReplace) btnReplace.disabled = !on;
+  };
+
+  setImportButtonsEnabled(false);
+  setError("");
+
+  fileEl?.addEventListener("change", async () => {
+    setImportButtonsEnabled(false);
+    setError("");
+    pendingImport = null;
+
+    const f = fileEl.files?.[0];
+    if (!f) {
+      setPreview(`<div class="import-muted">※ ここにプレビューが出るよ</div>`);
+      return;
+    }
+
+    const text = await f.text();
+    const raw = safeParseJSON(text);
+    if (!raw) {
+      setPreview(`<div class="import-muted">読み込み失敗</div>`);
+      setError("JSONとして読み込めなかったよ（ファイルが壊れてるかも）");
+      return;
+    }
+
+    const parsed = parseBackupPayload(raw);
+    if (!parsed) {
+      setPreview(`<div class="import-muted">形式が違うみたい</div>`);
+      setError("このファイルは対応してない形式っぽい");
+      return;
+    }
+
+    // アプリ判定（違っても“警告”に留める）
+    const isOurApp = parsed.meta.app === "snowboard-stance-memo" || parsed.meta.app === "";
+    if (!isOurApp) {
+      setError("このファイルは別アプリの可能性があるよ（復元はおすすめしない）");
+    }
+
+    const sum = summarizeItems(parsed.items);
+    const boardsLine = sum.topBoards.length
+      ? sum.topBoards.map(([b,c]) => `${escapeHtml(b)}（${c}）`).join(" / ")
+      : "なし";
+
+    setPreview(`
+      <div><b>ファイル：</b>${escapeHtml(f.name)}</div>
+      <div><b>件数：</b>${sum.count}</div>
+      <div><b>期間：</b>${escapeHtml(sum.range)}</div>
+      <div><b>板（上位）：</b>${boardsLine}</div>
+      <div><b>形式：</b>app=${escapeHtml(parsed.meta.app || "不明")} / v=${escapeHtml(String(parsed.meta.dataVersion || "不明"))}</div>
+    `);
+
+    pendingImport = parsed;
+    setImportButtonsEnabled(parsed.items.length > 0);
+  });
+
+  function mergeItems(existing, incoming){
+    const byId = new Map(existing.map(x => [x.id, x]));
+    const out = [...existing];
+
+    for (const it0 of incoming) {
+      let it = it0;
+
+      // id衝突したら新しいidを振る（安全に追加できる）
+      if (byId.has(it.id)) {
+        it = { ...it, id: it.id + "-" + Math.random().toString(16).slice(2) };
+      }
+      out.unshift(it);
+      byId.set(it.id, it);
+    }
+    return out;
+  }
+
+  btnMerge?.addEventListener("click", () => {
+    if (!pendingImport) return;
+
+    const ok = confirm("バックアップを「追加」で復元するよ？（今のデータは残る）");
+    if (!ok) return;
+
+    const cur = loadList();
+    const next = mergeItems(cur, pendingImport.items);
+
+    localStorage.setItem(KEY, JSON.stringify(next));
+    render();
+    showToast(`追加で復元しました（+${pendingImport.items.length}件）`, "success");
+  });
+
+  btnReplace?.addEventListener("click", () => {
+    if (!pendingImport) return;
+
+    const ok = confirm("⚠️ 上書きで復元するよ？（今のデータは消える）");
+    if (!ok) return;
+
+    localStorage.setItem(KEY, JSON.stringify(pendingImport.items));
+
+    // UIも復元（上書き時のみ）
+    if (pendingImport.ui && typeof pendingImport.ui === "object") {
+      localStorage.setItem(UI_KEY, JSON.stringify(pendingImport.ui));
+    }
+
+    showToast("上書きで復元しました", "success");
+    location.reload();
+  });
 
   const close = () => {
     panel.classList.remove("open");
