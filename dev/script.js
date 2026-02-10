@@ -44,7 +44,38 @@ const saveBtn = document.getElementById("saveBtn");
 const clearBtn = document.getElementById("clearBtn"); // ← 追加
 const tabsDiv = document.getElementById("boardTabs");
 
+const stanceTabsDiv = document.getElementById("stanceTabs");
+
+function renderStanceTabs(){
+  if (!stanceTabsDiv) return;
+
+  const items = [
+    { key: "duck",    emoji: "🦆" },
+    { key: "forward", emoji: "△" },
+    { key: "back",    emoji: "▽" },
+    { key: "none",    emoji: "ー" }, // 未設定（stanceが空）
+  ];
+
+  stanceTabsDiv.innerHTML = items.map(x => {
+    const active = (stanceFilter === x.key) ? "active" : "";
+    return `<button type="button" class="stance-tab ${active}" data-stance-filter="${x.key}">${x.emoji}</button>`;
+  }).join("");
+
+  stanceTabsDiv.querySelectorAll("[data-stance-filter]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const key = btn.getAttribute("data-stance-filter") || "";
+
+      // 同じのを押したら解除（未選択へ）
+      stanceFilter = (stanceFilter === key) ? "" : key;
+
+      saveUI();
+      render();
+    });
+  });
+}
+
 let selectedBoard = "__ALL__";
+let stanceFilter = ""; // ""=未選択 / "duck" / "forward" / "back" / "none"(未設定)
 
 let favSortOn = true;      // ★を上にするON/OFF（初期はONでもOFFでもOK）
 let sortMode = "savedDesc"; // メインソート（将来増やす）
@@ -53,6 +84,7 @@ let sortMode = "savedDesc"; // メインソート（将来増やす）
 try {
   const ui = JSON.parse(localStorage.getItem(UI_KEY) || "{}");
   if (typeof ui.selectedBoard === "string") selectedBoard = ui.selectedBoard;
+  if (typeof ui.stanceFilter === "string") stanceFilter = ui.stanceFilter;
   if (typeof ui.favSortOn === "boolean") favSortOn = ui.favSortOn;
   if (typeof ui.sortMode === "string") sortMode = ui.sortMode;
 } catch {}
@@ -185,6 +217,7 @@ function loadList() {
 function saveUI(){
   localStorage.setItem(UI_KEY, JSON.stringify({
     selectedBoard,
+    stanceFilter,
     favSortOn,
     sortMode,
   }));
@@ -310,9 +343,19 @@ function renderRefSlots() {
 function render() {
   const all = loadList();
 
- const list =
+let list =
   (selectedBoard === "__ALL__") ? all
   : all.filter(x => (x.board || "").trim() === selectedBoard);
+
+// スタンス絞り込み（未選択なら何もしない）
+if (stanceFilter) {
+  list = list.filter(x => {
+    const s = x.stance || "";
+    if (stanceFilter === "none") return s === "";
+    return s === stanceFilter;
+  });
+}
+
   
   // 文字比較（空は最後）
 const cmpStr = (a, b) => String(a || "").localeCompare(String(b || ""), "ja");
@@ -344,6 +387,7 @@ list.sort((a, b) => {
   historyDiv.innerHTML = "";
 
   renderTabs();
+  renderStanceTabs();
   renderRefSlots();
 
   list.forEach((item) => {
