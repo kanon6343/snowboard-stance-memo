@@ -553,3 +553,15 @@ h1{
   border-color: var(--orange-border);
   color: #fff;
 }
+
+/* ===== タップ時の青枠・ハイライト完全無効 ===== */
+button,
+button:focus,
+button:active{
+  outline: none;
+}
+
+/* iOS / Android のタップ時ハイライト */
+button{
+  -webkit-tap-highlight-color: transparent;
+}
