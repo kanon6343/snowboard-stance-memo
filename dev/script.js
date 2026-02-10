@@ -571,13 +571,11 @@ function formatDateJP(iso){
 
 render();
 
-// ===== dev専用：localStorage リセット =====
-if (IS_DEV) {
-  window.resetDevStorage = () => {
-    Object.keys(localStorage)
-      .filter(k => k.startsWith("dev:"))
-      .forEach(k => localStorage.removeItem(k));
+const IS_DEV =
+  location.hostname === "localhost" ||
+  location.hostname === "127.0.0.1" ||
+  location.pathname.includes("/dev/");
 
-    alert("dev localStorage をリセットしたよ！");
-  };
-}
+const KEY_PREFIX = IS_DEV ? "dev:" : "prod:";
+const KEY    = `${KEY_PREFIX}snowboard-history-v1`;
+const UI_KEY = `${KEY_PREFIX}snowboard-ui-v1`;
