@@ -444,18 +444,10 @@ function miniSide(label, sideArr, refIndex) {
         ${top.map(on => `<span class="mini-hole ${on ? "active" : ""}"></span>`).join("")}
       </div>
 
-      <div class="mini-ref">
-  ${(() => {
-    const idx =
-      (refIndex === 0 || refIndex === "0" || (Number(refIndex) >= 0 && Number(refIndex) <= 5))
-        ? Number(refIndex)
-        : -1;
-
-    return Array.from({ length: 6 }, (_, i) =>
-      `<span class="mini-x ${i === idx ? "active" : ""}">×</span>`
-    ).join("");
-  })()}
-</div>
+       <div class="mini-ref">
+        ${Array.from({ length: 6 }, (_, i) =>
+          `<span class="mini-x ${i === Number(refIndex) ? "active" : ""}">×</span>`
+        ).join("")}
       </div>
 
       <div class="mini-row">
