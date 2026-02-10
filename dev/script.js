@@ -11,6 +11,24 @@ const KEY_PREFIX = IS_DEV ? "dev:" : "prod:";
 const KEY    = `${KEY_PREFIX}snowboard-history-v1`;
 const UI_KEY = `${KEY_PREFIX}snowboard-ui-v1`;
 
+// ===== 任意：初回だけ prod -> dev をコピーする =====
+if (IS_DEV) {
+  const PROD_KEY = `prod:snowboard-history-v1`;
+  const PROD_UI  = `prod:snowboard-ui-v1`;
+
+  const hasDevData = !!localStorage.getItem(KEY) || !!localStorage.getItem(UI_KEY);
+  const wantsCopy = new URLSearchParams(location.search).has("copyProd");
+
+  if (!hasDevData && wantsCopy) {
+    const prodData = localStorage.getItem(PROD_KEY);
+    const prodUI   = localStorage.getItem(PROD_UI);
+
+    if (prodData) localStorage.setItem(KEY, prodData);
+    if (prodUI)   localStorage.setItem(UI_KEY, prodUI);
+    alert("prod データを dev にコピーしたよ！");
+  }
+}
+
 const holes = [...document.querySelectorAll(".hole")];
 const historyDiv = document.getElementById("history");
 
