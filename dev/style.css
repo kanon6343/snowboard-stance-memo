@@ -330,7 +330,7 @@ button.tab[data-board="__FAV__"].active{
   gap: 8px;
   overflow-x: auto;
   padding: 0 0 12px;     /* 昔っぽい余白 */
-  margin-top: -4px;   /* ← これ追加（-2〜-6で微調整OK） */
+  margin-top: -10px;   /* ← これ追加（-2〜-6で微調整OK） */
   margin-bottom: 0;
   flex: 1;
   min-width: 0;
@@ -402,7 +402,7 @@ button.stance-tab.active{
   background: #fff;
   align-self: start;  /* 右上に固定 */
 
-   margin-top: 6px;   /* ← 追加（4〜8pxで好み調整） */
+  margin-top: 8px;   /* ← 追加（4〜8pxで好み調整） */
 }
 
 /* ===== スマホ：角度検索だけ1段下げる（板タブとスタンスの見た目はそのまま） ===== */
