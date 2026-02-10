@@ -1,0 +1,567 @@
+/* =========================
+   Theme / Variables
+   （カラーコードで合わせたいならここだけ変えればOK）
+========================= */
+:root{
+  --blue: #0077b6;        /* タブ選択 */
+  --blue-border: #caf0f8;
+
+  --orange: #fc6a03;      /* 穴・ディスク選択 */
+  --orange-border: #f5deb3;
+
+  --green: #4caf50;       /* 読込・保存 */
+  --red: #e53935;         /* 削除 */
+
+  --star: #f6c343;        /* ★ */
+  --card: #f4f4f4;
+  --text-muted: #777;
+}
+
+/* =========================
+   Base
+========================= */
+body{
+  font-family: sans-serif;
+  padding: 16px;
+}
+
+h1{
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+/* =========================
+   Layout / Card
+========================= */
+.bindings{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 480px){
+  .bindings{ grid-template-columns: 1fr; }
+}
+
+.card{
+  background: var(--card);
+  padding: 8px;
+  border-radius: 12px;
+}
+
+.card h2{
+  text-align: center;
+  margin: 0 0 10px 0;
+}
+
+/* =========================
+   Meta / Buttons
+========================= */
+.meta{
+  display: grid;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.meta input,
+.meta select{
+  font-size: 16px;
+}
+
+.comment{
+  margin-top: 6px;
+  padding: 8px;
+  background: #fff;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #333;
+}
+
+/* 保存・クリア */
+#saveBtn,
+#clearBtn{
+  padding: 10px 12px;
+  font-size: 16px;
+  width: 100%;
+}
+
+#clearBtn{ margin-top: 8px; }
+
+#saveBtn{
+  background: var(--green);
+  border: 1px solid var(--green);
+  color: #fff;
+}
+
+/* 押してる間だけ薄く＆ちょい縮む */
+#saveBtn:active{
+  filter: brightness(1.15);
+  transform: scale(0.97);
+}
+
+/* =========================
+   Holes (main)
+========================= */
+.holes{
+  width: 256px;
+  margin: 0 auto;
+}
+
+.row{
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 0;
+  align-items: center;
+}
+
+.hole{
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  aspect-ratio: 1 / 1;
+  box-sizing: border-box;
+
+  border: 2px solid #999;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.hole.active{
+  background: var(--orange);
+  border-color: var(--orange-border);
+}
+
+/* =========================
+   Tabs
+========================= */
+.tabs{
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px 0 12px;
+}
+
+.tab{
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid #999;
+  background: #fff;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.tab.active{
+  background: var(--blue);
+  border-color: var(--blue-border);
+  color: #fff;
+}
+
+/* ★タブ */
+.tab[data-board="__FAV__"]{
+  color: var(--star);
+  font-weight: 700;
+}
+.tab[data-board="__FAV__"].active{
+  background: var(--star);
+  border-color: var(--star);
+  color: #fff;
+}
+
+/* =========================
+   Reference (help + tap slots)
+   兄弟構造前提：ref-lineはabsolute禁止
+========================= */
+/* 追加：重ねるための箱 */
+.ref-wrap{
+  position: relative;
+  width: 256px;
+  height: 26px;
+  margin: 0 auto 0;
+}
+
+/* ref-wrap の中にある “下の穴(row)” だけ下げる */
+.ref-wrap > .row{
+  margin-top: 26px; /* 好きに調整 */
+}
+
+/* 表示側 */
+.ref-help{
+  position: absolute;
+  inset: 0;
+  text-align: center;
+  font-size: 11px;
+  color: #aaa;
+  opacity: 0.7;
+  line-height: 26px;
+
+  /* 文字はクリック邪魔しない */
+  pointer-events: none;
+}
+
+.ref-help.active::after{
+  content: "×";
+  position: absolute;
+  left: var(--ref-x, 50%);
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  font-size: 36px;
+  font-weight: 900;
+  color: var(--red);
+
+  text-shadow:
+    1px 0 currentColor,
+   -1px 0 currentColor,
+    0 1px currentColor,
+    0 -1px currentColor;
+}
+
+/* タップ判定（×と同じ場所に重なる） */
+.ref-line{
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  z-index: 2;
+
+  /* 判定は生かす */
+  pointer-events: auto;
+}
+
+.ref-slot{
+  width: 40px;
+  height: 26px;
+}
+/* =========================
+   Disk UI
+========================= */
+.side-row{
+  display: grid;
+  grid-template-columns: 34px 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.side-title{
+  font-weight: 700;
+  text-align: center;
+}
+
+.angle{
+  display: grid;
+  gap: 4px;
+}
+.angle input{
+  font-size: 16px;
+  width: 100%;
+}
+
+.disk{
+  display: grid;
+  gap: 4px;
+  justify-items: end;
+}
+.disk-label{
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.disk-group{
+  display: flex;
+  gap: 6px;
+}
+
+.chip{
+  border: 1px solid #bbb;
+  background: #fff;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.chip.active{
+  background: var(--orange);
+  border-color: var(--orange-border);
+  color: #fff;
+}
+
+@media (max-width: 420px){
+  .side-row{ grid-template-columns: 34px 1fr; }
+  .disk{
+    grid-column: 1 / -1;
+    justify-items: start;
+  }
+}
+
+/* =========================
+   History
+========================= */
+#history{
+  margin-top: 16px;
+  display: grid;
+  gap: 16px;
+}
+
+.history-preview{
+  margin: 10px 0 12px;
+}
+
+.history-actions{
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.btn-load{
+  padding: 6px 12px;
+  background: var(--green);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+}
+
+.btn-del{
+  padding: 6px 12px;
+  background: var(--red);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+}
+
+/* =========================
+   Favorite star button
+========================= */
+.fav-btn{
+  border: none;
+  background: transparent;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 6px;
+  color: #bbb; /* ☆ */
+}
+
+.fav-btn.active{
+  color: var(--star) !important; /* ★ */
+  text-shadow: 0 1px 0 rgba(0,0,0,0.12);
+}
+
+/* =========================
+   Mini preview
+========================= */
+.mini-bindings{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.mini-side{
+  background: #fff;
+  border-radius: 10px;
+  padding: 8px;
+}
+
+.mini-label{
+  text-align: center;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.mini-row,
+.mini-ref{
+  width: calc(12px * 6 + 4px * 5);
+  margin-left: auto;
+  margin-right: auto;
+
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+
+  margin-bottom: 4px;
+}
+
+.mini-hole,
+.mini-x{
+  width: 12px;
+  height: 12px;
+  flex: 0 0 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+/* 穴（未選択でも枠が見える） */
+.mini-hole{
+  border: 1px solid #999;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.mini-hole.active{
+  background: var(--orange);
+  border-color: var(--orange-border);
+}
+
+/* ×（activeだけ見える） */
+.mini-x{
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+  color: transparent;
+}
+
+.mini-x.active{
+  color: var(--red);
+}
+
+/* =========================
+   DEBUG MODE（位置確認用）
+   使うときだけON
+========================= */
+/*
+.holes     { outline: 2px dashed purple; }  /* 穴エリア全体 *//*
+.row       { outline: 1px dashed blue; }    /* 穴の列 *//*
+.ref-help  { outline: 2px solid red; }      /* ×表示エリア *//*
+.ref-line  { outline: 2px solid orange; }   /* タップ判定エリア *//*
+.ref-slot  { background: rgba(255,165,0,0.15); } /* 各スロット */
+
+/* ==== ref 判定帯を強制で26pxに固定（最終上書き用） ==== *//*
+.ref-line{
+  position: relative !important;
+  inset: auto !important;
+  top: auto !important;
+  left: auto !important;
+
+  width: 256px !important;
+  height: 26px !important;
+  margin: 0 auto !important;
+
+  display: flex !important;
+  justify-content: center !important;
+  gap: 10px !important;
+}
+*/
+
+/*
+.ref-slot{
+  height: 26px !important;
+}
+
+/* ref-line を ref-help の上に重ねる（兄弟構造のまま） *//*
+.ref-line{
+  margin-top: -28px !important; /* ← ref-help の高さぶん上に持ち上げる */
+}
+
+.ref-help{ transform: translateY(-1px); }
+.ref-line{ transform: translateY(-1px); }
+
+/* 下の穴列だけ少し下げる *//*
+.holes > .row:last-child{
+  margin-top: 26px;  /* 好きに調整（4〜10くらい） */
+}
+
+.btn-del:disabled{
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* =========================
+   Toast
+========================= */
+
+#toast{
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+
+  padding: 10px 18px;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 14px;
+
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.25s;
+  z-index: 999;
+}
+
+/* 表示 */
+#toast.show{
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* 色バリエーション */
+#toast.success { background: var(--green); }
+#toast.error   { background: var(--red); }
+#toast.star    { background: var(--star); color:#333; }
+#toast.info    { background: #555; }
+#toast.rode    { background: var(--green); }
+
+.btn-del.is-protected{
+  opacity: 0.45;
+  filter: grayscale(0.2);
+}
+
+.tabs-bar{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tabs{
+  flex: 1;
+}
+
+.sort-select{
+  font-size: 12px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  border: 1px solid #bbb;
+  background: #fff;
+}
+
+.stance-quick{
+  display:flex;
+  gap:6px;
+  margin-top:6px;
+}
+
+.stance-quick button{
+  font-size:12px;
+  padding:6px 12px;
+  border-radius:999px;
+  border:1px solid #bbb;
+  background:#fff;
+  cursor:pointer;
+/*  transition: 0.15s;*/
+}
+
+.stance-quick button:active{
+  transform: scale(0.95);
+}
+
+.stance-quick button.active{
+  background: var(--orange);         /* ←ここが色 */
+  border-color: var(--orange-border);
+  color: #fff;
+}
+
+/* ===== タップ時の青枠・ハイライト完全無効 ===== */
+button,
+button:focus,
+button:active{
+  outline: none;
+}
+
+/* iOS / Android のタップ時ハイライト */
+button{
+  -webkit-tap-highlight-color: transparent;
+}
