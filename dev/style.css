@@ -759,6 +759,7 @@ button{
   align-items: center;
   gap: 10px;
   padding-bottom: 12px;
+  flex-wrap: wrap;
 }
 
 /* スタンスは横スクロールOKのまま */
@@ -774,6 +775,7 @@ button{
   align-items: center;
   gap: 6px;
   flex-shrink: 0; /* ← ここ重要：潰れない */
+  margin-left: auto; /* 2段目になった時も右寄せ */
 }
 
 .angle-in,
@@ -803,4 +805,51 @@ button{
   font-size: 16px;
   line-height: 1;
   cursor: pointer;
+}
+
+/* =========================
+   Angle Filter（コンパクト化）
+========================= */
+.stance-row{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap; /* まずは横1列を維持 */
+}
+
+.stance-tabs{
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto; /* ここはスクロールできるように保険 */
+}
+
+.angle-filter{
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 2桁ぶんだけ表示できればOKな幅 */
+.angle-filter .angle-in,
+.angle-filter .angle-tol{
+  width: 2.6em;           /* ←2桁+ちょい余白 */
+  padding: 6px 8px;
+  font-size: 12px;
+  text-align: center;
+}
+
+/* ± と × も小さめに */
+.angle-filter .angle-pm{
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.angle-filter .angle-clear{
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 10px;
+  font-size: 16px;
+  line-height: 1;
 }
