@@ -562,7 +562,7 @@ h1{
 
 .stance-btn.active{
   background: var(--orange);
-  border-color: var(--blue-border);
+  border-color: var(--orange-border);
   color: #fff;
    
   transform: scale(0.95);
