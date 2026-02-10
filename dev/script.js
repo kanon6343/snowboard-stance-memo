@@ -139,7 +139,8 @@ saveBtn?.addEventListener("click", () => {
     leftAngle: (leftAngleEl?.value || "").trim(),
     rightAngle: (rightAngleEl?.value || "").trim(),
     disk: { ...disk },
-    holes: holes.map(h => h.classList.contains("active")),
+    holes: holesV1ToV2(holes.map(h => h.classList.contains("active"))),
+    dataVersion: 2,
     reference: { ...reference },
     dateTime: new Date().toISOString(),
   };
@@ -469,8 +470,9 @@ historyDiv.querySelectorAll('button[data-load-id]').forEach(btn => {
     leftAngleEl && (leftAngleEl.value = item.leftAngle || "");
     rightAngleEl && (rightAngleEl.value = item.rightAngle || "");
 
+    const holesArr = getHolesAsV1(item);
     holes.forEach((h, i) => {
-      h.classList.toggle("active", !!item.holes?.[i]);
+      h.classList.toggle("active", !!holesArr[i]);
     });
 
     stance = item.stance || "";
@@ -585,7 +587,8 @@ function showToast(message, type = "info", time = 1600){
 
 function renderMini(holesState, ref) {
   const total = 24;
-  const arr = Array.from({ length: total }, (_, i) => !!holesState[i]);
+  const v1 = Array.isArray(holesState) ? holesState : holesV2ToV1(holesState);
+  const arr = Array.from({ length: total }, (_, i) => !!v1[i]);
   const left = arr.slice(0, 12);
   const right = arr.slice(12, 24);
 
@@ -630,6 +633,51 @@ function miniSide(label, sideArr, refIndex) {
       </div>
     </div>
   `;
+}
+
+// ===== holes v1/v2 互換 =====
+
+// v1(24個boolean) -> v2({left,right} index配列)
+function holesV1ToV2(arr24){
+  const left = [];
+  const right = [];
+  const arr = Array.isArray(arr24) ? arr24 : [];
+
+  for (let i = 0; i < 24; i++) {
+    if (!arr[i]) continue;
+    if (i < 12) left.push(i);
+    else right.push(i - 12);
+  }
+  return { left, right };
+}
+
+// v2({left,right}) -> v1(24個boolean)  ※UI表示用
+function holesV2ToV1(obj){
+  const out = Array.from({length:24}, () => false);
+  if (!obj || typeof obj !== "object") return out;
+
+  const left = Array.isArray(obj.left) ? obj.left : [];
+  const right = Array.isArray(obj.right) ? obj.right : [];
+
+  left.forEach(i => {
+    const n = Number(i);
+    if (Number.isFinite(n) && n >= 0 && n < 12) out[n] = true;
+  });
+
+  right.forEach(i => {
+    const n = Number(i);
+    if (Number.isFinite(n) && n >= 0 && n < 12) out[12 + n] = true;
+  });
+
+  return out;
+}
+
+// item.holes が v1でもv2でも 24boolean に揃える（表示・読込で使う）
+function getHolesAsV1(item){
+  const h = item?.holes;
+  if (Array.isArray(h)) return h;                 // v1
+  if (h && typeof h === "object") return holesV2ToV1(h); // v2
+  return Array.from({length:24}, () => false);
 }
 
 function escapeHtml(str) {
