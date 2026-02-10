@@ -360,6 +360,7 @@ button.stance-tab.active{
 
 /* 角度検索（枠は付けない＝変な枠が出ない） */
 .angle-filter{
+  margin-left: auto;     /* ← これが右詰めの正体 */
   display: flex;
   align-items: center;
   gap: 6px;
@@ -413,6 +414,8 @@ button.stance-tab.active{
   .angle-filter{
     width: 100%;
     justify-content: flex-end;
+    margin-left: 0;          /* ← auto を解除 */
+    justify-content: flex-start; /* ← 左詰め */
     margin-top: 6px;
   }
 }
