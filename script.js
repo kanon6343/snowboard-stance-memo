@@ -43,7 +43,40 @@ if (sortModeEl) {
 
 let reference = { left: null, right: null };
 
+let stance = ""; // "duck" | "forward" | "back" | ""
 let disk = { left: "", right: "" };
+
+const stanceBtns = [...document.querySelectorAll("[data-stance]")];
+
+function renderStanceUI(){
+  stanceBtns.forEach(btn => {
+    const v = btn.dataset.stance ?? "";
+    const isOn = (v === stance) || (v === "off" && stance === "");
+    btn.classList.toggle("active", isOn);
+  });
+}
+
+stanceBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    const v = btn.dataset.stance ?? "";
+
+    // OFF扱い（"off" でも "" でも解除）
+    const next = (v === "off" || v === "") ? "" : v;
+
+    // 同じのをもう一回押したら解除（ON/OFF）
+    stance = (stance === next) ? "" : next;
+
+    renderStanceUI();
+
+    // トースト任意
+    const label =
+      stance === "duck" ? "ダック" :
+      stance === "forward" ? "前振り" :
+      stance === "back" ? "後振り" :
+      "解除";
+    showToast(`スタンス：${label}`, stance ? "info" : "info");
+  });
+});
 
 // 穴タップ
 holes.forEach(h => h.addEventListener("click", () => h.classList.toggle("active")));
@@ -56,6 +89,9 @@ clearBtn?.addEventListener("click", () => {
   if (leftAngleEl) leftAngleEl.value = "";
   if (rightAngleEl) rightAngleEl.value = "";
   holes.forEach(h => h.classList.remove("active"));
+
+  stance = "";
+  renderStanceUI();
 
   reference = { left: null, right: null };
   renderRefSlots();
@@ -72,6 +108,7 @@ saveBtn?.addEventListener("click", () => {
     board: (boardEl?.value || "").trim(),
     snow: snowEl?.value || "",
     comment: (commentEl?.value || "").trim(),
+    stance,
     leftAngle: (leftAngleEl?.value || "").trim(),
     rightAngle: (rightAngleEl?.value || "").trim(),
     disk: { ...disk },
@@ -299,9 +336,14 @@ list.sort((a, b) => {
     const title = `${boardLabel} / ${dateLabel} / ${timeLabel} / ${snowLabel}`;
     const leftDisk = item.disk?.left || "";
     const rightDisk = item.disk?.right || "";
-    
+
     const commentText = (item.comment || "").trim();
 
+    const stanceLabel =
+      item.stance === "duck" ? "ダック" :
+      item.stance === "forward" ? "前振り" :
+      item.stance === "back" ? "後振り" : "";
+    
     const setupLine = `左 ${item.leftAngle || "?"}°  ${leftDisk}　右 ${item.rightAngle || "?"}°  ${rightDisk}`;
 
     const fav = !!item.favorite;
@@ -401,6 +443,9 @@ historyDiv.querySelectorAll('button[data-load-id]').forEach(btn => {
       h.classList.toggle("active", !!item.holes?.[i]);
     });
 
+    stance = item.stance || "";
+    renderStanceUI();
+
     reference = item.reference || { left: null, right: null };
     renderRefSlots();
 
@@ -477,6 +522,7 @@ function miniSide(label, sideArr, refIndex) {
     </div>
   `;
 }
+
 function escapeHtml(str) {
   return String(str)
     .replaceAll("&", "&amp;")
