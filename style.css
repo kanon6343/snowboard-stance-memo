@@ -528,6 +528,10 @@ h1{
   background: #fff;
 }
 
+.stance-btn{
+  transition: 0.15s;
+}
+
 .stance-quick{
   display:flex;
   gap:6px;
@@ -545,4 +549,12 @@ h1{
 
 .stance-quick button:active{
   transform:scale(0.95);
+}
+
+.stance-btn.active{
+  background: var(--orange);
+  border-color: var(--blue-border);
+  color: #fff;
+   
+  transform: scale(0.95);
 }
