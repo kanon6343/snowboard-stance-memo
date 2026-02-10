@@ -260,64 +260,114 @@ h1{
 }
 
 /* =========================
-   Tabs + Filters + Sort（確定版）
+   Tabs + Stance Filter + Angle Filter + Sort
+   “見た目は昔のまま”で、“配置だけ改善”
 ========================= */
 
-/* PCは「左=タブ&フィルタ / 右=ソート」 */
+/* ★ ここで「ソート右上固定」 */
 .tabs-bar{
   display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: start;
+  grid-template-columns: 1fr auto; /* 左：タブ群 / 右：ソート */
   gap: 8px;
-  margin-top: 12px;
+  align-items: start;
 }
 
+/* 左カラム（板タブ + スタンス/角度） */
 .tabs-stack{
-  display: grid;
-  gap: 8px;          /* boardTabs / stance-row の間隔 */
   min-width: 0;
+  display: grid;
+  gap: 8px;
 }
 
-/* board tabs は上下の余白を安定させる */
+/* ===== 板タブ（←昔のデザインそのまま） ===== */
 .tabs{
-  padding: 0;
-  margin: 0;
-  display:flex;
+  display: flex;
   gap: 8px;
   overflow-x: auto;
+  padding: 8px 0 12px;   /* 昔の余白 */
+  margin: 0;
 }
 
-/* stance + angle を横並び */
+button.tab{
+  padding: 8px 12px;
+  border-radius: 999px !important;
+  border: 1px solid #999;
+  background: #fff;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+button.tab.active{
+  background: var(--blue);
+  border-color: var(--blue-border);
+  color: #fff;
+}
+
+/* ★タブ */
+button.tab[data-board="__FAV__"]{
+  color: var(--star);
+  font-weight: 700;
+}
+button.tab[data-board="__FAV__"].active{
+  background: var(--star);
+  border-color: var(--star);
+  color: #fff;
+}
+
+/* ===== スタンス + 角度（2段目） ===== */
 .stance-row{
-  display:flex;
-  align-items:center;
-  gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   min-width: 0;
 }
 
-/* スタンスは横スクロール可 */
+/* スタンスタブ（←昔の“丸くて小さめ”の見た目を復活） */
 .stance-tabs{
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 0 0 12px;     /* 昔っぽい余白 */
+  margin: 0;
   flex: 1;
   min-width: 0;
-  display:flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding: 0;
-  margin: 0;
 }
 
-/* 角度検索（外枠は付けない＝変な枠が消える） */
+button.stance-tab{
+  padding: 6px 10px;
+  border-radius: 999px !important;
+  border: 1px solid #bbb;
+  background: #fff;
+  white-space: nowrap;
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0.9;
+  transition: all 0.15s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+button.stance-tab.active{
+  background: var(--blue);
+  border-color: var(--blue-border);
+  color: #fff;
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+/* 角度検索（枠は付けない＝変な枠が出ない） */
 .angle-filter{
-  flex: 0 0 auto;
-  display:flex;
-  align-items:center;
+  display: flex;
+  align-items: center;
   gap: 6px;
+  flex: 0 0 auto;
 }
 
-/* 2桁想定でコンパクト */
 .angle-in,
 .angle-tol{
-  width: 2.6em;
+  width: 2.6em;            /* 2桁想定 */
   padding: 6px 6px;
   border-radius: 999px;
   border: 1px solid #bbb;
@@ -342,25 +392,18 @@ h1{
   cursor: pointer;
 }
 
-/* ソートは右の「auto列」に乗るのでデカくならない */
+/* ===== ソート（右上・昔のデザイン） ===== */
 .sort-select{
   font-size: 12px;
-  padding: 8px 10px;
-  border-radius: 12px;
+  padding: 6px 8px;
+  border-radius: 10px;
   border: 1px solid #bbb;
   background: #fff;
-  height: 40px;      /* 見た目の安定 */
-  align-self: start;
+  align-self: start;  /* 右上に固定 */
 }
 
-/* スマホは 1列にして、順番を「tabs→filters→sort」にする */
+/* ===== スマホ：角度検索だけ1段下げる（板タブとスタンスの見た目はそのまま） ===== */
 @media (max-width: 520px){
-  .tabs-bar{
-    grid-template-columns: 1fr;
-  }
-  .sort-select{
-    width: 100%;
-  }
   .stance-row{
     flex-wrap: wrap;
   }
@@ -369,6 +412,16 @@ h1{
     justify-content: flex-end;
     margin-top: 6px;
   }
+}
+
+/* ついで：numberのスピナーで幅崩れ抑制 */
+input[type="number"]{
+  appearance: textfield;
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button{
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 /* =========================
