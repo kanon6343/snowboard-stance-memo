@@ -130,8 +130,23 @@
 <div class="tabs-bar">
   <div class="tabs-stack">
     <div id="boardTabs" class="tabs"></div>
-    <div id="stanceTabs" class="stance-tabs" aria-label="スタンス絞り込み"></div>
+   <div class="stance-row">
+  <div class="stance-tabs" id="stanceTabs">
+    <!-- 🦆 △ ▽ ー -->
   </div>
+
+  <!-- 角度検索 -->
+  <div class="angle-filter" aria-label="角度検索">
+    <input id="angleLeft"  class="angle-in" type="number" placeholder="L">
+    <input id="angleRight" class="angle-in" type="number" placeholder="R">
+
+    <span class="angle-pm">±</span>
+    <input id="angleTol"   class="angle-tol" type="number" value="2" min="0">
+
+    <button id="angleClear" class="angle-clear" type="button">×</button>
+  </div>
+</div>
+
   
   <select id="sortMode" class="sort-select">
     <option value="savedDesc">保存日↓</option>
