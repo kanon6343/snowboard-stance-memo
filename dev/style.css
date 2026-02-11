@@ -268,7 +268,7 @@ h1{
   grid-template-areas:
     "boards sort"
     "stance angle";
-  gap: 8px;
+  gap: 1px;
   align-items: start;
   margin-top: 0px;
 }
