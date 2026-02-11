@@ -864,3 +864,22 @@ input[type="number"]::-webkit-inner-spin-button{
 #menuFilters .angle-filter{
   justify-content: flex-start; /* メニュー内は左詰めで自然 */
 }
+
+/* 右スライド内の時だけ */
+.filters-panel.in-menu .menu-filters{
+  display: grid;
+  gap: 10px;
+}
+
+.filters-panel.in-menu .sort-select{
+  width: 100%;
+  height: 40px;
+}
+
+.filters-panel.in-menu .stance-tabs{
+  padding: 0;
+}
+
+.filters-panel.in-menu .angle-filter{
+  justify-content: flex-start;
+}
