@@ -172,6 +172,38 @@
   <div id="filtersMountMenu"></div>
     </section>
 
+  
+    
+    <section class="menu-card">
+      <h3>📦 データ管理</h3>
+
+      <button id="btnExport" type="button" class="menu-action">📤 バックアップを書き出す（.json）</button>
+
+      <div class="import-box">
+        <div class="import-title">📥 バックアップから復元</div>
+
+        <input id="importFile" type="file" accept="application/json" class="import-file">
+
+        <div id="importPreview" class="import-preview">
+          <div class="import-muted">※ ここにプレビューが出るよ</div>
+        </div>
+
+        <div class="import-actions">
+          <button id="btnImportMerge" type="button" class="menu-action" disabled>追加して復元（安全）</button>
+          <button id="btnImportReplace" type="button" class="menu-action danger" disabled>上書きで復元（危険）</button>
+        </div>
+
+        <div id="importError" class="import-error" hidden></div>
+      </div>
+    </section>
+
+    <section class="menu-card">
+      <h3>🎛 表示・操作</h3>
+      <button type="button" class="menu-action" disabled>（今後追加）</button>
+    </section>
+  </div>
+</aside>
+
   <div class="menu-filters">
     <!-- ① 日付ソート -->
     <label class="menu-label">
@@ -207,37 +239,7 @@
       🧹 フィルター/ソートを全部クリア
     </button>
   </div>
-    </section>
-    
-    <section class="menu-card">
-      <h3>📦 データ管理</h3>
-
-      <button id="btnExport" type="button" class="menu-action">📤 バックアップを書き出す（.json）</button>
-
-      <div class="import-box">
-        <div class="import-title">📥 バックアップから復元</div>
-
-        <input id="importFile" type="file" accept="application/json" class="import-file">
-
-        <div id="importPreview" class="import-preview">
-          <div class="import-muted">※ ここにプレビューが出るよ</div>
-        </div>
-
-        <div class="import-actions">
-          <button id="btnImportMerge" type="button" class="menu-action" disabled>追加して復元（安全）</button>
-          <button id="btnImportReplace" type="button" class="menu-action danger" disabled>上書きで復元（危険）</button>
-        </div>
-
-        <div id="importError" class="import-error" hidden></div>
-      </div>
-    </section>
-
-    <section class="menu-card">
-      <h3>🎛 表示・操作</h3>
-      <button type="button" class="menu-action" disabled>（今後追加）</button>
-    </section>
-  </div>
-</aside>
+</section>
 
 <script src="script.js?v=30"></script>
 
