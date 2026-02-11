@@ -106,6 +106,28 @@ function saveUI(){
   }));
 }
 
+const btnFilterClearAll = document.getElementById("btnFilterClearAll");
+
+btnFilterClearAll?.addEventListener("click", () => {
+  // 1) 状態を初期化
+  stanceFilter = "";
+  sortMode = "savedDesc";
+  angleFilter = { left: null, right: null, tol: 2 };
+
+  // 2) UIに反映
+  if (sortModeEl) sortModeEl.value = sortMode;
+
+  if (angleLeftEl) angleLeftEl.value = "";
+  if (angleRightEl) angleRightEl.value = "";
+  if (angleTolEl) angleTolEl.value = "2";
+
+  // 3) 保存 & 再描画
+  saveUI();
+  render();
+
+  showToast("フィルター/ソート：全部クリア", "info");
+});
+
 // ===== stance tabs =====
 function renderStanceTabs(){
   if (!stanceTabsDiv) return;
