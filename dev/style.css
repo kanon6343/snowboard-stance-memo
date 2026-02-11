@@ -275,7 +275,7 @@ h1{
 
 /* 配置 */
 #boardTabs{ grid-area: boards; }
-#sortMode{  grid-area: sort;  }
+#sortMode{  grid-area: sort; justify-self: end; }
 #stanceTabs{ grid-area: stance; }
 .angle-filter{
   grid-area: angle;
