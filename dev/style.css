@@ -267,7 +267,7 @@ h1{
   grid-template-columns: 1fr auto; /* 左=タブ / 右=セレクト・角度 */
   grid-template-areas:
     "boards sort"
-    "stance angle"
+    "stance angle";
   gap: 8px;
   align-items: start;
   margin-top: 6px;
