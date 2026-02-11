@@ -666,6 +666,33 @@ function render() {
   });
 }
 
+// ===== フィルターUIの置き場所切り替え =====
+let filtersPlace = "menu"; // "menu" or "top"
+
+// UIから復元（UI_KEYに混ぜるならここで）
+try{
+  const ui = JSON.parse(localStorage.getItem(UI_KEY) || "{}");
+  if (ui.filtersPlace === "top" || ui.filtersPlace === "menu") filtersPlace = ui.filtersPlace;
+}catch{}
+
+function mountFilters(place){
+  const panel = document.getElementById("filtersPanel");       // フィルター本体
+  const top = document.getElementById("filtersMountTop");      // 上の受け皿
+  const menu = document.getElementById("filtersMountMenu");    // 右スライド受け皿
+  if (!panel || !top || !menu) return;
+
+  (place === "top" ? top : menu).appendChild(panel);
+
+  // 保存
+  try{
+    const ui = JSON.parse(localStorage.getItem(UI_KEY) || "{}");
+    ui.filtersPlace = place;
+    localStorage.setItem(UI_KEY, JSON.stringify(ui));
+  }catch{}
+}
+
+mountFilters(filtersPlace);
+
 // ===== import helpers =====
 function safeParseJSON(text){
   try { return JSON.parse(text); }
