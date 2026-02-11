@@ -142,6 +142,11 @@
 <div id="devFooter" class="dev-footer" hidden>
   <div class="dev-badge">🧪 DEV MODE</div>
 
+  <label class="dev-toggle">
+  <input id="uiFiltersInTop" type="checkbox">
+  フィルターを上に表示
+  </label>
+
   <div class="dev-actions">
     <button id="btnDevCopyProd" type="button" class="dev-btn">本番データを取り込む</button>
     <button id="btnDevReset" type="button" class="dev-btn danger">devデータ全削除</button>
@@ -164,6 +169,8 @@
   <div class="menu-body">
     <section class="menu-card" id="menuFilters">
   <h3>🎛 フィルター / ソート</h3>
+  <div id="filtersMountMenu"></div>
+    </section>
 
   <div class="menu-filters">
     <!-- ① 日付ソート -->
