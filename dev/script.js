@@ -108,24 +108,28 @@ function saveUI(){
 
 const btnFilterClearAll = document.getElementById("btnFilterClearAll");
 
-btnFilterClearAll?.addEventListener("click", () => {
-  // 1) 状態を初期化
-  stanceFilter = "";
-  sortMode = "savedDesc";
-  angleFilter = { left: null, right: null, tol: 2 };
+const btnFilterClear = document.getElementById("btnFilterClear");
 
-  // 2) UIに反映
+btnFilterClear?.addEventListener("click", () => {
+  // 1) ソートを初期に
+  sortMode = "savedDesc";
   if (sortModeEl) sortModeEl.value = sortMode;
 
+  // 2) スタンスフィルター解除
+  stanceFilter = "";
+  renderStanceTabs();
+
+  // 3) 角度フィルター解除（既存の角度クリアと同じ状態へ）
+  angleFilter = { left: null, right: null, tol: 2 };
   if (angleLeftEl) angleLeftEl.value = "";
   if (angleRightEl) angleRightEl.value = "";
   if (angleTolEl) angleTolEl.value = "2";
 
-  // 3) 保存 & 再描画
+  // 4) UI保存→再描画
   saveUI();
   render();
 
-  showToast("フィルター/ソート：全部クリア", "info");
+  showToast("フィルター/ソートをクリアしたよ", "info");
 });
 
 // ===== stance tabs =====
