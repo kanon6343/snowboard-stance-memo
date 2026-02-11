@@ -344,7 +344,7 @@ h1{
   border: 1px solid #bbb;
   background: #fff;
   align-self: start;
-  margin-top: 6px 12px; /* 好みで微調整 */
+  margin-top: 12px 12px; /* 好みで微調整 */
   justify-self: end;
 }
 
