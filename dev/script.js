@@ -111,6 +111,7 @@ const btnFilterClearAll = document.getElementById("btnFilterClearAll");
 const btnFilterClear = document.getElementById("btnFilterClear");
 
 btnFilterClear?.addEventListener("click", () => {
+  const sortModeEl = document.getElementById("sortMode");
   // 1) ソートを初期に
   sortMode = "savedDesc";
   if (sortModeEl) sortModeEl.value = sortMode;
