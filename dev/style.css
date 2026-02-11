@@ -838,3 +838,29 @@ input[type="number"]::-webkit-inner-spin-button{
   -webkit-appearance: none;
   margin: 0;
 }
+
+/* 右スライド内のフィルターUI */
+#menuFilters .menu-filters{
+  display: grid;
+  gap: 10px;
+}
+
+#menuFilters .menu-label{
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  color: #555;
+}
+
+#menuFilters .sort-select{
+  width: 100%;
+  height: 40px;
+}
+
+#menuFilters .stance-tabs{
+  padding: 0;     /* 下余白いらない */
+}
+
+#menuFilters .angle-filter{
+  justify-content: flex-start; /* メニュー内は左詰めで自然 */
+}
