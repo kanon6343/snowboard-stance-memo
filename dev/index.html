@@ -130,29 +130,6 @@
   <!-- 1段目 左：板タブ -->
   <div id="boardTabs" class="tabs"></div>
 
-  <!-- 1段目 右：日付ソート -->
-  <select id="sortMode" class="sort-select">
-    <option value="savedDesc">保存日↓</option>
-    <option value="savedAsc">保存日↑</option>
-    <option value="boardAsc">板名</option>
-    <option value="snowAsc">雪質</option>
-  </select>
-
-  <!-- 2段目 左：スタンスフィルター -->
-  <div class="stance-tabs" id="stanceTabs">
-    <!-- 🦆 △ ▽ ー（JSで生成） -->
-  </div>
-
-  <!-- 2段目 右：角度フィルター -->
-  <div class="angle-filter" aria-label="角度検索">
-    <input id="angleLeft"  class="angle-in" type="number" placeholder="L">
-    <input id="angleRight" class="angle-in" type="number" placeholder="R">
-
-    <span class="angle-pm">±</span>
-    <input id="angleTol"   class="angle-tol" type="number" value="2" min="0">
-
-    <button id="angleClear" class="angle-clear" type="button">×</button>
-  </div>
 </div>
 
 <div id="history"></div>
@@ -182,6 +159,46 @@
   </div>
 
   <div class="menu-body">
+    <section class="menu-card" id="menuFilters">
+  <h3>🎛 フィルター / ソート</h3>
+
+  <div class="menu-filters">
+    <!-- ① 日付ソート -->
+    <label class="menu-label">
+      並び替え
+      <select id="sortMode" class="sort-select">
+        <option value="savedDesc">保存日↓</option>
+        <option value="savedAsc">保存日↑</option>
+        <option value="boardAsc">板名</option>
+        <option value="snowAsc">雪質</option>
+      </select>
+    </label>
+
+    <!-- ② スタンス -->
+    <div class="menu-label">
+      スタンス
+      <div class="stance-tabs" id="stanceTabs"></div>
+    </div>
+
+    <!-- ③ 角度 -->
+    <div class="menu-label">
+      角度
+      <div class="angle-filter" aria-label="角度検索">
+        <input id="angleLeft" class="angle-in" type="number" placeholder="L">
+        <input id="angleRight" class="angle-in" type="number" placeholder="R">
+        <span class="angle-pm">±</span>
+        <input id="angleTol" class="angle-tol" type="number" value="2" min="0">
+        <button id="angleClear" class="angle-clear" type="button">×</button>
+      </div>
+    </div>
+
+    <!-- ✅ オールクリア -->
+    <button id="btnFilterClearAll" type="button" class="menu-action">
+      🧹 フィルター/ソートを全部クリア
+    </button>
+  </div>
+    </section>
+    
     <section class="menu-card">
       <h3>📦 データ管理</h3>
 
