@@ -683,6 +683,8 @@ function mountFilters(place){
 
   (place === "top" ? top : menu).appendChild(panel);
 
+  panel.hidden = false;
+
   // 保存
   try{
     const ui = JSON.parse(localStorage.getItem(UI_KEY) || "{}");
