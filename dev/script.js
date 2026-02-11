@@ -106,8 +106,6 @@ function saveUI(){
   }));
 }
 
-const btnFilterClearAll = document.getElementById("btnFilterClearAll");
-
 const btnFilterClear = document.getElementById("btnFilterClear");
 
 btnFilterClear?.addEventListener("click", () => {
