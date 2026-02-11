@@ -92,12 +92,52 @@ if (angleLeftEl)  angleLeftEl.value  = (angleFilter.left  ?? "") === "" ? "" : S
 if (angleRightEl) angleRightEl.value = (angleFilter.right ?? "") === "" ? "" : String(angleFilter.right);
 if (angleTolEl)   angleTolEl.value   = String(angleFilter.tol ?? 2);
 
+// ===== filters placement toggle =====
+const mountTop  = document.getElementById("filtersMountTop");
+const mountMenu = document.getElementById("filtersMountMenu");
+const panel     = document.getElementById("filtersPanel");
+const uiToggle  = document.getElementById("uiFiltersInTop");
+
+function applyFiltersPlacement(mode){
+  if (!mountTop || !mountMenu || !panel) return;
+
+  if (mode === "top") {
+    mountTop.appendChild(panel);
+    panel.classList.remove("in-menu");
+  } else {
+    mountMenu.appendChild(panel);
+    panel.classList.add("in-menu");
+  }
+}
+
+// UI復元（UI_KEYに保存）
+let filtersPlacement = "menu";
+try{
+  const ui = JSON.parse(localStorage.getItem(UI_KEY) || "{}");
+  if (ui.filtersPlacement === "top" || ui.filtersPlacement === "menu") {
+    filtersPlacement = ui.filtersPlacement;
+  }
+}catch{}
+
+applyFiltersPlacement(filtersPlacement);
+if (uiToggle) uiToggle.checked = (filtersPlacement === "top");
+
+uiToggle?.addEventListener("change", () => {
+  filtersPlacement = uiToggle.checked ? "top" : "menu";
+  applyFiltersPlacement(filtersPlacement);
+  saveUI();
+  showToast(filtersPlacement === "top" ? "上部表示に切替" : "右スライドに切替", "info");
+});
+
+// saveUI にこれも保存してね（追記）
+
 function saveUI(){
   localStorage.setItem(UI_KEY, JSON.stringify({
     selectedBoard,
     stanceFilter,
     favSortOn,
     sortMode,
+    filtersPlacement,
     angleFilter: {
       left: angleFilter.left,
       right: angleFilter.right,
