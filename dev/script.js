@@ -171,6 +171,24 @@ btnFilterClear?.addEventListener("click", () => {
   showToast("フィルター/ソートをクリアしたよ", "info");
 });
 
+function resetSortAndFilters(){
+  // ソート
+  sortMode = "savedDesc";
+  if (sortModeEl) sortModeEl.value = sortMode;
+
+  // スタンスフィルター
+  stanceFilter = "";
+
+  // 角度フィルター
+  angleFilter = { left: null, right: null, tol: 2 };
+  if (angleLeftEl)  angleLeftEl.value  = "";
+  if (angleRightEl) angleRightEl.value = "";
+  if (angleTolEl)   angleTolEl.value   = "2";
+
+  // UI保存（selectedBoardやfavSortOnは触らない＝好み維持）
+  saveUI();
+}
+
 // ===== stance tabs =====
 function renderStanceTabs(){
   if (!stanceTabsDiv) return;
@@ -992,6 +1010,7 @@ function exportBackup() {
 
     localStorage.setItem(KEY, JSON.stringify(next));
 
+    resetSortAndFilters();
     render();
     showToast(`追加で復元（+${pendingImport.items.length}件 / 合計${next.length}件）`, "success");
 
@@ -1013,10 +1032,13 @@ function exportBackup() {
 
     localStorage.setItem(KEY, JSON.stringify(pendingImport.items));
 
+    /*
     if (pendingImport.ui && typeof pendingImport.ui === "object") {
       localStorage.setItem(UI_KEY, JSON.stringify(pendingImport.ui));
     }
+*/
 
+    resetSortAndFilters();
     showToast("上書きで復元しました", "success");
 
     resetImportUI();
