@@ -1010,6 +1010,16 @@ function exportBackup() {
 
     localStorage.setItem(KEY, JSON.stringify(next));
 
+    const restoreUI = confirm("バックアップの「フィルター/ソート状態(UI)」も復元する？\n\nOK：UIも復元\nキャンセル：UIは初期状態（クリア）");
+
+if (restoreUI && pendingImport.ui && typeof pendingImport.ui === "object") {
+  localStorage.setItem(UI_KEY, JSON.stringify(pendingImport.ui));
+} else {
+  // UIを初期化して保存（フィルター/ソートをクリア状態に）
+  resetUIState();
+}
+
+
     resetSortAndFilters();
     render();
     showToast(`追加で復元（+${pendingImport.items.length}件 / 合計${next.length}件）`, "success");
