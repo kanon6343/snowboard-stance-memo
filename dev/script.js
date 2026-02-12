@@ -57,7 +57,7 @@ const angleClearEl = document.getElementById("angleClear");
 let selectedBoard = "__ALL__";
 let stanceFilter = ""; // ""=未選択 / "duck" / "forward" / "back" / "none"(未設定)
 
-let favSortOn = true;       // ★を上に
+let favSortOn = false;       // ★を上に
 let sortMode = "savedDesc"; // メインソート
 
 // 角度検索：片方だけでも両方でもOK
