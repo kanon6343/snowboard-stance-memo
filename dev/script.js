@@ -149,45 +149,26 @@ function saveUI(){
 const btnFilterClear = document.getElementById("btnFilterClear");
 
 btnFilterClear?.addEventListener("click", () => {
-  const sortModeEl = document.getElementById("sortMode");
-  // 1) ソートを初期に
+function resetAllFiltersAndSort(){
+  selectedBoard = "__ALL__";
+  favSortOn = false;
+
   sortMode = "savedDesc";
   if (sortModeEl) sortModeEl.value = sortMode;
 
-  // 2) スタンスフィルター解除
-  stanceFilter = "";
-  renderStanceTabs();
-
-  // 3) 角度フィルター解除（既存の角度クリアと同じ状態へ）
-  angleFilter = { left: null, right: null, tol: 2 };
-  if (angleLeftEl) angleLeftEl.value = "";
-  if (angleRightEl) angleRightEl.value = "";
-  if (angleTolEl) angleTolEl.value = "2";
-
-  // 4) UI保存→再描画
-  saveUI();
-  render();
-
-  showToast("フィルター/ソートをクリアしたよ", "info");
-});
-
-function resetSortAndFilters(){
-  // ソート
-  sortMode = "savedDesc";
-  if (sortModeEl) sortModeEl.value = sortMode;
-
-  // スタンスフィルター
   stanceFilter = "";
 
-  // 角度フィルター
   angleFilter = { left: null, right: null, tol: 2 };
   if (angleLeftEl)  angleLeftEl.value  = "";
   if (angleRightEl) angleRightEl.value = "";
   if (angleTolEl)   angleTolEl.value   = "2";
 
-  // UI保存（selectedBoardやfavSortOnは触らない＝好み維持）
   saveUI();
 }
+
+
+  showToast("フィルター/ソートをクリアしたよ", "info");
+});
 
 // ===== stance tabs =====
 function renderStanceTabs(){
@@ -1013,13 +994,6 @@ function exportBackup() {
     "フィルター/ソートを初期状態にリセットしますか？\n\nOK：UIをリセット\nキャンセル：バックアップのUIも復元"
   );
 
-  if (resetUI) {
-    resetUIState();        // UIを初期化して保存するならここ
-  } else if (pendingImport.ui && typeof pendingImport.ui === "object") {
-    localStorage.setItem(UI_KEY, JSON.stringify(pendingImport.ui));
-  } else {
-    resetUIState();
-  }
 
   // ✅ ここは「UIリセットしたい時だけ」にする
   // resetSortAndFilters();  ← 消すか、下のifの中へ
