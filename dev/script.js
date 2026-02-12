@@ -1010,9 +1010,14 @@ function exportBackup() {
 
     localStorage.setItem(KEY, JSON.stringify(next));
 
-    const restoreUI = confirm("バックアップの「フィルター/ソート状態(UI)」も復元する？\n\nOK：UIも復元\nキャンセル：UIは初期状態（クリア）");
-
-if (restoreUI && pendingImport.ui && typeof pendingImport.ui === "object") {
+    const resetUI = confirm("フィルター/ソートを初期状態にリセットしますか？\n\nOK：UIをリセット\nキャンセル：バックアップのUIも復元"
+);
+    
+if (resetUI) {
+  // OK押した → UIを初期化
+  resetUIState();
+} else if (pendingImport.ui && typeof pendingImport.ui === "object") {
+  // キャンセル押した → バックアップのUIも復元
   localStorage.setItem(UI_KEY, JSON.stringify(pendingImport.ui));
 } else {
   // UIを初期化して保存（フィルター/ソートをクリア状態に）
