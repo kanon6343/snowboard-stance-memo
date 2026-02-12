@@ -1000,66 +1000,69 @@ function exportBackup() {
   }
 
   btnMerge?.addEventListener("click", () => {
-    if (!pendingImport) return;
+  if (!pendingImport) return;
 
-    const ok = confirm("バックアップを「追加」で復元するよ？（今のデータは残る）");
-    if (!ok) return;
+  const ok = confirm("バックアップを「追加」で復元するよ？（今のデータは残る）");
+  if (!ok) return;
 
-    const cur = loadList();
-    const next = mergeItems(cur, pendingImport.items);
+  const cur = loadList();
+  const next = mergeItems(cur, pendingImport.items);
+  localStorage.setItem(KEY, JSON.stringify(next));
 
-    localStorage.setItem(KEY, JSON.stringify(next));
+  const resetUI = confirm(
+    "フィルター/ソートを初期状態にリセットしますか？\n\nOK：UIをリセット\nキャンセル：バックアップのUIも復元"
+  );
 
-    const resetUI = confirm("フィルター/ソートを初期状態にリセットしますか？\n\nOK：UIをリセット\nキャンセル：バックアップのUIも復元"
-);
-    
-if (resetUI) {
-  // OK押した → UIを初期化
-  resetUIState();
-} else if (pendingImport.ui && typeof pendingImport.ui === "object") {
-  // キャンセル押した → バックアップのUIも復元
-  localStorage.setItem(UI_KEY, JSON.stringify(pendingImport.ui));
-} else {
-  // UIを初期化して保存（フィルター/ソートをクリア状態に）
-  resetUIState();
-}
+  if (resetUI) {
+    resetUIState();        // UIを初期化して保存するならここ
+  } else if (pendingImport.ui && typeof pendingImport.ui === "object") {
+    localStorage.setItem(UI_KEY, JSON.stringify(pendingImport.ui));
+  } else {
+    resetUIState();
+  }
 
+  // ✅ ここは「UIリセットしたい時だけ」にする
+  // resetSortAndFilters();  ← 消すか、下のifの中へ
 
-    resetSortAndFilters();
-    render();
-    showToast(`追加で復元（+${pendingImport.items.length}件 / 合計${next.length}件）`, "success");
+  render();
+  showToast(`追加で復元（+${pendingImport.items.length}件 / 合計${next.length}件）`, "success");
 
-    resetImportUI();
-    close();
-  });
+  resetImportUI();
+  close();
+});
 
-  btnReplace?.addEventListener("click", () => {
-    if (!pendingImport) return;
+ btnReplace?.addEventListener("click", () => {
+  if (!pendingImport) return;
 
-    const ok1 = confirm("⚠️ 上書きで復元するよ？（今のデータは消える）");
-    if (!ok1) return;
+  const ok1 = confirm("⚠️ 上書きで復元するよ？（今のデータは消える）");
+  if (!ok1) return;
 
-    const ok2 = prompt("本当に上書きするなら「OK」と入力してね");
-    if (ok2 !== "OK") {
-      showToast("上書きをキャンセルしました", "info");
-      return;
-    }
+  const ok2 = prompt("本当に上書きするなら「OK」と入力してね");
+  if (ok2 !== "OK") {
+    showToast("上書きをキャンセルしました", "info");
+    return;
+  }
 
-    localStorage.setItem(KEY, JSON.stringify(pendingImport.items));
+  localStorage.setItem(KEY, JSON.stringify(pendingImport.items));
 
-    /*
-    if (pendingImport.ui && typeof pendingImport.ui === "object") {
-      localStorage.setItem(UI_KEY, JSON.stringify(pendingImport.ui));
-    }
-*/
+  const resetUI = confirm(
+    "フィルター/ソートを初期状態にリセットしますか？\n\nOK：UIをリセット\nキャンセル：バックアップのUIも復元"
+  );
 
-    resetSortAndFilters();
-    showToast("上書きで復元しました", "success");
+  if (resetUI) {
+    resetUIState();
+  } else if (pendingImport.ui && typeof pendingImport.ui === "object") {
+    localStorage.setItem(UI_KEY, JSON.stringify(pendingImport.ui));
+  } else {
+    resetUIState();
+  }
 
-    resetImportUI();
-    close();
-    location.reload();
-  });
+  showToast("上書きで復元しました", "success");
+
+  resetImportUI();
+  close();
+  location.reload();
+});
 
   btn.addEventListener("click", () => {
     const isOpen = panel.classList.contains("open");
