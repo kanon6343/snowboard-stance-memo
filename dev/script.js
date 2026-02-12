@@ -1023,14 +1023,14 @@ function exportBackup() {
     "フィルター/ソートを初期状態にリセットしますか？\n\nOK：UIをリセット\nキャンセル：バックアップのUIも復元"
   );
 
-  if (resetUI) {
+ /* if (resetUI) {
     resetUIState();
   } else if (pendingImport.ui && typeof pendingImport.ui === "object") {
     localStorage.setItem(UI_KEY, JSON.stringify(pendingImport.ui));
   } else {
     resetUIState();
   }
-
+*/
   showToast("上書きで復元しました", "success");
 
   resetImportUI();
