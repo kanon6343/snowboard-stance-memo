@@ -39,6 +39,14 @@ const snowEl = document.getElementById("snow");
 const commentEl = document.getElementById("comment");
 if (commentEl) commentEl.value = "";
 
+const commentClearBtn = document.getElementById("commentClearBtn");
+
+commentClearBtn?.addEventListener("click", () => {
+  if (!commentEl) return;
+  commentEl.value = "";
+  showToast("コメントをクリアしたよ", "info");
+});
+
 const leftAngleEl = document.getElementById("left-angle");
 const rightAngleEl = document.getElementById("right-angle");
 const saveBtn = document.getElementById("saveBtn");
