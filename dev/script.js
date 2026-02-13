@@ -116,6 +116,8 @@ function applyFiltersPlacement(mode){
     mountMenu.appendChild(panel);
     panel.classList.add("in-menu");
   }
+  panel.hidden = false; // ←これ追加（filtersPanelをhidden運用してるなら必須）
+}
 }
 
 // UI復元（UI_KEYに保存）
@@ -674,7 +676,7 @@ function render() {
 }
 
 // ===== フィルターUIの置き場所切り替え =====
-let filtersPlace = "menu"; // "menu" or "top"
+/* let filtersPlace = "menu"; // "menu" or "top"
 
 // UIから復元（UI_KEYに混ぜるならここで）
 try{
@@ -701,7 +703,7 @@ function mountFilters(place){
 }
 
 mountFilters(filtersPlace);
-
+*/
 // ===== import helpers =====
 function safeParseJSON(text){
   try { return JSON.parse(text); }
