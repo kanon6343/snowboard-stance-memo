@@ -118,7 +118,6 @@ function applyFiltersPlacement(mode){
   }
   panel.hidden = false; // ←これ追加（filtersPanelをhidden運用してるなら必須）
 }
-}
 
 // UI復元（UI_KEYに保存）
 let filtersPlacement = "menu";
