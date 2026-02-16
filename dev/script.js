@@ -998,14 +998,24 @@ function exportBackup() {
   const cur = loadList();
   const next = mergeItems(cur, pendingImport.items);
   localStorage.setItem(KEY, JSON.stringify(next));
-
+/*
   // ✅ 復元直後は「板タブ含めて全部OFF」
   resetAllFiltersAndSort();  // ← 追加
-/*
+
  const resetUI = confirm(
     "フィルター/ソートを初期状態にリセットしますか？\n\nOK：UIをリセット\nキャンセル：バックアップのUIも復元"
   ); 　*/
 
+    if (resetUI) {
+  // OK：全部OFFで復元
+  resetAllFiltersAndSort();
+} else if (pendingImport.ui && typeof pendingImport.ui === "object") {
+  // キャンセル：バックアップのUIを復元
+  localStorage.setItem(UI_KEY, JSON.stringify(pendingImport.ui));
+  // ※この場合は in-memory の state も同期した方が安全（後述）
+} else {
+  resetAllFiltersAndSort();
+}
 
   // ✅ ここは「UIリセットしたい時だけ」にする
   // resetSortAndFilters();  ← 消すか、下のifの中へ
@@ -1045,6 +1055,44 @@ function exportBackup() {
     resetUIState();
   }
 */
+
+   btnMerge?.addEventListener("click", () => {
+  if (!pendingImport) return;
+
+  const ok = confirm("バックアップを「追加」で復元するよ？（今のデータは残る）");
+  if (!ok) return;
+
+  const cur = loadList();
+  const next = mergeItems(cur, pendingImport.items);
+  localStorage.setItem(KEY, JSON.stringify(next));
+
+  // ✅ 復元直後は「板タブ含めて全部OFF」
+  resetAllFiltersAndSort();  // ← 追加
+
+ const resetUI = confirm(
+    "フィルター/ソートを初期状態にリセットしますか？\n\nOK：UIをリセット\nキャンセル：バックアップのUIも復元"
+  ); 　
+
+    if (resetUI) {
+  // OK：全部OFFで復元
+  resetAllFiltersAndSort();
+} else if (pendingImport.ui && typeof pendingImport.ui === "object") {
+  // キャンセル：バックアップのUIを復元
+  localStorage.setItem(UI_KEY, JSON.stringify(pendingImport.ui));
+  // ※この場合は in-memory の state も同期した方が安全（後述）
+} else {
+  resetAllFiltersAndSort();
+}
+
+  // ✅ ここは「UIリセットしたい時だけ」にする
+  // resetSortAndFilters();  ← 消すか、下のifの中へ
+
+  render();
+  showToast(`追加で復元（+${pendingImport.items.length}件 / 合計${next.length}件）`, "success");
+
+  resetImportUI();
+  close();
+});
   showToast("上書きで復元しました", "success");
 
   resetImportUI();
