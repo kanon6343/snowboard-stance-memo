@@ -1184,7 +1184,6 @@ function formatDateJP(iso){
   return `${y}-${m}-${day}`;
 }
 
-loadUIFromStorage();
 // ===== start =====
 render();
 
