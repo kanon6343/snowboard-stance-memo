@@ -898,3 +898,21 @@ input[type="number"]::-webkit-inner-spin-button{
 .comment-clear:active{
   transform: scale(0.97);
 }
+
+/* 右上固定メニューボタン */
+.menu-btn{
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 10000;
+
+  width: 44px;
+  height: 44px;
+
+  border-radius: 50%;
+  font-size: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
