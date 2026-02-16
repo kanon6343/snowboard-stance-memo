@@ -999,9 +999,12 @@ function exportBackup() {
   const next = mergeItems(cur, pendingImport.items);
   localStorage.setItem(KEY, JSON.stringify(next));
 
-  const resetUI = confirm(
+  // ✅ 復元直後は「板タブ含めて全部OFF」
+  resetAllFiltersAndSort();  // ← 追加
+
+ /* const resetUI = confirm(
     "フィルター/ソートを初期状態にリセットしますか？\n\nOK：UIをリセット\nキャンセル：バックアップのUIも復元"
-  );
+  ); */
 
 
   // ✅ ここは「UIリセットしたい時だけ」にする
@@ -1028,9 +1031,11 @@ function exportBackup() {
 
   localStorage.setItem(KEY, JSON.stringify(pendingImport.items));
 
+  resetAllFiltersAndSort();  // ← 追加
+/*
   const resetUI = confirm(
     "フィルター/ソートを初期状態にリセットしますか？\n\nOK：UIをリセット\nキャンセル：バックアップのUIも復元"
-  );
+  ); */
 
  /* if (resetUI) {
     resetUIState();
