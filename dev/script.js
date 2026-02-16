@@ -155,9 +155,6 @@ function saveUI(){
   }));
 }
 
-const btnFilterClear = document.getElementById("btnFilterClear");
-
-btnFilterClear?.addEventListener("click", () => {
 function resetAllFiltersAndSort(){
   selectedBoard = "__ALL__";
   favSortOn = false;
@@ -175,7 +172,11 @@ function resetAllFiltersAndSort(){
   saveUI();
 }
 
+const btnFilterClear = document.getElementById("btnFilterClear");
 
+btnFilterClear?.addEventListener("click", () => {
+  resetAllFiltersAndSort();
+  render();
   showToast("フィルター/ソートをクリアしたよ", "info");
 });
 
@@ -1001,8 +1002,6 @@ function exportBackup() {
 
   // 復元直後は「板タブ含めて全部OFF」
   resetAllFiltersAndSort();
-
-  loadUIFromStorage();        // 念のため state を揃える
     
   render();
   showToast(`追加で復元（+${pendingImport.items.length}件 / 合計${next.length}件）`, "success");
@@ -1027,8 +1026,6 @@ function exportBackup() {
 
   // 復元直後は「板タブ含めて全部OFF」
   resetAllFiltersAndSort();
-
-  loadUIFromStorage();        // 念のため state を揃える
    
   render();
   showToast("上書きで復元しました", "success");
