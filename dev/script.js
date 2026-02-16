@@ -99,7 +99,7 @@ try {
 if (angleLeftEl)  angleLeftEl.value  = (angleFilter.left  ?? "") === "" ? "" : String(angleFilter.left);
 if (angleRightEl) angleRightEl.value = (angleFilter.right ?? "") === "" ? "" : String(angleFilter.right);
 if (angleTolEl)   angleTolEl.value   = String(angleFilter.tol ?? 2);
-
+/*
 // ===== filters placement toggle =====
 const mountTop  = document.getElementById("filtersMountTop");
 const mountMenu = document.getElementById("filtersMountMenu");
@@ -137,6 +137,16 @@ uiToggle?.addEventListener("change", () => {
   saveUI();
   showToast(filtersPlacement === "top" ? "上部表示に切替" : "右スライドに切替", "info");
 });
+*/
+
+// ===== filters placement: menu固定（右スライドだけ）=====
+const mountMenu = document.getElementById("filtersMountMenu");
+const panel = document.getElementById("filtersPanel");
+
+if (mountMenu && panel) {
+  mountMenu.appendChild(panel);
+  panel.hidden = false;
+}
 
 // saveUI にこれも保存してね（追記）
 
@@ -146,7 +156,6 @@ function saveUI(){
     stanceFilter,
     favSortOn,
     sortMode,
-    filtersPlacement,
     angleFilter: {
       left: angleFilter.left,
       right: angleFilter.right,
