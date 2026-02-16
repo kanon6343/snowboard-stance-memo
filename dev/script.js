@@ -1188,7 +1188,6 @@ function formatDateJP(iso){
 }
 
 loadUIFromStorage();
-render();
 // ===== start =====
 render();
 
