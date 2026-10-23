@@ -932,3 +932,251 @@ input[type="number"]::-webkit-inner-spin-button{
 background: white;
 }
 
+/* =========================
+   Haru UX pass
+========================= */
+*,
+*::before,
+*::after{
+  box-sizing: border-box;
+}
+
+html,
+body{
+  overflow-x: hidden;
+}
+
+body{
+  color: #16252d;
+  background:
+    radial-gradient(circle at 90% 0%, rgba(202,240,248,.55), transparent 28rem),
+    linear-gradient(180deg, #f7fbfc 0%, #edf4f5 100%);
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 56px;
+}
+
+.card{
+  background: rgba(255,255,255,.88);
+  border: 1px solid rgba(219,229,232,.9);
+  border-radius: 18px;
+  box-shadow: 0 10px 28px rgba(42,76,88,.08);
+  padding: 18px;
+}
+
+.section-help,
+.binding-help{
+  color: var(--text-muted);
+  font-size: 12px;
+  text-align: center;
+  margin: -2px 0 16px;
+}
+
+.binding-help{
+  margin: -4px 0 12px;
+  line-height: 1.5;
+}
+
+.meta > .field-row{
+  display: grid;
+  grid-template-columns: 5em minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  color: #34454d;
+  font-weight: 700;
+}
+
+.meta > .comment-field{
+  align-items: start;
+}
+
+.meta input,
+.meta select,
+.meta textarea{
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #dbe5e8;
+  border-radius: 10px;
+  padding: 9px 10px;
+  background: #fff;
+  font-size: 16px;
+}
+
+.meta textarea{
+  min-height: 88px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.meta input:focus,
+.meta select:focus,
+.meta textarea:focus{
+  outline: 3px solid rgba(0,119,182,.14);
+  border-color: var(--blue);
+}
+
+.comment-clear{
+  justify-self: start;
+  margin-left: 5.5em;
+  margin-top: -2px;
+}
+
+.stance-quick{
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 4px 0 2px;
+}
+
+.stance-quick::before{
+  content: "スタンス";
+  width: 100%;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.side-row{
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid #e5edef;
+}
+
+.side-row:first-of-type{
+  margin-top: 4px;
+}
+
+.angle input{
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.disk-group{
+  flex-wrap: wrap;
+}
+
+.holes{
+  width: min(100%, 256px);
+  max-width: 100%;
+  padding: 10px 0 4px;
+}
+
+.row{
+  max-width: 100%;
+}
+
+.hole{
+  flex: 0 1 36px;
+  min-width: 0;
+}
+
+.ref-wrap,
+.ref-line{
+  width: min(100%, 256px);
+  max-width: 100%;
+}
+
+.ref-slot{
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.history-heading{
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 24px 2px 4px;
+}
+
+.history-heading h2{
+  margin: 0;
+  font-size: 20px;
+}
+
+.history-heading p{
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.history-hint{
+  flex: 0 0 auto;
+  color: #9b7611;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.empty-state{
+  text-align: center;
+  padding: 30px 18px;
+}
+
+.empty-state h2{
+  margin: 8px 0 6px;
+  font-size: 18px;
+}
+
+.empty-state p{
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.empty-icon{
+  font-size: 34px;
+}
+
+@media (max-width: 720px){
+  .bindings{
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px){
+  body{
+    padding: 18px 10px 40px;
+  }
+
+  .card{
+    padding: 14px;
+  }
+
+  .topbar{
+    align-items: flex-start;
+  }
+
+  .title{
+    font-size: 25px;
+  }
+
+  .meta > .field-row{
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .comment-clear{
+    margin-left: 0;
+  }
+
+  .side-row{
+    grid-template-columns: 40px minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .disk{
+    grid-column: 2;
+    justify-items: start;
+  }
+
+  .chip{
+    min-width: 48px;
+    padding: 8px 10px;
+  }
+
+  .history-heading{
+    align-items: start;
+    flex-direction: column;
+  }
+}
+

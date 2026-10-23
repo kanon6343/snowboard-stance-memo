@@ -554,6 +554,18 @@ function render() {
   renderStanceTabs();
   renderRefSlots();
 
+  if (list.length === 0) {
+    const hasSavedItems = loadList().length > 0;
+    historyDiv.innerHTML = `
+      <section class="empty-state card">
+        <div class="empty-icon">🏂</div>
+        <h2>${hasSavedItems ? "条件に一致するメモがありません" : "まだメモがありません"}</h2>
+        <p>${hasSavedItems ? "メニューのフィルターを見直すか、別の板を選んでみてね。" : "上のフォームにセッティングを入力して、最初の一本を保存しよう。"}</p>
+      </section>
+    `;
+    return;
+  }
+
   list.forEach((item) => {
     const card = document.createElement("section");
     card.className = "card";
@@ -1218,10 +1230,10 @@ render();
     if (!ok) return;
 
     Object.keys(localStorage)
-      .filter(k => k.startsWith("dev:"))
+      .filter(k => k.startsWith(`${KEY_PREFIX}`))
       .forEach(k => localStorage.removeItem(k));
 
-    showToast("devデータを削除しました", "error");
+    showToast("作業版データを削除しました", "error");
     location.reload();
   });
 
