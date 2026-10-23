@@ -46,6 +46,7 @@ const commentClearBtn = document.getElementById("commentClearBtn");
 commentClearBtn?.addEventListener("click", () => {
   if (!commentEl) return;
   commentEl.value = "";
+  syncEditorSummary();
   showToast("コメントをクリアしたよ", "info");
 });
 
@@ -288,6 +289,7 @@ function renderStanceUI(){
     const v = btn.dataset.stance ?? "";
     const isOn = (v === stance) || (v === "off" && stance === "");
     btn.classList.toggle("active", isOn);
+    btn.setAttribute("aria-pressed", String(isOn));
   });
 }
 
@@ -309,7 +311,15 @@ stanceBtns.forEach(btn => {
 });
 
 // 穴タップ
-holes.forEach(h => h.addEventListener("click", () => h.classList.toggle("active")));
+holes.forEach((h, i) => {
+  const side = i < 12 ? "左足" : "右足";
+  const row = i % 12 < 6 ? "上段" : "下段";
+  h.setAttribute("aria-label", `${side} ${row} 穴${i % 6 + 1}`);
+  h.addEventListener("click", () => {
+    h.classList.toggle("active");
+    syncEditorSummary();
+  });
+});
 
 // クリア（入力）
 clearBtn?.addEventListener("click", () => {
@@ -328,6 +338,9 @@ clearBtn?.addEventListener("click", () => {
 
   disk = { left: "", right: "" };
   renderDiskUI();
+  document.getElementById("commentDetails").open = false;
+  showFoot("left");
+  syncEditorSummary();
 });
 
 // 保存
@@ -374,9 +387,74 @@ function renderDiskUI() {
   document.querySelectorAll(".disk-group").forEach(group => {
     const side = group.dataset.side;
     group.querySelectorAll(".chip").forEach(btn => {
-      btn.classList.toggle("active", btn.dataset.value === disk[side]);
+      const active = btn.dataset.value === disk[side];
+      btn.classList.toggle("active", active);
+      btn.setAttribute("aria-pressed", String(active));
     });
   });
+  syncEditorSummary();
+}
+
+// Compact editor: switching panels keeps the existing input elements and state.
+function syncEditorSummary() {
+  for (const side of ["left", "right"]) {
+    const angle = document.getElementById(`${side}-angle`)?.value || "";
+    const count = document.querySelectorAll(`.holes[data-side="${side}"] .hole.active`).length;
+    const summary = document.querySelector(`[data-summary="${side}"]`);
+    const angleText = angle === "" ? "角度未入力" : `${Number(angle) > 0 ? "+" : ""}${angle}°`;
+    if (summary) summary.textContent = `${angleText}${disk?.[side] ? ` · ${disk[side]}` : ""} · 穴${count}`;
+  }
+  holes.forEach(h => h.setAttribute("aria-pressed", String(h.classList.contains("active"))));
+  const savedCount = document.getElementById("savedCount");
+  if (savedCount) savedCount.textContent = String(loadList().length);
+  const commentState = document.getElementById("commentState");
+  if (commentState) commentState.textContent = commentEl?.value.trim() ? "入力あり" : "任意";
+}
+
+function showView(view) {
+  document.querySelectorAll("[data-view]").forEach(button => {
+    const active = button.dataset.view === view;
+    button.setAttribute("aria-selected", String(active));
+    button.tabIndex = active ? 0 : -1;
+    document.getElementById(button.getAttribute("aria-controls")).hidden = !active;
+  });
+  if (view === "input") renderRefSlots();
+}
+
+function showFoot(side) {
+  document.querySelectorAll("[data-foot]").forEach(button => {
+    const active = button.dataset.foot === side;
+    button.setAttribute("aria-selected", String(active));
+    button.tabIndex = active ? 0 : -1;
+    document.getElementById(button.getAttribute("aria-controls")).hidden = !active;
+  });
+  renderRefSlots();
+}
+
+function setupCompactEditor() {
+  for (const [selector, attribute, change] of [
+    ["[data-view]", "view", showView],
+    ["[data-foot]", "foot", showFoot],
+  ]) {
+    const buttons = [...document.querySelectorAll(selector)];
+    buttons.forEach((button, index) => {
+      button.addEventListener("click", () => change(button.dataset[attribute]));
+      button.addEventListener("keydown", event => {
+        let next;
+        if (event.key === "ArrowRight") next = (index + 1) % buttons.length;
+        if (event.key === "ArrowLeft") next = (index - 1 + buttons.length) % buttons.length;
+        if (event.key === "Home") next = 0;
+        if (event.key === "End") next = buttons.length - 1;
+        if (next === undefined) return;
+        event.preventDefault();
+        buttons[next].click();
+        buttons[next].focus();
+      });
+    });
+  }
+  [leftAngleEl, rightAngleEl, commentEl].forEach(input => input?.addEventListener("input", syncEditorSummary));
+  window.addEventListener("resize", () => renderRefSlots());
+  syncEditorSummary();
 }
 
 function loadList() {
@@ -454,7 +532,7 @@ function renderRefSlots() {
     const side = line.dataset.side;
 
     line.innerHTML = Array.from({ length: 6 }, (_, i) =>
-      `<div class="ref-slot" data-index="${i}" data-side="${side}"></div>`
+      `<button type="button" class="ref-slot" data-index="${i}" data-side="${side}" aria-label="${side === "left" ? "左足" : "右足"} 推奨位置${i + 1}" aria-pressed="${reference?.[side] === i}"></button>`
     ).join("");
 
     const idx = reference?.[side];
@@ -477,12 +555,14 @@ function renderRefSlots() {
           reference[side] = null;
           line.querySelectorAll(".ref-slot").forEach(s => s.classList.remove("active"));
           setHelpX(side, null);
+          line.querySelectorAll(".ref-slot").forEach(s => s.setAttribute("aria-pressed", "false"));
           return;
         }
 
         reference[side] = index;
         line.querySelectorAll(".ref-slot").forEach(s => s.classList.remove("active"));
         slot.classList.add("active");
+        line.querySelectorAll(".ref-slot").forEach(s => s.setAttribute("aria-pressed", String(s === slot)));
         setHelpX(side, index);
       });
     });
@@ -492,6 +572,7 @@ function renderRefSlots() {
 // ===== render =====
 function render() {
   const all = loadList();
+  syncEditorSummary();
 
   let list =
     (selectedBoard === "__ALL__") ? all
@@ -693,6 +774,11 @@ function render() {
       disk = item.disk || { left: "", right: "" };
       renderDiskUI();
 
+      document.getElementById("commentDetails").open = !!commentEl?.value.trim();
+      showView("input");
+      showFoot("left");
+      document.getElementById("inputTab").focus();
+
       showToast("読み込みました", "rode");
     });
   });
@@ -877,19 +963,91 @@ function exportBackup() {
   const overlay = document.getElementById("menuOverlay");
   if (!btn || !panel || !overlay || !closeBtn) return;
 
+  const sideSelect = document.getElementById("menuSide");
+  const sideKey = `${KEY_PREFIX}menu-side-v1`;
+  let menuSide = "left";
+  let closeTimer;
+  let swipe = null;
+  let returnFocus = null;
+  try {
+    if (localStorage.getItem(sideKey) === "right") menuSide = "right";
+  } catch {}
+
+  function applyMenuSide() {
+    document.body.dataset.menuSide = menuSide;
+    if (sideSelect) sideSelect.value = menuSide;
+    const help = document.getElementById("menuGestureHelp");
+    if (help) help.textContent = menuSide === "left"
+      ? "左端から右へスワイプで開き、左へ戻すと閉じます。"
+      : "右端から左へスワイプで開き、右へ戻すと閉じます。";
+  }
+  applyMenuSide();
+  sideSelect?.addEventListener("change", () => {
+    menuSide = sideSelect.value === "right" ? "right" : "left";
+    applyMenuSide();
+    try { localStorage.setItem(sideKey, menuSide); } catch {}
+  });
+
   function open(){
+    clearTimeout(closeTimer);
+    returnFocus = document.activeElement;
     overlay.hidden = false;
+    panel.inert = false;
     panel.classList.add("open");
+    document.body.classList.add("menu-open");
     panel.setAttribute("aria-hidden", "false");
     btn.setAttribute("aria-expanded", "true");
+    closeBtn.focus();
   }
 
   function close(){
     panel.classList.remove("open");
+    document.body.classList.remove("menu-open");
+    panel.inert = true;
     panel.setAttribute("aria-hidden", "true");
     btn.setAttribute("aria-expanded", "false");
-    setTimeout(() => { overlay.hidden = true; }, 220);
+    closeTimer = setTimeout(() => { overlay.hidden = true; }, 220);
+    if (returnFocus instanceof HTMLElement && returnFocus !== document.body) returnFocus.focus();
+    else btn.focus();
   }
+
+  // Only deliberate horizontal swipes/drags near the chosen edge open it.
+  // Vertical scrolling and touches on form controls keep their normal behavior.
+  document.addEventListener("pointerdown", event => {
+    swipe = null;
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    if (!event.isPrimary) return;
+    if (event.target.closest("input, textarea, select, button, a, summary")) return;
+    const isOpen = panel.classList.contains("open");
+    const atEdge = menuSide === "left" ? event.clientX <= 28 : event.clientX >= window.innerWidth - 28;
+    if (!isOpen && !atEdge) return;
+    if (event.pointerType === "mouse") event.preventDefault();
+    swipe = { id: event.pointerId, x: event.clientX, y: event.clientY, isOpen };
+  });
+  document.addEventListener("pointerup", event => {
+    const start = swipe;
+    swipe = null;
+    if (!start || start.id !== event.pointerId) return;
+    const dx = event.clientX - start.x;
+    const dy = event.clientY - start.y;
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.8 || Math.abs(dy) > 50) return;
+    const openingDirection = menuSide === "left" ? dx > 0 : dx < 0;
+    if (!start.isOpen && openingDirection) open();
+    if (start.isOpen && !openingDirection) close();
+  }, { passive: true });
+  document.addEventListener("pointercancel", () => { swipe = null; }, { passive: true });
+  panel.addEventListener("keydown", event => {
+    if (event.key !== "Tab") return;
+    const focusable = [...panel.querySelectorAll("button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex='0']")]
+      .filter(element => element.getClientRects().length > 0);
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault(); last?.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault(); first?.focus();
+    }
+  });
 
   // export
   const exportBtn = document.getElementById("btnExport");
@@ -1208,6 +1366,7 @@ function formatDateJP(iso){
 }
 
 // ===== start =====
+setupCompactEditor();
 render();
 
 // ===== dev footer（devのときだけ表示）=====

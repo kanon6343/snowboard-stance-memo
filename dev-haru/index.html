@@ -5,15 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="スノーボードのスタンスと滑走メモをブラッシュアップする専用作業版" />
   <title>スタンスメモ（はる作業版）</title>
-  <link rel="stylesheet" href="style.css?v=1001">
+  <link rel="stylesheet" href="style.css?v=1002">
 </head>
-<body>
+<body data-menu-side="left">
 
 <header class="topbar">
   <div class="title-wrap">
-    <p class="eyebrow">SNOWBOARD SETUP LOG</p>
     <h1 class="title">スタンスメモ <span class="haru-badge">はる作業版</span></h1>
-    <p class="lead">ここはブラッシュアップ用の専用スペース。</p>
   </div>
 
   <button id="menuBtn" class="menu-btn" type="button" aria-label="メニュー" aria-expanded="false">
@@ -22,13 +20,19 @@
 </header>
 
 
-<section class="card">
-  <h2>セッティング情報</h2>
+<nav class="view-tabs" role="tablist" aria-label="画面">
+  <button id="inputTab" type="button" role="tab" data-view="input" aria-controls="inputView" aria-selected="true">入力</button>
+  <button id="historyTab" type="button" role="tab" data-view="history" aria-controls="historyView" aria-selected="false" tabindex="-1">保存履歴 <span id="savedCount" class="count-badge">0</span></button>
+</nav>
 
-  <div class="meta">
-    <label class="field-row">板名：<input id="board" type="text" placeholder="例：TNT"></label>
+<main>
+<section id="inputView" role="tabpanel" aria-labelledby="inputTab">
+<section class="card setup-card" aria-label="セッティング入力">
 
-    <label class="field-row">雪質：
+  <div class="setup-meta">
+    <label>板名<input id="board" type="text" placeholder="例：TNT"></label>
+
+    <label>雪質
       <select id="snow">
         <option value="">選択</option>
         <option value="パウダー">パウダー</option>
@@ -38,23 +42,26 @@
       </select>
     </label>
     
-    <label class="field-row comment-field">コメント：
-      <textarea id="comment" rows="3" placeholder="例：カービング気持ちいい / 右足が疲れる など"></textarea>
-    </label>
-
-    <button id="commentClearBtn" type="button" class="comment-clear">コメントを消す</button>
+  </div>
 
     <div class="stance-quick" aria-label="スタンス">
+    <span class="stance-label">スタンス</span>
     <button type="button" data-stance="duck">ダック</button>
     <button type="button" data-stance="forward">前振り</button>
     <button type="button" data-stance="back">後振り</button>
   </div>
+
+  <div class="foot-tabs" role="tablist" aria-label="設定する足">
+    <button id="leftFootTab" type="button" role="tab" data-foot="left" aria-controls="leftFootPanel" aria-selected="true">左足<span class="foot-summary" data-summary="left">角度未入力 · 穴0</span></button>
+    <button id="rightFootTab" type="button" role="tab" data-foot="right" aria-controls="rightFootPanel" aria-selected="false" tabindex="-1">右足<span class="foot-summary" data-summary="right">角度未入力 · 穴0</span></button>
+  </div>
+
+<div class="bindings">
+  <section id="leftFootPanel" class="binding-panel" role="tabpanel" aria-labelledby="leftFootTab">
     
     <div class="side-row">
-  <div class="side-title">左</div>
-
   <label class="angle">
-    角度
+    左足の角度（°）
     <input id="left-angle" type="number" placeholder="+15">
   </label>
 
@@ -67,38 +74,11 @@
     </div>
   </div>
 </div>
-
-<div class="side-row">
-  <div class="side-title">右</div>
-
-  <label class="angle">
-    角度
-    <input id="right-angle" type="number" placeholder="-9">
-  </label>
-
-  <div class="disk">
-    <div class="disk-label">ディスク</div>
-    <div class="disk-group" data-side="right">
-      <button type="button" class="chip" data-value="前">前</button>
-      <button type="button" class="chip" data-value="中">中</button>
-      <button type="button" class="chip" data-value="後">後</button>
-    </div>
-  </div>
-</div>
-  </div>
-
-  <button id="saveBtn" type="button">保存</button>
-  <button id="clearBtn" type="button">クリア</button>
-</section>
-
-<div class="bindings">
-  <section class="card">
-    <h2>左足</h2>
-    <p class="binding-help">画面上がノーズ側。穴をタップして選択</p>
+    <p class="binding-help">↑ ノーズ側 · 穴をタップして選択</p>
     <div class="holes" data-side="left">
       <div class="row">
-        <div class="hole"></div><div class="hole"></div><div class="hole"></div>
-        <div class="hole"></div><div class="hole"></div><div class="hole"></div>
+        <button type="button" class="hole"></button><button type="button" class="hole"></button><button type="button" class="hole"></button>
+        <button type="button" class="hole"></button><button type="button" class="hole"></button><button type="button" class="hole"></button>
       </div>
 
     <div class="ref-wrap" data-side="left">
@@ -107,19 +87,29 @@
      </div>
       
       <div class="row">
-        <div class="hole"></div><div class="hole"></div><div class="hole"></div>
-        <div class="hole"></div><div class="hole"></div><div class="hole"></div>
+        <button type="button" class="hole"></button><button type="button" class="hole"></button><button type="button" class="hole"></button>
+        <button type="button" class="hole"></button><button type="button" class="hole"></button><button type="button" class="hole"></button>
       </div>
     </div>
   </section>
 
-  <section class="card">
-    <h2>右足</h2>
-    <p class="binding-help">画面上がノーズ側。穴をタップして選択</p>
+  <section id="rightFootPanel" class="binding-panel" role="tabpanel" aria-labelledby="rightFootTab" hidden>
+    <div class="side-row">
+      <label class="angle">右足の角度（°）<input id="right-angle" type="number" placeholder="-9"></label>
+      <div class="disk">
+        <div class="disk-label">ディスク</div>
+        <div class="disk-group" data-side="right">
+          <button type="button" class="chip" data-value="前">前</button>
+          <button type="button" class="chip" data-value="中">中</button>
+          <button type="button" class="chip" data-value="後">後</button>
+        </div>
+      </div>
+    </div>
+    <p class="binding-help">↑ ノーズ側 · 穴をタップして選択</p>
     <div class="holes" data-side="right">
       <div class="row">
-        <div class="hole"></div><div class="hole"></div><div class="hole"></div>
-        <div class="hole"></div><div class="hole"></div><div class="hole"></div>
+        <button type="button" class="hole"></button><button type="button" class="hole"></button><button type="button" class="hole"></button>
+        <button type="button" class="hole"></button><button type="button" class="hole"></button><button type="button" class="hole"></button>
       </div>
 
     <div class="ref-wrap" data-side="right">
@@ -128,13 +118,28 @@
      </div>
       
       <div class="row">
-        <div class="hole"></div><div class="hole"></div><div class="hole"></div>
-        <div class="hole"></div><div class="hole"></div><div class="hole"></div>
+        <button type="button" class="hole"></button><button type="button" class="hole"></button><button type="button" class="hole"></button>
+        <button type="button" class="hole"></button><button type="button" class="hole"></button><button type="button" class="hole"></button>
       </div>
     </div>
   </section>
 </div>
 
+  <details id="commentDetails" class="comment-details">
+    <summary>コメント <span id="commentState">任意</span></summary>
+    <label class="comment-label" for="comment">滑った感覚・気づいたこと</label>
+    <textarea id="comment" rows="2" placeholder="例：カービングしやすい / 右足が疲れる"></textarea>
+    <button id="commentClearBtn" type="button" class="comment-clear">コメントを消す</button>
+  </details>
+
+  <div class="editor-actions">
+    <button id="clearBtn" type="button">クリア</button>
+    <button id="saveBtn" type="button">この設定を保存</button>
+  </div>
+</section>
+</section>
+
+<section id="historyView" role="tabpanel" aria-labelledby="historyTab" hidden>
 <section class="history-heading">
   <div>
     <h2>保存履歴</h2>
@@ -149,11 +154,15 @@
   </div>
   
 <div id="history"></div>
+</section>
+</main>
   
-  <!-- 右から出るメニュー -->
+<div id="menuSwipeEdge" class="menu-swipe-edge" aria-hidden="true"></div>
+
+  <!-- 設定した側から出るメニュー -->
 <div id="menuOverlay" class="menu-overlay" hidden></div>
 
-<aside id="menuPanel" class="menu-panel" aria-hidden="true">
+<aside id="menuPanel" class="menu-panel" aria-label="設定とデータ管理" aria-hidden="true" inert>
   <div class="menu-head">
     <div class="menu-title">⚙ 設定 / データ管理</div>
     <button id="menuCloseBtn" class="menu-close" type="button" aria-label="閉じる">×</button>
@@ -191,7 +200,12 @@
 
     <section class="menu-card">
     <h3>🎛 表示・操作</h3>
-      <button type="button" class="menu-action" disabled>（今後追加）</button>
+      <label class="menu-position-label" for="menuSide">メニューの位置</label>
+      <select id="menuSide" class="menu-side-select">
+        <option value="left">左側</option>
+        <option value="right">右側</option>
+      </select>
+      <p id="menuGestureHelp" class="menu-note">左端から右へスワイプで開きます。</p>
     </section>
 
     <section class="menu-card dev-footer" id="devFooter">
@@ -241,7 +255,7 @@
     </button>
   </div>
 
-<script src="script.js?v=31"></script>
+<script src="script.js?v=1002"></script>
 
 <div id="toast"></div>
   
