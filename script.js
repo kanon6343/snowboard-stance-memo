@@ -317,6 +317,17 @@ list.sort((a, b) => {
   renderTabs();
   renderRefSlots();
 
+  if (list.length === 0) {
+    historyDiv.innerHTML = `
+      <section class="empty-state card">
+        <div class="empty-icon">🏂</div>
+        <h2>まだメモがありません</h2>
+        <p>上のフォームにセッティングを入力して、最初の一本を保存しよう。</p>
+      </section>
+    `;
+    return;
+  }
+
   list.forEach((item) => {
     const card = document.createElement("section");
     card.className = "card";
