@@ -980,8 +980,8 @@ function exportBackup() {
     if (sideSelect) sideSelect.value = menuSide;
     const help = document.getElementById("menuGestureHelp");
     if (help) help.textContent = menuSide === "left"
-      ? "左端か☰から右へスワイプで開き、左へ払うと閉じます。"
-      : "右端か☰から左へスワイプで開き、右へ払うと閉じます。";
+      ? "左端か☰から右へスワイプで開きます。メニューを直接左へ引くと閉じます。"
+      : "右端か☰から左へスワイプで開きます。メニューを直接右へ引くと閉じます。";
   }
   applyMenuSide();
   sideSelect?.addEventListener("change", () => {
@@ -1067,6 +1067,8 @@ function exportBackup() {
     if (event.pointerType === "mouse" && event.button !== 0) return;
     if (!event.isPrimary) return;
     const isOpen = panel.classList.contains("open");
+    // Dismiss by grabbing the drawer itself, not by dragging the dimmed backdrop.
+    if (isOpen && !panel.contains(event.target)) return;
     const onControl = event.target.closest("input, textarea, select, button, a, summary");
     const onMenuButton = btn.contains(event.target);
     if (!isOpen && onControl && !onMenuButton) return;
