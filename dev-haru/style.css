@@ -1259,13 +1259,20 @@ body[data-menu-side="right"] .title-wrap{ padding-left: 0; padding-right: 48px; 
 body[data-menu-side="left"] .menu-panel{ left: 0; right: auto; transform: translateX(-100%); }
 body[data-menu-side="left"] .menu-panel.open{ transform: translateX(0); }
 .menu-panel{ touch-action: pan-y pinch-zoom; }
+.menu-overlay{ opacity: 0; transition: opacity 0.22s ease; touch-action: pan-y pinch-zoom; }
+.menu-open .menu-overlay{ opacity: 1; }
+.menu-panel.is-dragging{ transition: none; will-change: transform; }
+.menu-dragging{ overflow: hidden; user-select: none; }
+.menu-dragging .menu-overlay{ transition: none; }
+.menu-dragging .menu-btn{ visibility: hidden; }
 .menu-open{ overflow: hidden; }
 .menu-open .menu-btn{ visibility: hidden; }
 .menu-position-label{ display: block; margin-bottom: 6px; font-size: 12px; color: #52646c; }
 .menu-side-select{ width: 100%; height: 42px; margin-bottom: 8px; padding: 8px; font-size: 16px; border: 1px solid #cbdadd; border-radius: 9px; background: #fff; }
-.menu-swipe-edge{ position: fixed; top: 0; bottom: 0; left: 0; width: 18px; z-index: 890; touch-action: pan-y pinch-zoom; }
+.menu-swipe-edge{ position: fixed; top: 0; bottom: 0; left: 0; width: 24px; z-index: 890; touch-action: pan-y pinch-zoom; }
 body[data-menu-side="right"] .menu-swipe-edge{ left: auto; right: 0; }
 .menu-open .menu-swipe-edge{ display: none; }
+.menu-btn{ touch-action: pan-y pinch-zoom; }
 button:focus-visible,
 summary:focus-visible,
 input:focus-visible,
@@ -1282,6 +1289,7 @@ textarea:focus-visible{ outline: 3px solid #096a8a; outline-offset: 2px; }
 
 @media (prefers-reduced-motion: reduce){
   .menu-panel{ transition: none; }
+  .menu-overlay{ transition: none; }
 }
 
 @media (max-height: 660px){
