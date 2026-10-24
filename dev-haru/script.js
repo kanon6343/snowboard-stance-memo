@@ -968,6 +968,7 @@ function exportBackup() {
   let menuSide = "left";
   let closeTimer;
   let swipe = null;
+  let suppressSwipeClickUntil = 0;
   let returnFocus = null;
   try {
     if (localStorage.getItem(sideKey) === "right") menuSide = "right";
@@ -1012,16 +1013,18 @@ function exportBackup() {
   }
 
   // Only deliberate horizontal swipes/drags near the chosen edge open it.
-  // Vertical scrolling and touches on form controls keep their normal behavior.
+  // Inside an open menu, swipes can start on controls too. Their normal clicks
+  // are only suppressed when the gesture actually closes the menu.
   document.addEventListener("pointerdown", event => {
     swipe = null;
     if (event.pointerType === "mouse" && event.button !== 0) return;
     if (!event.isPrimary) return;
-    if (event.target.closest("input, textarea, select, button, a, summary")) return;
     const isOpen = panel.classList.contains("open");
+    const onControl = event.target.closest("input, textarea, select, button, a, summary");
+    if (!isOpen && onControl) return;
     const atEdge = menuSide === "left" ? event.clientX <= 28 : event.clientX >= window.innerWidth - 28;
     if (!isOpen && !atEdge) return;
-    if (event.pointerType === "mouse") event.preventDefault();
+    if (event.pointerType === "mouse" && !onControl) event.preventDefault();
     swipe = { id: event.pointerId, x: event.clientX, y: event.clientY, isOpen };
   });
   document.addEventListener("pointerup", event => {
@@ -1032,10 +1035,18 @@ function exportBackup() {
     const dy = event.clientY - start.y;
     if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.8 || Math.abs(dy) > 50) return;
     const openingDirection = menuSide === "left" ? dx > 0 : dx < 0;
-    if (!start.isOpen && openingDirection) open();
-    if (start.isOpen && !openingDirection) close();
+    if ((!start.isOpen && openingDirection) || (start.isOpen && !openingDirection)) {
+      suppressSwipeClickUntil = performance.now() + 400;
+      if (start.isOpen) close();
+      else open();
+    }
   }, { passive: true });
   document.addEventListener("pointercancel", () => { swipe = null; }, { passive: true });
+  document.addEventListener("click", event => {
+    if (performance.now() >= suppressSwipeClickUntil) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  }, true);
   panel.addEventListener("keydown", event => {
     if (event.key !== "Tab") return;
     const focusable = [...panel.querySelectorAll("button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex='0']")]
