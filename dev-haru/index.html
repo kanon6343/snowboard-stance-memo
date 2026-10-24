@@ -5,8 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="スノーボードのスタンスと滑走メモをブラッシュアップする専用作業版" />
   <title>スタンスメモ（はる作業版）</title>
-  <link rel="stylesheet" href="style.css?v=1010">
-  <link rel="stylesheet" href="outdoor.css?v=1010">
+  <link rel="stylesheet" href="style.css?v=1011">
+  <link rel="stylesheet" href="outdoor.css?v=1011">
+  <link rel="stylesheet" href="theme.css?v=1011">
+  <script src="theme.js?v=1011"></script>
 </head>
 <body data-menu-side="left">
 
@@ -187,6 +189,15 @@
 
   <section class="menu-card">
     <h3>表示・操作</h3>
+    <div class="menu-position-row theme-row">
+      <label class="menu-position-label" for="colorTheme">カラーモード</label>
+      <select id="colorTheme" class="menu-side-select">
+        <option value="light">ライト</option>
+        <option value="dark">ダーク</option>
+        <option value="auto">端末に合わせる</option>
+      </select>
+    </div>
+    <p id="themeStatus" class="menu-note" role="status">このブラウザーで設定を記憶します。</p>
     <div class="menu-position-row">
       <label class="menu-position-label" for="menuSide">メニューの位置</label>
       <select id="menuSide" class="menu-side-select">
@@ -277,7 +288,7 @@
     </button>
   </div>
 
-<script src="script.js?v=1010"></script>
+<script src="script.js?v=1011"></script>
 
 <div id="toast"></div>
   

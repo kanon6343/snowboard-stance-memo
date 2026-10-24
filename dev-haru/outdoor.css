@@ -68,7 +68,7 @@ input::placeholder, textarea::placeholder{ color: var(--outdoor-placeholder); op
 .setup-card .holes{ width: min(100%, 324px); }
 .setup-card .hole{ position: relative; height: auto; min-height: 44px; aspect-ratio: 1; border: 2px solid #576d79; background: #fff; }
 .setup-card .hole.active{ background: var(--outdoor-amber); border-color: var(--outdoor-amber-border); }
-.setup-card .hole.active::after{ content: "✓"; color: var(--outdoor-on-amber); font-size: 24px; font-weight: 900; line-height: 1; }
+.setup-card .hole.active::after{ content: "+"; color: var(--outdoor-on-amber); font-size: 28px; font-weight: 500; line-height: 1; }
 .setup-card .ref-wrap, .setup-card .ref-line{ height: 44px; }
 .setup-card .ref-help{ display: none; }
 .setup-card .ref-slot{
@@ -126,7 +126,7 @@ input::placeholder, textarea::placeholder{ color: var(--outdoor-placeholder); op
 .mini-hole{ border: 1px solid #576d79; }
 .mini-hole{ height: auto; aspect-ratio: 1; }
 .mini-hole.active{ background: var(--outdoor-amber); border-color: var(--outdoor-amber-border); }
-.mini-hole.active::after{ content: "✓"; color: var(--outdoor-on-amber); font-size: 11px; font-weight: 900; line-height: 1; }
+.mini-hole.active::after{ content: "+"; color: var(--outdoor-on-amber); font-size: 14px; font-weight: 500; line-height: 1; }
 .mini-x.active{ position: relative; color: transparent; }
 .mini-x.active::before, .mini-x.active::after{
   content: ""; position: absolute; top: 50%; left: 50%; width: 14px; height: 1.5px;
