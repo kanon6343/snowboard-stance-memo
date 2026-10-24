@@ -9,6 +9,7 @@
   --outdoor-on-amber: #211500;
   --outdoor-amber-border: #8a3b04;
   --outdoor-reference: #111111;
+  --outdoor-placeholder: #a4b0b9;
   --blue: var(--outdoor-blue);
   --blue-border: var(--outdoor-blue);
   --green: var(--outdoor-green);
@@ -21,7 +22,7 @@
 body{ color: var(--outdoor-ink); background: #edf3f6; font-size: 16px; line-height: 1.45; }
 button, input, select, textarea{ font-family: inherit; }
 button{ color: var(--outdoor-ink); }
-input::placeholder, textarea::placeholder{ color: #435965; opacity: 1; }
+input::placeholder, textarea::placeholder{ color: var(--outdoor-placeholder); opacity: 1; font-weight: 400; }
 .title{ font-size: 22px; font-weight: 800; }
 .haru-badge{ color: #50316c; background: #efe5fa; font-size: 11px; font-weight: 700; }
 .card{ background: #fff; border-color: #a3b2ba; box-shadow: 0 3px 12px #152d3b0b; }
@@ -38,7 +39,7 @@ input::placeholder, textarea::placeholder{ color: #435965; opacity: 1; }
 .setup-meta input, .setup-meta select, .setup-card .angle input, .comment-details textarea{
   height: 44px; border: 2px solid var(--outdoor-border); color: var(--outdoor-ink); background: #fff; font-size: 17px; font-weight: 500;
 }
-.setup-card .stance-row{ display: grid; grid-template-columns: minmax(0, 1fr) 100px; align-items: start; gap: 12px; margin: 14px 0; }
+.setup-card .stance-row{ display: grid; grid-template-columns: minmax(0, 1fr) 100px; align-items: start; gap: 24px; margin: 14px 0; }
 .setup-card .stance-quick{ margin: 0; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
 .stance-quick .stance-label{ grid-column: 1 / -1; line-height: 1.25; }
 .stance-width{ display: block; min-width: 0; color: var(--outdoor-muted); font-size: 14px; font-weight: 650; line-height: 1.25; }
@@ -75,7 +76,6 @@ input::placeholder, textarea::placeholder{ color: #435965; opacity: 1; }
   border: 1px dashed var(--outdoor-border); border-radius: 7px; font-size: 14px; font-weight: 650;
 }
 .setup-card .ref-slot.active{ color: var(--outdoor-reference); background: #fff; border: 2px solid var(--outdoor-border); }
-.setup-card .ref-slot.active span{ visibility: hidden; }
 /* Geometric strokes keep the board reference mark thin across font families. */
 .setup-card .ref-slot.active::before, .setup-card .ref-slot.active::after{
   content: ""; position: absolute; top: 50%; left: 50%; width: calc(141.421% - 14px); height: 2px;
@@ -160,7 +160,7 @@ input::placeholder, textarea::placeholder{ color: #435965; opacity: 1; }
 #menuPanel .sort-select, #menuPanel .menu-side-select, #menuPanel .angle-in, #menuPanel .angle-tol{
   height: 48px; border: 2px solid var(--outdoor-border); color: var(--outdoor-ink); background: #fff; font-size: 17px;
 }
-#menuPanel .angle-filter input::placeholder{ color: #435965; opacity: 1; font-size: 14px; }
+#menuPanel .angle-filter input::placeholder{ color: var(--outdoor-placeholder); opacity: 1; font-size: 14px; }
 #menuPanel .stance-tab{
   position: relative; min-height: 48px; color: var(--outdoor-ink); background: #fff;
   border: 2px solid var(--outdoor-border); font-size: 14px; padding: 8px 1px; transform: none;
@@ -193,7 +193,7 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
   .setup-card{ padding: 8px; }
   .setup-card .row, .setup-card .ref-line{ gap: 2px; }
   .setup-card .chip{ min-width: 44px; }
-  .setup-card .stance-row{ grid-template-columns: minmax(0, 1fr) 92px; gap: 8px; }
+  .setup-card .stance-row{ grid-template-columns: minmax(0, 1fr) 88px; gap: 16px; }
   .setup-card .side-row{ gap: 12px; }
   .history-card{ padding: 12px; }
   .history-setting{ padding: 8px; }

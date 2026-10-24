@@ -550,7 +550,7 @@ function renderRefSlots() {
     const side = line.dataset.side;
 
     line.innerHTML = Array.from({ length: 6 }, (_, i) =>
-      `<button type="button" class="ref-slot" data-index="${i}" data-side="${side}" aria-label="${side === "left" ? "左足" : "右足"} 推奨位置${i + 1}" aria-pressed="${reference?.[side] === i}"><span aria-hidden="true">${i + 1}</span></button>`
+      `<button type="button" class="ref-slot" data-index="${i}" data-side="${side}" aria-label="${side === "left" ? "左足" : "右足"} 推奨位置${i + 1}" aria-pressed="${reference?.[side] === i}"></button>`
     ).join("");
 
     const idx = reference?.[side];
