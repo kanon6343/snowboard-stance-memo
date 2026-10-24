@@ -2,13 +2,21 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#075579" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="スタンスメモ" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icons/icon-192.png" type="image/png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
   <meta name="description" content="スノーボードのスタンスと滑走メモをブラッシュアップする専用作業版" />
   <title>スタンスメモ（はる作業版）</title>
-  <link rel="stylesheet" href="style.css?v=1012">
-  <link rel="stylesheet" href="outdoor.css?v=1012">
-  <link rel="stylesheet" href="theme.css?v=1012">
-  <script src="theme.js?v=1012"></script>
+  <link rel="stylesheet" href="style.css?v=1014">
+  <link rel="stylesheet" href="outdoor.css?v=1014">
+  <link rel="stylesheet" href="theme.css?v=1014">
+  <link rel="stylesheet" href="pwa.css?v=1014">
+  <script src="theme.js?v=1014"></script>
+  <script src="pwa.js?v=1014" defer></script>
 </head>
 <body data-menu-side="left">
 
@@ -208,6 +216,24 @@
     <p id="menuGestureHelp" class="menu-note">左端から右へスワイプで開きます。</p>
   </section>
 
+  <section class="menu-card" id="appInstallCard" aria-labelledby="appInstallHeading">
+    <h3 id="appInstallHeading">アプリとして使う</h3>
+    <p id="installStatus" class="menu-note" role="status">ホーム画面やPCに追加できます。</p>
+    <button id="installAppBtn" type="button" class="menu-action menu-primary" hidden>アプリをインストール</button>
+    <details class="install-help">
+      <summary>インストール方法</summary>
+      <p class="menu-note">Android・PC：Chrome／Edgeのメニューから「アプリをインストール」または「ホーム画面に追加」。iPhone／iPad：Safariの共有メニューから「ホーム画面に追加」を選びます。名称は端末によって異なります。</p>
+    </details>
+    <p id="offlineStatus" class="menu-note" role="status">オフラインで開く準備を確認しています。</p>
+    <button id="checkAppUpdateBtn" type="button" class="menu-action">最新版を確認</button>
+    <div id="appUpdateReady" class="app-update-ready" hidden>
+      <p class="menu-note">新しい版があります。この画面や別のタブの入力を保存してから更新してください。</p>
+      <button id="applyAppUpdateBtn" type="button" class="menu-action menu-primary">入力を確認して更新する</button>
+    </div>
+    <p id="appUpdateStatus" class="menu-note" role="status"></p>
+    <p class="menu-note">インストール前にバックアップを書き出してください。履歴はこの端末・ブラウザー内に保存され、自動同期はしません。アプリとブラウザーでデータが共有されない場合は、バックアップから復元できます。</p>
+  </section>
+
   <details class="menu-card menu-disclosure" id="menuBackup">
     <summary>
       <span><strong>バックアップ</strong><small>ファイルに保存・復元</small></span>
@@ -290,7 +316,7 @@
     </button>
   </div>
 
-<script src="script.js?v=1012"></script>
+<script src="script.js?v=1014"></script>
 
 <div id="toast"></div>
   

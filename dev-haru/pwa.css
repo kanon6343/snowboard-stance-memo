@@ -1,0 +1,9 @@
+#menuPanel #appInstallCard .menu-action{ width: 100%; margin: 6px 0; }
+#menuPanel .install-help summary{ min-height: 44px; display: flex; align-items: center; cursor: pointer; font-size: 14px; font-weight: 650; }
+#menuPanel .install-help summary::before{ content: "▸"; margin-right: 6px; }
+#menuPanel .install-help[open] summary::before{ content: "▾"; }
+#menuPanel .app-update-ready{ margin: 8px 0; padding: 10px; border: 2px solid var(--outdoor-border); border-radius: 10px; }
+#menuPanel #appInstallCard [hidden]{ display: none !important; }
+@media (display-mode: standalone){
+  body{ padding-top: max(4px, env(safe-area-inset-top)); padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+}
