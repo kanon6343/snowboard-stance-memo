@@ -1258,9 +1258,13 @@ body[data-menu-side="right"] .title-wrap{ padding-left: 0; padding-right: 48px; 
 
 body[data-menu-side="left"] .menu-panel{ left: 0; right: auto; transform: translateX(-100%); }
 body[data-menu-side="left"] .menu-panel.open{ transform: translateX(0); }
-/* Set this on the scroll container too: panel ancestors alone do not constrain its gestures. */
+/* Inner scroll containers and form controls must reserve horizontal gestures too. */
 .menu-panel,
-.menu-body{ touch-action: pan-y pinch-zoom; }
+.menu-body,
+.menu-body .stance-tabs,
+.menu-body button,
+.menu-body select,
+.menu-body input:not([type="range"]){ touch-action: pan-y pinch-zoom; }
 .menu-overlay{ opacity: 0; transition: opacity 0.22s ease; touch-action: pan-y pinch-zoom; }
 .menu-open .menu-overlay{ opacity: 1; }
 .menu-panel.is-dragging{ transition: none; will-change: transform; }

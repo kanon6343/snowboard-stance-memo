@@ -980,8 +980,8 @@ function exportBackup() {
     if (sideSelect) sideSelect.value = menuSide;
     const help = document.getElementById("menuGestureHelp");
     if (help) help.textContent = menuSide === "left"
-      ? "左端か☰から右へスワイプで開きます。メニューを直接左へ引くと閉じます。"
-      : "右端か☰から左へスワイプで開きます。メニューを直接右へ引くと閉じます。";
+      ? "左端か☰から右へスワイプで開きます。メニュー中央や項目の上から、左へ軽く払うと閉じます。"
+      : "右端か☰から左へスワイプで開きます。メニュー中央や項目の上から、右へ軽く払うと閉じます。";
   }
   applyMenuSide();
   sideSelect?.addEventListener("change", () => {
@@ -1045,8 +1045,8 @@ function exportBackup() {
     let nextOpen = start.isOpen;
     if (!cancelled) {
       // A short, quick flick works too; slow drags settle by their distance.
-      const threshold = Math.min(64, start.width * 0.2) / start.width;
-      nextOpen = distance >= 24 && Math.abs(freshVelocity) >= 0.45
+      const threshold = Math.min(start.isOpen ? 32 : 64, start.width * 0.2) / start.width;
+      nextOpen = distance >= (start.isOpen ? 18 : 24) && Math.abs(freshVelocity) >= 0.45
         ? freshVelocity > 0
         : start.progress >= (start.isOpen ? 1 - threshold : threshold);
     }
@@ -1091,9 +1091,9 @@ function exportBackup() {
     const dy = event.clientY - start.y;
     const direction = menuSide === "left" ? 1 : -1;
     if (!start.locked) {
-      if (Math.max(Math.abs(dx), Math.abs(dy)) < 8) return;
+      if (Math.max(Math.abs(dx), Math.abs(dy)) < (start.isOpen ? 6 : 8)) return;
       if (Math.abs(dy) > Math.abs(dx) * 1.2) { swipe = null; return; }
-      if (Math.abs(dx) < Math.abs(dy) * 1.2) return;
+      if (Math.abs(dx) < Math.abs(dy) * (start.isOpen ? 1.05 : 1.2)) return;
       if (!start.isOpen && dx * direction <= 0) { swipe = null; return; }
       start.locked = true;
       clearTimeout(closeTimer);
