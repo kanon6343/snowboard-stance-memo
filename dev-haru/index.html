@@ -11,12 +11,13 @@
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
   <meta name="description" content="スノーボードのスタンスと滑走メモをブラッシュアップする専用作業版" />
   <title>スタンスメモ（はる作業版）</title>
-  <link rel="stylesheet" href="style.css?v=1014">
-  <link rel="stylesheet" href="outdoor.css?v=1014">
-  <link rel="stylesheet" href="theme.css?v=1014">
-  <link rel="stylesheet" href="pwa.css?v=1014">
-  <script src="theme.js?v=1014"></script>
-  <script src="pwa.js?v=1014" defer></script>
+  <link rel="stylesheet" href="style.css?v=1015">
+  <link rel="stylesheet" href="outdoor.css?v=1015">
+  <link rel="stylesheet" href="theme.css?v=1015">
+  <link rel="stylesheet" href="pwa.css?v=1015">
+  <link rel="stylesheet" href="board-suggestions.css?v=1015">
+  <script src="theme.js?v=1015"></script>
+  <script src="pwa.js?v=1015" defer></script>
 </head>
 <body data-menu-side="left">
 
@@ -41,7 +42,11 @@
 <section class="card setup-card" aria-label="セッティング入力">
 
   <div class="setup-meta">
-    <label>板名<input id="board" type="text" placeholder="例：TNT"></label>
+    <div class="board-field">
+      <label for="board">板名</label>
+      <input id="board" type="text" placeholder="例：TNT" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="boardSuggestions">
+      <ul id="boardSuggestions" class="board-suggestions" role="listbox" aria-label="保存履歴の板名候補" hidden></ul>
+    </div>
 
     <label>雪質
       <select id="snow" aria-label="雪質">
@@ -316,7 +321,8 @@
     </button>
   </div>
 
-<script src="script.js?v=1014"></script>
+<script src="script.js?v=1015"></script>
+<script src="board-suggestions.js?v=1015"></script>
 
 <div id="toast"></div>
   

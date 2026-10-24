@@ -1,5 +1,5 @@
 /* Release shell: bump RELEASE and every versioned index.html asset together. */
-const RELEASE = '1014';
+const RELEASE = '1015';
 const BASE = new URL('./', self.registration.scope);
 const CACHE_PREFIX = `snowboard-stance-haru:${BASE.href}:`;
 const CACHE_NAME = `${CACHE_PREFIX}${RELEASE}`;
@@ -7,6 +7,7 @@ const SHELL = [
   'index.html', `style.css?v=${RELEASE}`, `outdoor.css?v=${RELEASE}`,
   `theme.css?v=${RELEASE}`, `theme.js?v=${RELEASE}`, `script.js?v=${RELEASE}`,
   `pwa.css?v=${RELEASE}`, `pwa.js?v=${RELEASE}`, 'manifest.webmanifest',
+  `board-suggestions.css?v=${RELEASE}`, `board-suggestions.js?v=${RELEASE}`,
   'icons/icon-192.png', 'icons/icon-512.png',
   'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png',
 ].map(path => new URL(path, BASE).href);
