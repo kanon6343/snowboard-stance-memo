@@ -37,6 +37,8 @@ const historyDiv = document.getElementById("history");
 
 const boardEl = document.getElementById("board");
 const snowEl = document.getElementById("snow");
+const stanceWidthEl = document.getElementById("stanceWidth");
+stanceWidthEl?.addEventListener("input", () => stanceWidthEl.setCustomValidity(""));
 
 const commentEl = document.getElementById("comment");
 if (commentEl) commentEl.value = "";
@@ -88,8 +90,10 @@ try {
 
   // 角度検索
   if (ui.angleFilter && typeof ui.angleFilter === "object") {
-    const L = Number(ui.angleFilter.left);
-    const R = Number(ui.angleFilter.right);
+    const Lraw = ui.angleFilter.left;
+    const Rraw = ui.angleFilter.right;
+    const L = Lraw == null || Lraw === "" ? NaN : Number(Lraw);
+    const R = Rraw == null || Rraw === "" ? NaN : Number(Rraw);
     const T = Number(ui.angleFilter.tol);
 
     angleFilter.left  = Number.isFinite(L) ? L : null;
@@ -325,6 +329,10 @@ holes.forEach((h, i) => {
 clearBtn?.addEventListener("click", () => {
   if (boardEl) boardEl.value = "";
   if (snowEl) snowEl.value = "";
+  if (stanceWidthEl) {
+    stanceWidthEl.value = "";
+    stanceWidthEl.setCustomValidity("");
+  }
   if (commentEl) commentEl.value = "";
   if (leftAngleEl) leftAngleEl.value = "";
   if (rightAngleEl) rightAngleEl.value = "";
@@ -345,6 +353,14 @@ clearBtn?.addEventListener("click", () => {
 
 // 保存
 saveBtn?.addEventListener("click", () => {
+  const rawWidth = (stanceWidthEl?.value || "").trim();
+  const stanceWidth = normalizeStanceWidth(rawWidth);
+  if (stanceWidthEl && (stanceWidthEl.validity.badInput || (rawWidth !== "" && stanceWidth === ""))) {
+    stanceWidthEl.setCustomValidity("スタンス幅は0より大きい数値をcmで入力するか、空欄にしてください。");
+    stanceWidthEl.reportValidity();
+    stanceWidthEl.focus();
+    return;
+  }
   const item = {
     id: String(Date.now()),
     favorite: false,
@@ -352,6 +368,7 @@ saveBtn?.addEventListener("click", () => {
     snow: snowEl?.value || "",
     comment: (commentEl?.value || "").trim(),
     stance,
+    stanceWidth,
     leftAngle: (leftAngleEl?.value || "").trim(),
     rightAngle: (rightAngleEl?.value || "").trim(),
     disk: { ...disk },
@@ -474,7 +491,7 @@ function renderTabs() {
 
   tabsDiv.innerHTML = items.map(b => {
     const label =
-      b === "__FAV__" ? "★" :
+      b === "__FAV__" ? "★ 優先" :
       b === "__ALL__" ? "全部" :
       (b === "" ? "未入力" : b);
 
@@ -482,7 +499,8 @@ function renderTabs() {
       (b === "__FAV__") ? (favSortOn ? "active" : "") :
       (b === selectedBoard ? "active" : "");
 
-    return `<button type="button" class="tab ${active}" data-board="${escapeHtml(b)}">${escapeHtml(label)}</button>`;
+    const accessibleLabel = b === "__FAV__" ? "お気に入りを優先して並べる" : label;
+    return `<button type="button" class="tab ${active}" data-board="${escapeHtml(b)}" aria-label="${escapeHtml(accessibleLabel)}" aria-pressed="${!!active}">${escapeHtml(label)}</button>`;
   }).join("");
 
   tabsDiv.querySelectorAll("button.tab").forEach(btn => {
@@ -532,7 +550,7 @@ function renderRefSlots() {
     const side = line.dataset.side;
 
     line.innerHTML = Array.from({ length: 6 }, (_, i) =>
-      `<button type="button" class="ref-slot" data-index="${i}" data-side="${side}" aria-label="${side === "left" ? "左足" : "右足"} 推奨位置${i + 1}" aria-pressed="${reference?.[side] === i}"></button>`
+      `<button type="button" class="ref-slot" data-index="${i}" data-side="${side}" aria-label="${side === "left" ? "左足" : "右足"} 推奨位置${i + 1}" aria-pressed="${reference?.[side] === i}"><span aria-hidden="true">${i + 1}</span></button>`
     ).join("");
 
     const idx = reference?.[side];
@@ -649,7 +667,7 @@ function render() {
 
   list.forEach((item) => {
     const card = document.createElement("section");
-    card.className = "card";
+    card.className = "card history-card";
 
     const dateLabel = item.dateTime ? formatDateJP(item.dateTime) : "日付なし";
     const timeLabel = item.dateTime
@@ -659,9 +677,10 @@ function render() {
     const boardLabel = item.board || "板名なし";
     const snowLabel  = item.snow  || "雪質なし";
 
-    const title = `${boardLabel} / ${dateLabel} / ${timeLabel} / ${snowLabel}`;
+    const metadata = [dateLabel, timeLabel, snowLabel].filter(Boolean).join(" · ");
     const leftDisk = item.disk?.left || "";
     const rightDisk = item.disk?.right || "";
+    const stanceWidth = normalizeStanceWidth(item.stanceWidth);
 
     const commentText = (item.comment || "").trim();
 
@@ -670,28 +689,36 @@ function render() {
       item.stance === "forward" ? "前振り" :
       item.stance === "back" ? "後振り" : "";
 
-    const setupLine = `左 ${item.leftAngle || "?"}°  ${leftDisk}　右 ${item.rightAngle || "?"}°  ${rightDisk}`;
-
     const fav = !!item.favorite;
     const favLabel = fav ? "★" : "☆";
 
     card.innerHTML = `
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <b>${escapeHtml(title)}</b>
-
+      <header class="history-card-head">
+        <div class="history-card-heading">
+          <h3 class="history-board">${escapeHtml(boardLabel)}</h3>
+          <p class="history-meta">${escapeHtml(metadata)}</p>
+        </div>
         <button
           type="button"
           class="fav-btn ${fav ? "active" : ""}"
           data-fav-id="${item.id}"
           title="${fav ? "お気に入り解除" : "お気に入り登録"}"
+          aria-label="${fav ? "お気に入り解除" : "お気に入り登録"}"
+          aria-pressed="${fav}"
         >
           ${favLabel}
         </button>
+      </header>
+
+      <div class="history-settings">
+        <div class="history-setting"><span>左足</span><strong>${escapeHtml(item.leftAngle || "?")}°</strong><small>ディスク ${escapeHtml(leftDisk || "未設定")}</small></div>
+        <div class="history-setting"><span>右足</span><strong>${escapeHtml(item.rightAngle || "?")}°</strong><small>ディスク ${escapeHtml(rightDisk || "未設定")}</small></div>
       </div>
 
-      <div>${escapeHtml(setupLine)}</div>
-
-      ${stanceLabel ? `<div class="stance-tag">${escapeHtml(stanceLabel)}</div>` : ""}
+      ${stanceLabel || stanceWidth ? `<div class="history-stance">
+        ${stanceLabel ? `<span class="stance-tag">${escapeHtml(stanceLabel)}</span>` : ""}
+        ${stanceWidth ? `<span class="stance-width-tag">幅 ${escapeHtml(stanceWidth)} cm</span>` : ""}
+      </div>` : ""}
       ${commentText ? `<div class="comment">${escapeHtml(commentText)}</div>` : ""}
 
       <div class="history-preview">
@@ -699,16 +726,17 @@ function render() {
       </div>
 
       <div class="history-actions">
-        <button type="button" class="btn-load" data-load-id="${item.id}">読込</button>
+        <button type="button" class="btn-load" data-load-id="${item.id}">この設定を使う</button>
 
         <button
           type="button"
           class="btn-del ${fav ? "is-protected" : ""}"
           data-del-id="${item.id}"
           data-protected="${fav ? "1" : "0"}"
+          aria-disabled="${fav}"
           title="${fav ? "お気に入りは削除できません" : "削除"}"
         >
-          削除
+          ${fav ? "保護中" : "削除"}
         </button>
       </div>
     `;
@@ -756,6 +784,10 @@ function render() {
 
       boardEl && (boardEl.value = item.board || "");
       snowEl  && (snowEl.value  = item.snow  || "");
+      if (stanceWidthEl) {
+        stanceWidthEl.value = normalizeStanceWidth(item.stanceWidth);
+        stanceWidthEl.setCustomValidity("");
+      }
       commentEl && (commentEl.value = item.comment || "");
       leftAngleEl && (leftAngleEl.value = item.leftAngle || "");
       rightAngleEl && (rightAngleEl.value = item.rightAngle || "");
@@ -814,6 +846,14 @@ function mountFilters(place){
 mountFilters(filtersPlace);
 */
 // ===== import helpers =====
+// Optional, board-wide measurement. Older records remain valid without this field.
+function normalizeStanceWidth(value){
+  if (typeof value !== "number" && typeof value !== "string") return "";
+  if (typeof value === "string" && value.trim() === "") return "";
+  const width = Number(value);
+  return Number.isFinite(width) && width > 0 ? String(width) : "";
+}
+
 function safeParseJSON(text){
   try { return JSON.parse(text); }
   catch { return null; }
@@ -848,6 +888,7 @@ function normalizeItem(x){
   item.leftAngle = (item.leftAngle || "").toString();
   item.rightAngle = (item.rightAngle || "").toString();
   item.stance = (item.stance || "").toString();
+  item.stanceWidth = normalizeStanceWidth(item.stanceWidth);
 
   return item;
 }

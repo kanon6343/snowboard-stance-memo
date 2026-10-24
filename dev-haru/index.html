@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="スノーボードのスタンスと滑走メモをブラッシュアップする専用作業版" />
   <title>スタンスメモ（はる作業版）</title>
-  <link rel="stylesheet" href="style.css?v=1008">
+  <link rel="stylesheet" href="style.css?v=1009">
+  <link rel="stylesheet" href="outdoor.css?v=1009">
 </head>
 <body data-menu-side="left">
 
@@ -33,7 +34,7 @@
     <label>板名<input id="board" type="text" placeholder="例：TNT"></label>
 
     <label>雪質
-      <select id="snow">
+      <select id="snow" aria-label="雪質">
         <option value="">選択</option>
         <option value="パウダー">パウダー</option>
         <option value="圧雪">圧雪</option>
@@ -44,11 +45,16 @@
     
   </div>
 
+  <div class="stance-row">
     <div class="stance-quick" aria-label="スタンス">
     <span class="stance-label">スタンス</span>
     <button type="button" data-stance="duck">ダック</button>
     <button type="button" data-stance="forward">前振り</button>
     <button type="button" data-stance="back">後振り</button>
+  </div>
+    <label class="stance-width" for="stanceWidth">幅（cm）<span class="optional-label">任意</span>
+      <input id="stanceWidth" type="number" inputmode="decimal" min="0" step="any" placeholder="例：54" aria-label="スタンス幅（cm・任意）">
+    </label>
   </div>
 
   <div class="foot-tabs" role="tablist" aria-label="設定する足">
@@ -74,7 +80,7 @@
     </div>
   </div>
 </div>
-    <p class="binding-help">↑ ノーズ側 · 穴をタップして選択</p>
+    <p class="binding-help">↑ ノーズ側 · 中央の数字は推奨位置</p>
     <div class="holes" data-side="left">
       <div class="row">
         <button type="button" class="hole"></button><button type="button" class="hole"></button><button type="button" class="hole"></button>
@@ -82,7 +88,7 @@
       </div>
 
     <div class="ref-wrap" data-side="left">
-     <div class="ref-help" data-side="left">タップして推奨位置追加</div>
+     <div class="ref-help" data-side="left" aria-hidden="true"></div>
        <div class="ref-line" data-side="left"></div>
      </div>
       
@@ -105,7 +111,7 @@
         </div>
       </div>
     </div>
-    <p class="binding-help">↑ ノーズ側 · 穴をタップして選択</p>
+    <p class="binding-help">↑ ノーズ側 · 中央の数字は推奨位置</p>
     <div class="holes" data-side="right">
       <div class="row">
         <button type="button" class="hole"></button><button type="button" class="hole"></button><button type="button" class="hole"></button>
@@ -113,7 +119,7 @@
       </div>
 
     <div class="ref-wrap" data-side="right">
-     <div class="ref-help" data-side="right">タップして推奨位置追加</div>
+     <div class="ref-help" data-side="right" aria-hidden="true"></div>
        <div class="ref-line" data-side="right"></div>
      </div>
       
@@ -271,7 +277,7 @@
     </button>
   </div>
 
-<script src="script.js?v=1008"></script>
+<script src="script.js?v=1009"></script>
 
 <div id="toast"></div>
   
