@@ -880,7 +880,7 @@ function normalizeItem(x){
 
   if (!item.reference) item.reference = { left: null, right: null };
   if (!item.disk) item.disk = { left: "", right: "" };
-  if (!item.dateTime) item.dateTime = new Date().toISOString();
+  if (!item.dateTime) item.dateTime = "";
 
   item.board = (item.board || "").toString();
   item.snow = (item.snow || "").toString();
@@ -913,6 +913,35 @@ function parseBackupPayload(obj){
   }
 
   return null;
+}
+
+// Only explicit, valid ISO timestamps are safe to use as duplicate keys.
+function recordDateKey(item){
+  if (typeof item?.dateTime !== "string") return null;
+  const value = item.dateTime.trim();
+  const parts = value.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/i);
+  if (!parts) return null;
+  const [year, month, day, hour, minute, second] = parts.slice(1).map(Number);
+  const leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+  const days = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  if (month < 1 || month > 12 || day < 1 || day > days[month - 1] || hour > 23 || minute > 59 || second > 59) return null;
+  const timestamp = Date.parse(value);
+  return Number.isFinite(timestamp) ? String(timestamp) : null;
+}
+
+function planDateUniqueImport(existing, incoming){
+  const seen = new Set(existing.map(recordDateKey).filter(key => key !== null));
+  const items = [];
+  let skipped = 0;
+  let undated = 0;
+  for (const item of incoming) {
+    const key = recordDateKey(item);
+    if (key !== null && seen.has(key)) { skipped++; continue; }
+    if (key === null) undated++;
+    else seen.add(key);
+    items.push(item);
+  }
+  return {items, skipped, undated};
 }
 
 // プレビュー用：件数・期間・板上位
@@ -1255,6 +1284,7 @@ function exportBackup() {
   const previewEl = document.getElementById("importPreview");
   const errEl = document.getElementById("importError");
   const btnMerge = document.getElementById("btnImportMerge");
+  const btnDateUnique = document.getElementById("btnImportDateUnique");
   const btnReplace = document.getElementById("btnImportReplace");
 
   let pendingImport = null; // { items, ui, meta }
@@ -1274,6 +1304,8 @@ function exportBackup() {
   const setImportButtonsEnabled = (on) => {
     if (btnMerge) btnMerge.disabled = !on;
     if (btnReplace) btnReplace.disabled = !on;
+    if (btnDateUnique) btnDateUnique.disabled = !on || !pendingImport
+      || planDateUniqueImport(loadList(), pendingImport.items).items.length === 0;
   };
 
   function resetImportUI(){
@@ -1338,6 +1370,7 @@ function exportBackup() {
 
     const envLabel = parsed.meta.env ? String(parsed.meta.env) : "不明";
     const exportedAtLabel = fmtDateTimeJP(parsed.meta.exportedAt);
+    const uniquePlan = planDateUniqueImport(loadList(), parsed.items);
 
     setPreview(`
       <div><b>ファイル：</b>${escapeHtml(f.name)}</div>
@@ -1347,6 +1380,8 @@ function exportBackup() {
       <div><b>環境：</b>${escapeHtml(envLabel)}</div>
       <div><b>作成：</b>${escapeHtml(exportedAtLabel)}</div>
       <div><b>形式：</b>app=${escapeHtml(parsed.meta.app || "不明")} / v=${escapeHtml(String(parsed.meta.dataVersion || "不明"))}</div>
+      <div class="import-dedupe-summary"><b>日時重複を除く追加：</b>追加予定 ${uniquePlan.items.length}件（うち日時不明 ${uniquePlan.undated}件） / 重複 ${uniquePlan.skipped}件</div>
+      ${uniquePlan.items.length === 0 ? `<div class="import-muted">すべて同じ日時の記録があるため、重複を除く追加は不要です。</div>` : ""}
     `);
 
     pendingImport = parsed;
@@ -1387,6 +1422,33 @@ function exportBackup() {
   resetImportUI();
   close();
 });
+
+  btnDateUnique?.addEventListener("click", () => {
+    if (!pendingImport) return;
+    const current = loadList();
+    const plan = planDateUniqueImport(current, pendingImport.items);
+    if (plan.items.length === 0) {
+      showToast(`すべて日時が重複しています（${plan.skipped}件）。追加はありません。`, "info");
+      return;
+    }
+    const ok = confirm(`日時の重複を除いて${plan.items.length}件を追加するよ？\n重複${plan.skipped}件は追加しません。日時不明${plan.undated}件は追加します。\n同じ日時なら内容が違っても既存の記録を優先します。今のデータは削除しません。`);
+    if (!ok) return;
+    // Recheck against current storage; preview and confirmation may be older than another tab.
+    const latest = loadList();
+    const applied = planDateUniqueImport(latest, pendingImport.items);
+    if (applied.items.length === 0) {
+      showToast("最新の保存内容ではすべて日時が重複しています。追加はありません。", "info");
+      return;
+    }
+    const next = mergeItems(latest, applied.items);
+    localStorage.setItem(KEY, JSON.stringify(next));
+    resetAllFiltersAndSort();
+    render();
+    showView("history");
+    showToast(`日時重複を除いて追加（+${applied.items.length}件 / 重複${applied.skipped}件を除外）`, "success");
+    resetImportUI();
+    close();
+  });
 
  btnReplace?.addEventListener("click", () => {
   if (!pendingImport) return;

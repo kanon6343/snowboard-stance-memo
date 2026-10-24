@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="スノーボードのスタンスと滑走メモをブラッシュアップする専用作業版" />
   <title>スタンスメモ（はる作業版）</title>
-  <link rel="stylesheet" href="style.css?v=1011">
-  <link rel="stylesheet" href="outdoor.css?v=1011">
-  <link rel="stylesheet" href="theme.css?v=1011">
-  <script src="theme.js?v=1011"></script>
+  <link rel="stylesheet" href="style.css?v=1012">
+  <link rel="stylesheet" href="outdoor.css?v=1012">
+  <link rel="stylesheet" href="theme.css?v=1012">
+  <script src="theme.js?v=1012"></script>
 </head>
 <body data-menu-side="left">
 
@@ -226,9 +226,11 @@
         </div>
 
         <div class="import-actions">
+          <button id="btnImportDateUnique" type="button" class="menu-action" disabled>日時の重複を除いて追加</button>
           <button id="btnImportMerge" type="button" class="menu-action" disabled>今のデータに追加して復元</button>
           <button id="btnImportReplace" type="button" class="menu-action danger" disabled>今のデータを上書きして復元</button>
         </div>
+        <p class="menu-note">重複を除く追加では、同じ日時の記録は内容が違っても追加せず、既存の記録を優先します。ファイル内の同じ日時は先頭の1件を採用し、日時不明の記録は残します。</p>
 
         <div id="importError" class="import-error" role="alert" hidden></div>
       </div>
@@ -288,7 +290,7 @@
     </button>
   </div>
 
-<script src="script.js?v=1011"></script>
+<script src="script.js?v=1012"></script>
 
 <div id="toast"></div>
   
