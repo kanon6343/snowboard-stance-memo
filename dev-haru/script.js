@@ -197,15 +197,15 @@ function renderStanceTabs(){
   if (!stanceTabsDiv) return;
 
   const items = [
-    { key: "duck",    emoji: "🦆" },
-    { key: "forward", emoji: "△" },
-    { key: "back",    emoji: "▽" },
-    { key: "none",    emoji: "ー" }, // 未設定（stanceが空）
+    { key: "duck",    label: "ダック" },
+    { key: "forward", label: "前振り" },
+    { key: "back",    label: "後振り" },
+    { key: "none",    label: "未設定" }, // 未設定（stanceが空）
   ];
 
   stanceTabsDiv.innerHTML = items.map(x => {
     const active = (stanceFilter === x.key) ? "active" : "";
-    return `<button type="button" class="stance-tab ${active}" data-stance-filter="${x.key}">${x.emoji}</button>`;
+    return `<button type="button" class="stance-tab ${active}" data-stance-filter="${x.key}" aria-pressed="${stanceFilter === x.key}">${x.label}</button>`;
   }).join("");
 
   stanceTabsDiv.querySelectorAll("[data-stance-filter]").forEach(btn => {
@@ -1186,8 +1186,16 @@ function exportBackup() {
   }, true);
   panel.addEventListener("keydown", event => {
     if (event.key !== "Tab") return;
-    const focusable = [...panel.querySelectorAll("button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex='0']")]
-      .filter(element => element.getClientRects().length > 0);
+    const focusable = [...panel.querySelectorAll("button:not(:disabled), summary, a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex='0']")]
+      .filter(element => {
+        if (!element.getClientRects().length) return false;
+        // Closed details can still report content rectangles; only their summary is focusable.
+        for (let parent = element.parentElement; parent && parent !== panel; parent = parent.parentElement) {
+          if (parent.tagName === "DETAILS" && !parent.open &&
+              !parent.querySelector(":scope > summary")?.contains(element)) return false;
+        }
+        return true;
+      });
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
     if (event.shiftKey && document.activeElement === first) {
@@ -1232,7 +1240,7 @@ function exportBackup() {
     setError("");
     setImportButtonsEnabled(false);
     if (fileEl) fileEl.value = "";
-    setPreview(`<div class="import-muted">※ ここにプレビューが出るよ</div>`);
+    setPreview(`<div class="import-muted">ファイルを選ぶと、復元する内容を確認できます。</div>`);
   }
 
   resetImportUI();

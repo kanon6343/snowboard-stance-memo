@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="スノーボードのスタンスと滑走メモをブラッシュアップする専用作業版" />
   <title>スタンスメモ（はる作業版）</title>
-  <link rel="stylesheet" href="style.css?v=1007">
+  <link rel="stylesheet" href="style.css?v=1008">
 </head>
 <body data-menu-side="left">
 
@@ -164,98 +164,114 @@
 
 <aside id="menuPanel" class="menu-panel" aria-label="設定とデータ管理" aria-hidden="true" inert>
   <div class="menu-head">
-    <div class="menu-title">⚙ 設定 / データ管理</div>
+    <div>
+      <p class="menu-eyebrow">STANCE MEMO</p>
+      <h2 class="menu-title">メニュー</h2>
+    </div>
     <button id="menuCloseBtn" class="menu-close" type="button" aria-label="閉じる">×</button>
   </div>
 
   <div class="menu-body">
 
   <section class="menu-card" id="menuFilters">
-    <h3>🎛 フィルター / ソート</h3>
+    <h3>絞り込み・並び替え</h3>
+    <p class="menu-section-note">保存したセッティングを探す</p>
     <div id="filtersMountMenu"></div>
   </section>
 
   <section class="menu-card">
-    <h3>📦 データ管理</h3>
-
-      <button id="btnExport" type="button" class="menu-action">📤 バックアップを書き出す（.json）</button>
-
-      <div class="import-box">
-        <div class="import-title">📥 バックアップから復元</div>
-
-        <input id="importFile" type="file" accept="application/json" class="import-file">
-
-        <div id="importPreview" class="import-preview">
-          <div class="import-muted">※ ここにプレビューが出るよ</div>
-        </div>
-
-        <div class="import-actions">
-          <button id="btnImportMerge" type="button" class="menu-action" disabled>追加して復元（安全）</button>
-          <button id="btnImportReplace" type="button" class="menu-action danger" disabled>上書きで復元（危険）</button>
-        </div>
-
-        <div id="importError" class="import-error" hidden></div>
-      </div>
-    </section>
-
-    <section class="menu-card">
-    <h3>🎛 表示・操作</h3>
+    <h3>表示・操作</h3>
+    <div class="menu-position-row">
       <label class="menu-position-label" for="menuSide">メニューの位置</label>
       <select id="menuSide" class="menu-side-select">
         <option value="left">左側</option>
         <option value="right">右側</option>
       </select>
-      <p id="menuGestureHelp" class="menu-note">左端から右へスワイプで開きます。</p>
-    </section>
+    </div>
+    <p id="menuGestureHelp" class="menu-note">左端から右へスワイプで開きます。</p>
+  </section>
 
-    <section class="menu-card dev-footer" id="devFooter">
-      <h3>🧪 はる作業版</h3>
+  <details class="menu-card menu-disclosure" id="menuBackup">
+    <summary>
+      <span><strong>バックアップ</strong><small>ファイルに保存・復元</small></span>
+      <span class="menu-chevron" aria-hidden="true">⌄</span>
+    </summary>
+    <div class="menu-disclosure-body">
+      <button id="btnExport" type="button" class="menu-action menu-primary">バックアップを書き出す<span class="menu-action-note">JSONファイルとして保存</span></button>
+
+      <div class="import-box">
+        <label class="import-title" for="importFile">ファイルから復元</label>
+
+        <input id="importFile" type="file" accept="application/json,.json" class="import-file" aria-describedby="importPreview">
+
+        <div id="importPreview" class="import-preview" role="status" aria-live="polite">
+          <div class="import-muted">ファイルを選ぶと、復元する内容を確認できます。</div>
+        </div>
+
+        <div class="import-actions">
+          <button id="btnImportMerge" type="button" class="menu-action" disabled>今のデータに追加して復元</button>
+          <button id="btnImportReplace" type="button" class="menu-action danger" disabled>今のデータを上書きして復元</button>
+        </div>
+
+        <div id="importError" class="import-error" role="alert" hidden></div>
+      </div>
+    </div>
+  </details>
+
+  <details class="menu-card menu-disclosure dev-footer" id="devFooter">
+    <summary>
+      <span><strong>はる作業版の管理</strong><small>本番データの取り込み・初期化</small></span>
+      <span class="menu-chevron" aria-hidden="true">⌄</span>
+    </summary>
+    <div class="menu-disclosure-body">
       <div class="dev-actions">
         <button id="btnDevCopyProd" type="button" class="dev-btn">本番データを取り込む</button>
         <button id="btnDevReset" type="button" class="dev-btn danger">作業版データ全削除</button>
       </div>
-      <p class="dev-note">※本番のデータは消えず、作業版にコピーされます。</p>
-    </section>
+      <p class="dev-note">本番データは変更しません。取り込み時は、現在の作業版データが上書きされます。</p>
+    </div>
+  </details>
   </div>
 </aside> 
   
   <div id="filtersPanel" class="menu-filters" hidden>
     <!-- ① 日付ソート -->
-    <label class="menu-label">
-      並び替え
+    <div class="menu-label">
+      <label for="sortMode">並び替え</label>
       <select id="sortMode" class="sort-select">
         <option value="savedDesc">保存日↓</option>
         <option value="savedAsc">保存日↑</option>
         <option value="boardAsc">板名</option>
         <option value="snowAsc">雪質</option>
       </select>
-    </label>
+    </div>
 
     <!-- ② スタンス -->
     <div class="menu-label">
       スタンス
-      <div class="stance-tabs" id="stanceTabs"></div>
+      <div class="stance-tabs" id="stanceTabs" role="group" aria-label="スタンスで絞り込み"></div>
     </div>
 
     <!-- ③ 角度 -->
-    <div class="menu-label">
-      角度
+    <div class="menu-label menu-angle-group">
+      <div class="menu-field-heading">
+        <span>角度（°）</span>
+        <button id="angleClear" class="angle-clear" type="button" aria-label="角度の絞り込みを解除">解除</button>
+      </div>
       <div class="angle-filter" aria-label="角度検索">
-        <input id="angleLeft" class="angle-in" type="number" placeholder="L">
-        <input id="angleRight" class="angle-in" type="number" placeholder="R">
-        <span class="angle-pm">±</span>
-        <input id="angleTol" class="angle-tol" type="number" value="2" min="0">
-        <button id="angleClear" class="angle-clear" type="button">×</button>
+        <label>左足<input id="angleLeft" class="angle-in" type="number" placeholder="例：15"></label>
+        <label>右足<input id="angleRight" class="angle-in" type="number" placeholder="例：-9"></label>
+        <label>許容 ±<input id="angleTol" class="angle-tol" type="number" value="2" min="0"></label>
       </div>
     </div>
 
     <!-- ✅ オールクリア -->
     <button id="btnFilterClear" type="button" class="menu-action">
-      🧹 フィルター/ソートを全部クリア
+      絞り込み・並び替えをリセット
     </button>
   </div>
 
-<script src="script.js?v=1007"></script>
+<script src="script.js?v=1008"></script>
 
 <div id="toast"></div>
   
