@@ -7,6 +7,8 @@
 .detail-inline label,.disk-type-picker label,.detail-filters label{display:block;min-width:0;font-size:12px;font-weight:650;color:var(--outdoor-muted);}
 .detail-inline input,.detail-inline select,.detail-inline textarea,.detail-filters select{display:block;box-sizing:border-box;width:100%;min-width:0;min-height:44px;margin-top:5px;padding:8px;border:2px solid var(--outdoor-border);border-radius:9px;background:#fff;color:var(--outdoor-ink);font:inherit;font-size:16px;}
 .detail-inline textarea{resize:vertical;}
+.detail-binding{border-top:1px solid var(--outdoor-border);padding-top:12px;margin:14px 0;}
+.detail-binding label small{font-size:10px;font-weight:400;}
 .detail-board .detail-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
 .detail-board .detail-grid>label:last-child{grid-column:1/-1;}
 #detailSetbackBasis[hidden]{display:none!important;}
@@ -55,12 +57,20 @@
 .heelcup-settings{margin-top:14px;padding-top:12px;border-top:1px solid var(--outdoor-border);}
 .heelcup-settings h3{font-size:13px;margin:0 0 8px;}
 .heelcup-settings h3 small{font-size:10px;font-weight:400;color:var(--outdoor-muted);}
+.heelcup-head{display:grid;grid-template-columns:88px minmax(0,1fr);gap:12px;align-items:center;margin-bottom:10px;}
+.heelcup-head h3{margin:0;}
 .heelcup-layout{display:grid;grid-template-columns:88px minmax(0,1fr);gap:12px;align-items:center;}
 .heelcup-explanation{min-width:0;color:var(--outdoor-muted);text-align:center;}
 .heelcup-explanation p{font-size:10px;line-height:1.4;margin:0 0 4px;}
 .heelcup-explanation svg{display:block;width:80px;height:auto;max-width:100%;margin:auto;}
 .heelcup-values{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;min-width:0;}
 .heelcup-values label small{display:block;font-size:10px;font-weight:400;}
+.heelcup-origin{padding:2px;border-radius:8px;height:32px;}
+.heelcup-origin button{min-height:0;padding:0 2px;font-size:11px;white-space:nowrap;border-radius:5px;}
+.heelcup-origin .basis-highlight{top:2px;left:2px;width:calc((100% - 4px)/2);height:calc(100% - 4px);border-radius:5px;}
+.heelcup-origin[data-basis="far"] .basis-highlight{transform:translateX(100%);}
+.heelcup-origin-help{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;}
+.binding-heading{margin:14px 0 10px;padding-top:12px;border-top:1px solid var(--outdoor-border);font-size:13px;color:var(--outdoor-ink);}
 .heelcup-values .detail-hint{grid-column:1/-1;margin:0;font-size:10px;}
 .heelcup-settings p[hidden]{display:none;}
 .disk-type-picker select{font-size:14px;}

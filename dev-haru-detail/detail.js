@@ -5,6 +5,7 @@ const DetailData = (() => {
     nose: {round:'ラウンド',hammer:'ハンマーヘッド',semiHammer:'セミハンマー',other:'その他'},
     bend: {camber:'キャンバー',rocker:'ロッカー',flat:'フラット',hybrid:'ハイブリッド',other:'その他'},
     diskType: {holes:'穴位置式',slots:'長穴スライド式',mixed:'穴と長穴の併用',other:'その他・不明'},
+    heelcupOrigin: {near:'手前から',far:'奥から'},
   };
   const object = value => value && typeof value === 'object' && !Array.isArray(value) ? value : {};
   const text = (value, max) => typeof value === 'string' ? value.trim().slice(0,max) : '';
@@ -24,19 +25,21 @@ const DetailData = (() => {
     const foot = side => {
       const f=object(disk[side]);return {type:choice(f.type,choices.diskType),longitudinal:axis(f.longitudinal,['nose','tail']),lateral:axis(f.lateral,['toe','heel'])};
     };
-    const heelcup=side=>{const h=object(heel[side]);return {inner:text(h.inner,64),outer:text(h.outer,64),recorded:h.recorded===true||object(disk[side]).type==='highback'};};
+    const heelcup=side=>{const h=object(heel[side]);return {inner:text(h.inner,64),outer:text(h.outer,64),origin:choice(h.origin,choices.heelcupOrigin),recorded:h.recorded===true||object(disk[side]).type==='highback'};};
     return {version:1,shape:choice(v.shape,choices.shape),nose:choice(v.nose,choices.nose),bend:choice(v.bend,choices.bend),
-      boardNote:text(v.boardNote,160),forwardLeanLeft:text(v.forwardLeanLeft,64),forwardLeanRight:text(v.forwardLeanRight,64),
+      boardNote:text(v.boardNote,160),bindingName:text(v.bindingName,128),forwardLeanLeft:text(v.forwardLeanLeft,64),forwardLeanRight:text(v.forwardLeanRight,64),
       setback,diskShift:{left:foot('left'),right:foot('right')},heelcup:{left:heelcup('left'),right:heelcup('right')},note:text(v.note,1000)};
   }
   function rows(value) {
     const d=normalize(value),r=[];
     for(const [key,label]of [['shape','シェイプ'],['nose','ノーズ'],['bend','ベンド']])if(d[key])r.push([label,choices[key][d[key]]]);
     if(d.boardNote)r.push(['形状の補足',d.boardNote]);
+    if(d.bindingName)r.push(['ビンディング',d.bindingName]);
     for(const [key,label]of [['forwardLeanLeft','左リーン'],['forwardLeanRight','右リーン']])if(d[key])r.push([label,d[key]]);
     if(d.setback.mm!=='')r.push(['セットバック',`${({reference:'推奨位置',center:'板の中心'})[d.setback.basis]||'基準未設定'}から ${({nose:'ノーズ側',tail:'テール側'})[d.setback.direction]||'方向未設定'} ${d.setback.mm} mm`]);
     for(const [side,label]of [['left','左'],['right','右']]){
       const h=d.heelcup[side];
+      if(h.origin)r.push([`${label}ヒールカップの数え方`,choices.heelcupOrigin[h.origin]]);
       if(h.inner)r.push([`${label}ヒールカップ内側`,h.inner]);
       if(h.outer)r.push([`${label}ヒールカップ外側`,h.outer]);
       if(h.recorded&&!h.inner&&!h.outer)r.push([`${label}ヒールカップ`,'目盛り未入力（旧試作の記録）']);
@@ -87,17 +90,30 @@ const DetailData = (() => {
 
 const DetailEditor = (() => {
   const byId=id=>document.getElementById(id), modeKey='haru-detail:input-mode-v1',filterKey='haru-detail:shape-filter-v1';
-  const bindings={shape:'detailShape',nose:'detailNose',bend:'detailBend',boardNote:'detailBoardNote',forwardLeanLeft:'detailLeanLeft',forwardLeanRight:'detailLeanRight',note:'detailNote'};
+  const bindings={shape:'detailShape',nose:'detailNose',bend:'detailBend',boardNote:'detailBoardNote',bindingName:'detailBindingName',forwardLeanLeft:'detailLeanLeft',forwardLeanRight:'detailLeanRight',note:'detailNote'};
   const heelcupRecorded={left:false,right:false};
+  const heelcupOrigins={left:'',right:''};
   for(const side of ['left','right']){
     const foot=byId(`detailDisk-${side}`),label=side==='left'?'左足':'右足';
     foot.innerHTML=`<h3>${label}のディスク</h3><div class="detail-offset-grid"><label>前後（mm）<input id="shift-${side}-longitudinal-mm" type="number" step="any" placeholder="例：-3" aria-label="${label}ディスク前後（mm）" aria-describedby="diskSignHelp-${side}"></label><label>横の方向<select id="shift-${side}-lateral-direction" aria-label="${label}ディスク横の方向"><option value="">選択</option><option value="toe">つま先側</option><option value="heel">かかと側</option></select></label><label>横（mm）<input id="shift-${side}-lateral-mm" type="number" min="0" step="any" inputmode="decimal" placeholder="例：3" aria-label="${label}ディスク横（mm）"></label></div><p id="diskSignHelp-${side}" class="detail-hint">前後は ＋ノーズ／−テール。0はずらしなし、空欄は未入力。</p>`;
     const heelcup=document.createElement('section');heelcup.className='heelcup-settings';heelcup.setAttribute('aria-label',`${label}のヒールカップ`);
     const leftLabel=side==='left'?'外':'内',rightLabel=side==='left'?'内':'外';
-    heelcup.innerHTML=`<h3>ヒールカップ <small>任意</small></h3><div class="heelcup-layout"><div class="heelcup-explanation"><p>かかと側のU字部分<br>つま先を上に見た図</p><svg viewBox="0 0 120 110" role="img" aria-label="${label}のヒールカップ。図の左が${leftLabel}側、右が${rightLabel}側。両側の目盛りを別々に記録します"><rect x="27" y="12" width="66" height="86" rx="14" fill="none" stroke="currentColor" stroke-width="2" opacity=".3"/><path d="M33 51v23q0 17 27 17t27-17V51" fill="none" stroke="#df6500" stroke-width="7"/><g fill="none" stroke="currentColor" stroke-width="2"><circle cx="33" cy="64" r="5"/><circle cx="87" cy="64" r="5"/><path d="M14 58v29m-4-24 4-5 4 5m-8 19 4 5 4-5M106 58v29m-4-24 4-5 4 5m-8 19 4 5 4-5"/></g><g fill="currentColor" text-anchor="middle" font-size="15"><text x="14" y="50">${leftLabel}</text><text x="106" y="50">${rightLabel}</text><text x="60" y="11" font-size="10">つま先 ↑</text></g></svg></div><div class="heelcup-values"><label>内側 <small>親指側</small><input id="heelcup-${side}-inner" type="text" maxlength="64" placeholder="例：0" aria-label="${label}ヒールカップ内側（親指側）" aria-describedby="heelcup-help-${side}"></label><label>外側 <small>小指側</small><input id="heelcup-${side}-outer" type="text" maxlength="64" placeholder="例：1" aria-label="${label}ヒールカップ外側（小指側）" aria-describedby="heelcup-help-${side}"></label><p id="heelcup-help-${side}" class="detail-hint">目盛りをそのまま記録。mmには換算しません。</p></div></div><p id="heelcup-legacy-${side}" class="detail-hint" hidden>旧試作でヒールカップ調整として記録済みです。内側・外側の目盛りは未入力です。</p>`;
+    heelcup.innerHTML=`<div class="heelcup-head"><h3>ヒールカップ</h3><div id="heelcup-origin-${side}" class="basis-switch heelcup-origin" role="group" aria-label="${label}ヒールカップの目盛りを数える基準" aria-describedby="heelcup-origin-help-${side}" data-basis=""><span class="basis-highlight" aria-hidden="true"></span><button id="heelcup-origin-${side}-near" type="button" aria-pressed="false">手前から</button><button id="heelcup-origin-${side}-far" type="button" aria-pressed="false">奥から</button></div><span id="heelcup-origin-help-${side}" class="heelcup-origin-help">数える基準・任意</span></div><div class="heelcup-layout"><div class="heelcup-explanation"><p>かかと側のU字部分<br>つま先を上に見た図</p><svg viewBox="0 0 120 110" role="img" aria-label="${label}のヒールカップ。図の左が${leftLabel}側、右が${rightLabel}側。両側の目盛りを別々に記録します"><rect x="27" y="12" width="66" height="86" rx="14" fill="none" stroke="currentColor" stroke-width="2" opacity=".3"/><path d="M33 51v23q0 17 27 17t27-17V51" fill="none" stroke="#df6500" stroke-width="7"/><g fill="none" stroke="currentColor" stroke-width="2"><circle cx="33" cy="64" r="5"/><circle cx="87" cy="64" r="5"/><path d="M14 58v29m-4-24 4-5 4 5m-8 19 4 5 4-5M106 58v29m-4-24 4-5 4 5m-8 19 4 5 4-5"/></g><g fill="currentColor" text-anchor="middle" font-size="15"><text x="14" y="50">${leftLabel}</text><text x="106" y="50">${rightLabel}</text><text x="60" y="11" font-size="10">つま先 ↑</text></g></svg></div><div class="heelcup-values"><label>内側 <small>親指側</small><input id="heelcup-${side}-inner" type="text" maxlength="64" placeholder="例：0" aria-label="${label}ヒールカップ内側（親指側）" aria-describedby="heelcup-help-${side}"></label><label>外側 <small>小指側</small><input id="heelcup-${side}-outer" type="text" maxlength="64" placeholder="例：1" aria-label="${label}ヒールカップ外側（小指側）" aria-describedby="heelcup-help-${side}"></label><p id="heelcup-help-${side}" class="detail-hint">目盛りをそのまま記録。mmには換算しません。</p></div></div><p id="heelcup-legacy-${side}" class="detail-hint" hidden>旧試作でヒールカップ調整として記録済みです。内側・外側の目盛りは未入力です。</p>`;
     foot.appendChild(heelcup);
   }
   const panel=byId('setupCard'),select=byId('inputMode');
+  const syncHeelcupOrigin=side=>{
+    byId(`heelcup-origin-${side}`).dataset.basis=heelcupOrigins[side];
+    for(const origin of ['near','far'])byId(`heelcup-origin-${side}-${origin}`).setAttribute('aria-pressed',String(heelcupOrigins[side]===origin));
+  };
+  for(const side of ['left','right'])for(const origin of ['near','far']){
+    const button=byId(`heelcup-origin-${side}-${origin}`);
+    button.addEventListener('click',()=>{heelcupOrigins[side]=heelcupOrigins[side]===origin?'':origin;syncHeelcupOrigin(side);retained();});
+    button.addEventListener('keydown',event=>{
+      const next=event.key==='ArrowRight'||event.key==='End'?'far':event.key==='ArrowLeft'||event.key==='Home'?'near':null;
+      if(next){event.preventDefault();heelcupOrigins[side]=next;syncHeelcupOrigin(side);byId(`heelcup-origin-${side}-${next}`).focus();retained();}
+    });
+  }
   let setbackSign='tail';
   const syncSign=()=>{
     const input=byId('detailSetbackMm'),button=byId('setbackSignSwitch');
@@ -132,7 +148,7 @@ const DetailEditor = (() => {
     });
   }
   byId('detailSetbackBasis').addEventListener('change',syncBasis);
-  const sections=['detailFields','detailSetback','leftFootDetails','rightFootDetails','leftLeanFields','rightLeanFields','detailNoteFields'].map(byId);
+  const sections=['detailFields','detailBindingFields','detailSetback','leftFootDetails','rightFootDetails','leftLeanFields','rightLeanFields','detailNoteFields'].map(byId);
   let mode='simple',filters={shape:'',nose:'',bend:''};
   const profileKeys=['shape','nose','bend','boardNote'];let profileBoard='',autoProfile=false,profileDirty=false;
   const profileNotice=(message='',offer=false)=>{byId('boardProfileNotice').hidden=!message;byId('boardProfileStatus').textContent=message;byId('applyBoardProfile').hidden=!offer;};
@@ -160,7 +176,7 @@ const DetailEditor = (() => {
       const raw=byId(`shift-${side}-longitudinal-mm`).value,n=Number(raw);
       value.diskShift[side]={type:byId(`shift-${side}-type`).value,longitudinal:{direction:raw===''?'':n<0?'tail':'nose',mm:raw===''?'':String(Math.abs(n))},lateral:{direction:byId(`shift-${side}-lateral-direction`).value,mm:byId(`shift-${side}-lateral-mm`).value}};
     }
-    value.heelcup={};for(const side of ['left','right'])value.heelcup[side]={inner:byId(`heelcup-${side}-inner`).value,outer:byId(`heelcup-${side}-outer`).value,recorded:heelcupRecorded[side]};
+    value.heelcup={};for(const side of ['left','right'])value.heelcup[side]={inner:byId(`heelcup-${side}-inner`).value,outer:byId(`heelcup-${side}-outer`).value,origin:heelcupOrigins[side],recorded:heelcupRecorded[side]};
     return value;
   };
   const retained = () => {byId('detailRetained').hidden=mode==='detail'||!DetailData.has(collect());for(const side of ['left','right'])byId(`heelcup-legacy-${side}`).hidden=!heelcupRecorded[side]||!!byId(`heelcup-${side}-inner`).value.trim()||!!byId(`heelcup-${side}-outer`).value.trim();};
@@ -176,7 +192,7 @@ const DetailEditor = (() => {
     syncBasis();
     byId('detailSetbackMm').value=d.setback.mm===''?'':d.setback.direction==='tail'?String(-Number(d.setback.mm)):d.setback.mm;
     setbackSign=d.setback.direction||'tail';syncSign();
-    for(const side of ['left','right']){heelcupRecorded[side]=d.heelcup[side].recorded;for(const pos of ['inner','outer'])byId(`heelcup-${side}-${pos}`).value=d.heelcup[side][pos];}
+    for(const side of ['left','right']){heelcupRecorded[side]=d.heelcup[side].recorded;heelcupOrigins[side]=d.heelcup[side].origin;syncHeelcupOrigin(side);for(const pos of ['inner','outer'])byId(`heelcup-${side}-${pos}`).value=d.heelcup[side][pos];}
     for(const side of ['left','right']){byId(`shift-${side}-type`).value=d.diskShift[side].type;drawDisk(side);}
     for(const side of ['left','right'])for(const axis of ['longitudinal','lateral']){
       const a=d.diskShift[side][axis];

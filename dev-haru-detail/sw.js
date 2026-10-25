@@ -1,5 +1,5 @@
 /* Release shell: bump RELEASE and every versioned index.html asset together. */
-const RELEASE = '1034';
+const RELEASE = '1038';
 const BASE = new URL('./', self.registration.scope);
 const CACHE_PREFIX = `snowboard-stance-haru-detail:${BASE.href}:`;
 const CACHE_NAME = `${CACHE_PREFIX}${RELEASE}`;
