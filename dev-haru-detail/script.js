@@ -706,7 +706,7 @@ function render() {
     const boardLabel = item.board || "板名なし";
     const snowLabel  = item.snow  || "雪質なし";
 
-    const metadata = [dateLabel, timeLabel, snowLabel].filter(Boolean).join(" · ");
+    const metadata = [dateLabel, timeLabel].filter(Boolean).join(" · ");
     const leftDisk = item.disk?.left || "";
     const rightDisk = item.disk?.right || "";
     const stanceWidth = normalizeStanceWidth(item.stanceWidth);
@@ -726,7 +726,7 @@ function render() {
       <header class="history-card-head">
         <div class="history-card-heading">
           <h3 class="history-board">${escapeHtml(boardLabel)}</h3>
-          <p class="history-meta">${escapeHtml(metadata)}</p>
+          <p class="history-meta history-meta-compact"><span>${escapeHtml(metadata)}</span><span>${escapeHtml(snowLabel)}</span>${stanceLabel ? `<span class="stance-tag">${escapeHtml(stanceLabel)}</span>` : ""}</p>
         </div>
         <button
           type="button"
@@ -748,8 +748,7 @@ function render() {
       </div>
       ${detailParts.feet}
 
-      ${stanceLabel || stanceWidth || detailParts.stance ? `<div class="history-stance ${!stanceLabel && !stanceWidth ? 'detail-history-inline' : ''}">
-        ${stanceLabel ? `<span class="stance-tag">${escapeHtml(stanceLabel)}</span>` : ""}
+      ${stanceWidth || detailParts.stance ? `<div class="history-stance ${!stanceWidth ? 'detail-history-inline' : ''}">
         ${stanceWidth ? `<span class="stance-width-tag">幅 ${escapeHtml(stanceWidth)} cm</span>` : ""}
         ${detailParts.stance}
       </div>` : ""}

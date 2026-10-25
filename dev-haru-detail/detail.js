@@ -193,6 +193,7 @@ const DetailEditor = (() => {
   const persist = (key,value) => {try{localStorage.setItem(key,value);return true;}catch{return false;}};
   const applyMode = (next,save=false) => {
     mode=next==='detail'?'detail':'simple';sections.forEach(section=>section.hidden=mode!=='detail');select.value=mode;document.documentElement.dataset.inputMode=mode;retained();
+    byId('inputTab').textContent=mode==='detail'?'詳細入力':'簡易入力';
     const saved=!save||persist(modeKey,mode);
     byId('inputModeStatus').textContent=saved?'シンプルに戻しても詳細データは消えません。':'画面は切り替えましたが、入力モードの設定を保存できませんでした。';
     if(save&&typeof render==='function')render();
