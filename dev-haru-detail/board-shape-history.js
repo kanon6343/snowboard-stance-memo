@@ -33,6 +33,7 @@ const BoardShapeHistory = (() => {
     return {raw,items};
   }
   function apply() {
+    if (typeof HistoryEditor !== 'undefined' && HistoryEditor.isEditing()) {showToast('履歴の編集を保存してから、形状をまとめて反映してください。','info');return;}
     const board = byId('board').value.trim();
     if (!board) {showToast('反映する板名を入力してください。','info');byId('board').focus();return;}
     const source = Object.fromEntries(Object.entries(ids).map(([key,id]) => [key,byId(id).value]));

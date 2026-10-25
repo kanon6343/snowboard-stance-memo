@@ -50,7 +50,16 @@ commentClearBtn?.addEventListener("click", () => {
   if (!commentEl) return;
   commentEl.value = "";
   syncEditorSummary();
-  showToast("コメントをクリアしたよ", "info");
+  showToast("感想をクリアしたよ", "info");
+});
+
+const detailNoteClearBtn = document.getElementById("detailNoteClearBtn");
+detailNoteClearBtn?.addEventListener("click", () => {
+  const note = document.getElementById("detailNote");
+  if (!note) return;
+  note.value = "";
+  syncEditorSummary();
+  showToast("調整メモをクリアしたよ", "info");
 });
 
 const leftAngleEl = document.getElementById("left-angle");
@@ -328,6 +337,7 @@ holes.forEach((h, i) => {
 
 // クリア（入力）
 clearBtn?.addEventListener("click", () => {
+  if (typeof HistoryEditor !== "undefined" && !HistoryEditor.beforeNew()) return;
   if (boardEl) boardEl.value = "";
   DetailEditor.clear();
   if (snowEl) snowEl.value = "";
@@ -385,6 +395,10 @@ saveBtn?.addEventListener("click", () => {
   const detail = DetailEditor.read();
   if (!detail) return;
   item.detail = detail;
+  if (typeof HistoryEditor !== "undefined" && HistoryEditor.isEditing()) {
+    HistoryEditor.save(item);
+    return;
+  }
   list.unshift(item);
   localStorage.setItem(KEY, JSON.stringify(list));
   render();
@@ -431,7 +445,8 @@ function syncEditorSummary() {
   const savedCount = document.getElementById("savedCount");
   if (savedCount) savedCount.textContent = String(loadList().length);
   const commentState = document.getElementById("commentState");
-  if (commentState) commentState.textContent = commentEl?.value.trim() ? "入力あり" : "任意";
+  const hasDetailNote = document.documentElement.dataset.inputMode === "detail" && document.getElementById("detailNote")?.value.trim();
+  if (commentState) commentState.textContent = commentEl?.value.trim() || hasDetailNote ? "入力あり" : "任意";
 }
 
 function showView(view) {
@@ -475,7 +490,7 @@ function setupCompactEditor() {
       });
     });
   }
-  [leftAngleEl, rightAngleEl, commentEl].forEach(input => input?.addEventListener("input", syncEditorSummary));
+  [leftAngleEl, rightAngleEl, commentEl, document.getElementById("detailNote")].forEach(input => input?.addEventListener("input", syncEditorSummary));
   window.addEventListener("resize", () => renderRefSlots());
   syncEditorSummary();
 }
@@ -796,13 +811,7 @@ function render() {
     });
   });
 
-  // 読込
-  historyDiv.querySelectorAll('button[data-load-id]').forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = btn.dataset.loadId;
-      const item = loadList().find(x => x.id === id);
-      if (!item) return;
-
+  function fillEditor(item) {
       boardEl && (boardEl.value = item.board || "");
       DetailEditor.write(item.detail);
       snowEl  && (snowEl.value  = item.snow  || "");
@@ -833,7 +842,20 @@ function render() {
       showFoot("left");
       document.getElementById("inputTab").focus();
 
+  }
+  // 「使う」は新規記録用のコピー。「編集」は元の履歴を更新します。
+  historyDiv.querySelectorAll('button[data-load-id]').forEach(btn => {
+    btn.addEventListener("click", () => {
+      const item = loadList().find(x => x.id === btn.dataset.loadId);
+      if (!item) return;
+      if (typeof HistoryEditor !== "undefined" && !HistoryEditor.beforeNew()) return;
+      fillEditor(item);
       showToast("読み込みました", "rode");
+    });
+  });
+  historyDiv.querySelectorAll('button[data-edit-id]').forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (typeof HistoryEditor !== "undefined") HistoryEditor.begin(btn.dataset.editId, fillEditor);
     });
   });
 }

@@ -27,7 +27,7 @@ const DetailHistoryData = (() => {
   }).join('')}</div>`;}
   function favorite(item){const on=!!item.favorite;return `<button type="button" class="dh-favorite" data-fav-id="${escape(item.id)}" aria-pressed="${on}" aria-label="${escape(board(item))} ${escape(date(item))} ${on?'お気に入り解除':'お気に入り登録'}">${on?'★':'☆'}</button>`;}
   function heading(item,card=false){return `<header class="dh-head${card?' dh-card-top':''}"><div class="dh-heading"><p class="dh-date">${escape(date(item))}</p><h3>${escape(board(item))}</h3><p class="dh-meta">${escape(text(item.snow)||'雪質未入力')}</p></div>${favorite(item)}</header>`;}
-  function actions(item){const protectedItem=!!item.favorite;return `<div class="dh-actions"><button type="button" class="dh-load" data-load-id="${escape(item.id)}">この設定を使う</button><button type="button" class="dh-delete" data-del-id="${escape(item.id)}" data-protected="${protectedItem?'1':'0'}" aria-disabled="${protectedItem}" title="${protectedItem?'お気に入りは削除できません':'削除'}">${protectedItem?'保護中':'削除'}</button></div>`;}
+  function actions(item){const protectedItem=!!item.favorite;return `<div class="dh-actions"><button type="button" class="dh-load" data-load-id="${escape(item.id)}">この設定を使う</button><button type="button" class="dh-edit" data-edit-id="${escape(item.id)}">編集</button><button type="button" class="dh-delete" data-del-id="${escape(item.id)}" data-protected="${protectedItem?'1':'0'}" aria-disabled="${protectedItem}" title="${protectedItem?'お気に入りは削除できません':'削除'}">${protectedItem?'保護中':'削除'}</button></div>`;}
   function shapes(item){const d=detail(item),values=['shape','nose','bend'].map(key=>DetailData.choices[key][d[key]]).filter(Boolean);return values.length?`<div class="dh-shapes">${values.map(v=>`<span>${escape(v)}</span>`).join('')}</div>`:'';}
   function gear(item){return `<div class="dh-gear" role="group" aria-label="ビンディング"><span>${escape(detail(item).bindingName||'未入力')}</span></div>`;}
   function notes(item){return text(item.comment)?`<p class="dh-note"><span>滑走メモ</span>${escape(text(item.comment))}</p>`:'';}
@@ -50,7 +50,7 @@ const DetailHistoryData = (() => {
 const DetailHistoryView = (() => {
   const key='haru-detail:history-layout-v1',valid=['summary','matrix','grouped'];
   const controls=document.getElementById('detailHistoryControls'),group=document.getElementById('detailHistoryLayout'),status=document.getElementById('detailHistoryStatus'),history=document.getElementById('history');
-  let layout='matrix';try{const saved=localStorage.getItem(key);if(valid.includes(saved))layout=saved;}catch{}
+  let layout='summary';try{const saved=localStorage.getItem(key);if(valid.includes(saved))layout=saved;}catch{}
   const active=()=>document.documentElement.dataset.inputMode==='detail';
   const descriptions={summary:'カード：要点を表示し、調整の詳細は開いて確認します。',matrix:'詳細一覧：左右の詳細設定を常時表示します。',grouped:'板ごとの履歴：板内もメニューの並び順。変更点は表示中の過去記録との比較です。'};
   const buttons=controls?Array.from(controls.querySelectorAll('[data-history-layout]')):[];
