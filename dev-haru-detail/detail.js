@@ -195,6 +195,7 @@ const DetailEditor = (() => {
     mode=next==='detail'?'detail':'simple';sections.forEach(section=>section.hidden=mode!=='detail');select.value=mode;document.documentElement.dataset.inputMode=mode;retained();
     const saved=!save||persist(modeKey,mode);
     byId('inputModeStatus').textContent=saved?'シンプルに戻しても詳細データは消えません。':'画面は切り替えましたが、入力モードの設定を保存できませんでした。';
+    if(save&&typeof render==='function')render();
   };
   function write(value) {
     const d=DetailData.normalize(value);for(const [key,id]of Object.entries(bindings))byId(id).value=d[key];

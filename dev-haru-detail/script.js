@@ -654,11 +654,14 @@ function render() {
     }
   });
 
+  const detailHistoryOpen = typeof DetailHistoryView !== "undefined" ? DetailHistoryView.capture() : null;
   historyDiv.innerHTML = "";
 
   renderTabs();
   renderStanceTabs();
   renderRefSlots();
+
+  if (typeof DetailHistoryView !== "undefined") DetailHistoryView.sync();
 
   if (list.length === 0) {
     const hasSavedItems = loadList().length > 0;
@@ -672,6 +675,10 @@ function render() {
     return;
   }
 
+  if (typeof DetailHistoryView !== "undefined" && DetailHistoryView.active()) {
+    historyDiv.innerHTML = DetailHistoryView.render(list);
+    DetailHistoryView.restore(detailHistoryOpen);
+  } else {
   list.forEach((item) => {
     const card = document.createElement("section");
     card.className = "card history-card";
@@ -756,6 +763,7 @@ function render() {
 
     historyDiv.appendChild(card);
   });
+  }
 
   // ★お気に入り切替
   historyDiv.querySelectorAll("[data-fav-id]").forEach(btn => {
@@ -803,8 +811,8 @@ function render() {
         stanceWidthEl.setCustomValidity("");
       }
       commentEl && (commentEl.value = item.comment || "");
-      leftAngleEl && (leftAngleEl.value = item.leftAngle || "");
-      rightAngleEl && (rightAngleEl.value = item.rightAngle || "");
+      leftAngleEl && (leftAngleEl.value = item.leftAngle ?? "");
+      rightAngleEl && (rightAngleEl.value = item.rightAngle ?? "");
 
       const holesArr = getHolesAsV1(item);
       holes.forEach((h, i) => {
@@ -899,8 +907,8 @@ function normalizeItem(x){
   item.board = (item.board || "").toString();
   item.snow = (item.snow || "").toString();
   item.comment = (item.comment || "").toString();
-  item.leftAngle = (item.leftAngle || "").toString();
-  item.rightAngle = (item.rightAngle || "").toString();
+  item.leftAngle = (item.leftAngle ?? "").toString();
+  item.rightAngle = (item.rightAngle ?? "").toString();
   item.stance = (item.stance || "").toString();
   item.stanceWidth = normalizeStanceWidth(item.stanceWidth);
   item.detail = DetailData.normalize(item.detail);

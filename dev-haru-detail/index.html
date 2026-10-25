@@ -11,14 +11,15 @@
   <link rel="apple-touch-icon" href="icons/apple-touch-icon-trial.png" />
   <meta name="description" content="既存版とは保存先を分離した詳細入力モードの試作環境" />
   <title>スタンスメモ（詳細試作版）</title>
-  <link rel="stylesheet" href="style.css?v=1041">
-  <link rel="stylesheet" href="outdoor.css?v=1041">
-  <link rel="stylesheet" href="theme.css?v=1041">
-  <link rel="stylesheet" href="pwa.css?v=1041">
-  <link rel="stylesheet" href="board-suggestions.css?v=1041">
-  <link rel="stylesheet" href="detail.css?v=1041">
-  <script src="theme.js?v=1041"></script>
-  <script src="pwa.js?v=1041" defer></script>
+  <link rel="stylesheet" href="style.css?v=1042">
+  <link rel="stylesheet" href="outdoor.css?v=1042">
+  <link rel="stylesheet" href="theme.css?v=1042">
+  <link rel="stylesheet" href="pwa.css?v=1042">
+  <link rel="stylesheet" href="board-suggestions.css?v=1042">
+  <link rel="stylesheet" href="detail.css?v=1042">
+  <link rel="stylesheet" href="history-views.css?v=1042">
+  <script src="theme.js?v=1042"></script>
+  <script src="pwa.js?v=1042" defer></script>
 </head>
 <body data-menu-side="left">
 
@@ -216,6 +217,15 @@
 </section>
 
 <section id="historyView" role="tabpanel" aria-labelledby="historyTab" hidden>
+<section id="detailHistoryControls" aria-label="詳細履歴の表示設定" hidden>
+  <div id="detailHistoryLayout" class="dh-layout-switch" role="group" aria-label="詳細履歴の表示方法" data-layout="matrix" aria-describedby="detailHistoryStatus">
+    <span class="dh-layout-slider" aria-hidden="true"></span>
+    <button type="button" data-history-layout="summary" aria-pressed="false" tabindex="-1">カード</button>
+    <button type="button" data-history-layout="matrix" aria-pressed="true">詳細一覧</button>
+    <button type="button" data-history-layout="grouped" aria-label="板ごとの履歴" aria-pressed="false" tabindex="-1">板ごと</button>
+  </div>
+  <p id="detailHistoryStatus" role="status">詳細一覧：左右の詳細設定を常時表示します。</p>
+</section>
 <section class="history-heading">
   <div>
     <h2>保存履歴</h2>
@@ -377,9 +387,10 @@
     </button>
   </div>
 
-<script src="detail.js?v=1041"></script>
-<script src="script.js?v=1041"></script>
-<script src="board-suggestions.js?v=1041"></script>
+<script src="detail.js?v=1042"></script>
+<script src="history-views.js?v=1042"></script>
+<script src="script.js?v=1042"></script>
+<script src="board-suggestions.js?v=1042"></script>
 
 <div id="toast"></div>
   
