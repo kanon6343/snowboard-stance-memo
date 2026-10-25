@@ -698,6 +698,7 @@ function render() {
 
     const fav = !!item.favorite;
     const favLabel = fav ? "★" : "☆";
+    const detailParts = DetailData.historyParts(item.detail);
 
     card.innerHTML = `
       <header class="history-card-head">
@@ -717,17 +718,21 @@ function render() {
         </button>
       </header>
 
-      <div class="history-settings">
-        <div class="history-setting"><span>左足</span><strong>${escapeHtml(item.leftAngle || "?")}°</strong><small>ディスク ${escapeHtml(leftDisk || "未設定")}</small></div>
-        <div class="history-setting"><span>右足</span><strong>${escapeHtml(item.rightAngle || "?")}°</strong><small>ディスク ${escapeHtml(rightDisk || "未設定")}</small></div>
-      </div>
+      ${detailParts.board}
 
-      ${stanceLabel || stanceWidth ? `<div class="history-stance">
+      <div class="history-settings">
+        <div class="history-setting"><span>左足</span><strong>${escapeHtml(item.leftAngle || "?")}°</strong><small class="legacy-disk-history">ディスク ${escapeHtml(leftDisk || "未設定")}</small></div>
+        <div class="history-setting"><span>右足</span><strong>${escapeHtml(item.rightAngle || "?")}°</strong><small class="legacy-disk-history">ディスク ${escapeHtml(rightDisk || "未設定")}</small></div>
+      </div>
+      ${detailParts.feet}
+
+      ${stanceLabel || stanceWidth || detailParts.stance ? `<div class="history-stance ${!stanceLabel && !stanceWidth ? 'detail-history-inline' : ''}">
         ${stanceLabel ? `<span class="stance-tag">${escapeHtml(stanceLabel)}</span>` : ""}
         ${stanceWidth ? `<span class="stance-width-tag">幅 ${escapeHtml(stanceWidth)} cm</span>` : ""}
+        ${detailParts.stance}
       </div>` : ""}
-      ${DetailEditor.historyHtml(item.detail)}
       ${commentText ? `<div class="comment">${escapeHtml(commentText)}</div>` : ""}
+      ${detailParts.note}
 
       <div class="history-preview">
         ${renderMini(item.holes || [], item.reference || { left: null, right: null })}
@@ -815,7 +820,7 @@ function render() {
       disk = item.disk || { left: "", right: "" };
       renderDiskUI();
 
-      document.getElementById("commentDetails").open = !!commentEl?.value.trim();
+      document.getElementById("commentDetails").open = !!commentEl?.value.trim() || (document.documentElement.dataset.inputMode === "detail" && !!DetailData.normalize(item.detail).note);
       showView("input");
       showFoot("left");
       document.getElementById("inputTab").focus();

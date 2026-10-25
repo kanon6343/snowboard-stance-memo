@@ -50,11 +50,26 @@ const DetailData = (() => {
     return ['shape','nose','bend'].every(key=>!filters[key] || (filters[key]==='__unset__' ? !d[key] : d[key]===filters[key]));
   };
   const escape = value => String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const historyHtml = value => {
-    const r=rows(value);if(!r.length)return '';
-    const d=normalize(value),tags=['shape','nose','bend'].filter(k=>d[k]).map(k=>choices[k][d[k]]).join(' · ');
-    return `<details class="history-detail"><summary>詳細あり${tags?' · '+escape(tags):''}</summary><dl>${r.map(([k,v])=>`<div><dt>${escape(k)}</dt><dd>${escape(v)}</dd></div>`).join('')}</dl></details>`;
+  const historyParts = value => {
+    const d=normalize(value),r=rows(d);
+    const line=([k,v])=>`<div class="history-inline-row"><dt>${escape(k)}</dt><dd>${escape(v)}</dd></div>`;
+    const list=items=>items.length?`<dl class="history-inline-details detail-history-inline">${items.map(line).join('')}</dl>`:'';
+    const signed=a=>Number(a.mm)===0?'0':!a.direction?`${a.mm}（方向未設定）`:`${a.direction==='tail'?'-':'+'}${a.mm}`;
+    const compared=[
+      ['フォワードリーン',d.forwardLeanLeft,d.forwardLeanRight],
+      ...['ディスク方式','ディスク前後','ディスク横'].map(key=>[key,...['左','右'].map(side=>r.find(([k])=>k===side+key)?.[1]||'')])
+    ];
+    const feet=compared.filter(([,left,right])=>left||right).map(([label,left,right])=>`<div class="history-compare-row"><dt>${escape(label==='ディスク方式'?'ディスク形式':label)}</dt><dd><span><span class="compare-foot-label">左足 </span>${escape(left||'未入力')}</span><span><span class="compare-foot-label">右足 </span>${escape(right||'未入力')}</span></dd></div>`).join('');
+    return {
+      board:list(r.filter(([k])=>['シェイプ','ノーズ','ベンド','形状の補足'].includes(k))),
+      stance:d.setback.mm!==''?`<span class="stance-width-tag history-setback detail-history-inline">${escape(({reference:'推奨位置',center:'中心'})[d.setback.basis]||'基準未設定')}から ${escape(signed(d.setback))} mm</span>`:'',
+      left:list(r.filter(([k])=>k==='左リーン'||k.startsWith('左ディスク'))),
+      right:list(r.filter(([k])=>k==='右リーン'||k.startsWith('右ディスク'))),
+      feet:feet?`<dl class="history-comparison detail-history-inline">${feet}</dl>`:'',
+      note:d.note?`<div class="comment history-gear-note detail-history-inline"><span>ギア調整メモ</span>${escape(d.note)}</div>`:''
+    };
   };
+  const historyHtml=value=>{const p=historyParts(value);return [p.board,p.stance,p.feet,p.note].join('');};
   function boardProfile(items,board) {
     if(!Array.isArray(items)||typeof board!=='string'||!board.trim())return null;
     const candidates=items.map((item,order)=>({item,order,time:typeof item?.dateTime==='string'?Date.parse(item.dateTime):NaN}))
@@ -62,19 +77,60 @@ const DetailData = (() => {
       .sort((a,b)=>(Number.isFinite(b.time)?b.time:-Infinity)-(Number.isFinite(a.time)?a.time:-Infinity)||a.order-b.order);
     for(const {item}of candidates){const d=normalize(item.detail);if(d.shape||d.nose||d.bend||d.boardNote)return {shape:d.shape,nose:d.nose,bend:d.bend,boardNote:d.boardNote};}return null;
   }
-  return {choices,normalize,rows,has,matches,historyHtml,boardProfile};
+  return {choices,normalize,rows,has,matches,historyHtml,historyParts,boardProfile};
 })();
 
 const DetailEditor = (() => {
   const byId=id=>document.getElementById(id), modeKey='haru-detail:input-mode-v1',filterKey='haru-detail:shape-filter-v1';
   const bindings={shape:'detailShape',nose:'detailNose',bend:'detailBend',boardNote:'detailBoardNote',forwardLeanLeft:'detailLeanLeft',forwardLeanRight:'detailLeanRight',note:'detailNote'};
-  const disk=byId('detailDiskFields');
-  disk.innerHTML=['left','right'].map(side=>`<div class="detail-disk-foot"><h3>${side==='left'?'左足':'右足'}のディスク</h3><label>${side==='left'?'左足':'右足'}ディスク前後（mm）<input id="shift-${side}-longitudinal-mm" type="number" step="any" placeholder="例：-3" aria-describedby="diskSignHelp"></label><div class="detail-grid"><label>${side==='left'?'左足':'右足'}ディスク横の方向<select id="shift-${side}-lateral-direction"><option value="">選択</option><option value="toe">つま先側</option><option value="heel">かかと側</option></select></label><label>${side==='left'?'左足':'右足'}ディスク横（mm）<input id="shift-${side}-lateral-mm" type="number" min="0" step="any" inputmode="decimal" placeholder="例：3"></label></div></div>`).join('');
-  const panel=byId('detailFields'),select=byId('inputMode');let mode='simple',filters={shape:'',nose:'',bend:''};
+  for(const side of ['left','right']){
+    const foot=byId(`detailDisk-${side}`),label=side==='left'?'左足':'右足';
+    foot.innerHTML=`<h3>${label}のディスク</h3><div class="detail-offset-grid"><label>前後（mm）<input id="shift-${side}-longitudinal-mm" type="number" step="any" placeholder="例：-3" aria-label="${label}ディスク前後（mm）" aria-describedby="diskSignHelp-${side}"></label><label>横の方向<select id="shift-${side}-lateral-direction" aria-label="${label}ディスク横の方向"><option value="">選択</option><option value="toe">つま先側</option><option value="heel">かかと側</option></select></label><label>横（mm）<input id="shift-${side}-lateral-mm" type="number" min="0" step="any" inputmode="decimal" placeholder="例：3" aria-label="${label}ディスク横（mm）"></label></div><p id="diskSignHelp-${side}" class="detail-hint">前後は ＋ノーズ／−テール。0はずらしなし、空欄は未入力。</p>`;
+  }
+  const panel=byId('setupCard'),select=byId('inputMode');
+  let setbackSign='tail';
+  const syncSign=()=>{
+    byId('setbackSignSwitch').dataset.basis=setbackSign;
+    byId('setbackNose').setAttribute('aria-pressed',String(setbackSign==='nose'));
+    byId('setbackTail').setAttribute('aria-pressed',String(setbackSign==='tail'));
+  };
+  for(const [id,direction]of [['setbackNose','nose'],['setbackTail','tail']]){
+    byId(id).addEventListener('click',()=>{
+      setbackSign=direction;
+      const input=byId('detailSetbackMm');
+      if(input.value!==''&&Number.isFinite(Number(input.value)))input.value=String(Math.abs(Number(input.value))*(direction==='tail'?-1:1));
+      input.setCustomValidity('');syncSign();retained();
+    });
+    byId(id).addEventListener('keydown',event=>{
+      const next=event.key==='ArrowDown'||event.key==='End'?'setbackTail':event.key==='ArrowUp'||event.key==='Home'?'setbackNose':null;
+      if(next){event.preventDefault();byId(next).focus();byId(next).click();}
+    });
+  }
+  byId('detailSetbackMm').addEventListener('input',()=>{
+    const raw=byId('detailSetbackMm').value,n=Number(raw);
+    if(raw!==''&&Number.isFinite(n)&&n!==0)setbackSign=n<0?'tail':'nose';
+    syncSign();
+  });
+  const syncBasis=()=>{
+    const value=byId('detailSetbackBasis').value;
+    byId('setbackBasisSwitch').dataset.basis=value;
+    byId('basisReference').setAttribute('aria-pressed',String(value==='reference'));
+    byId('basisCenter').setAttribute('aria-pressed',String(value==='center'));
+  };
+  for(const [id,value]of [['basisReference','reference'],['basisCenter','center']]){
+    byId(id).addEventListener('click',()=>{byId('detailSetbackBasis').value=value;syncBasis();retained();});
+    byId(id).addEventListener('keydown',event=>{
+      const next=event.key==='ArrowRight'||event.key==='End'?'basisCenter':event.key==='ArrowLeft'||event.key==='Home'?'basisReference':null;
+      if(next){event.preventDefault();byId(next).focus();byId(next).click();}
+    });
+  }
+  byId('detailSetbackBasis').addEventListener('change',syncBasis);
+  const sections=['detailFields','detailSetback','leftFootDetails','rightFootDetails','leftLeanFields','rightLeanFields','detailNoteFields'].map(byId);
+  let mode='simple',filters={shape:'',nose:'',bend:''};
   const profileKeys=['shape','nose','bend','boardNote'];let profileBoard='',autoProfile=false,profileDirty=false;
   const profileNotice=(message='',offer=false)=>{byId('boardProfileNotice').hidden=!message;byId('boardProfileStatus').textContent=message;byId('applyBoardProfile').hidden=!offer;};
   for(const side of ['left','right']){
-    const foot=disk.querySelectorAll('.detail-disk-foot')[side==='left'?0:1];
+    const foot=byId(`detailDisk-${side}`);
     const picker=document.createElement('div');picker.className='disk-type-picker';picker.innerHTML=`<label for="shift-${side}-type">${side==='left'?'左足':'右足'}ディスクの調整方式</label><select id="shift-${side}-type"><option value="">未設定</option>${Object.entries(DetailData.choices.diskType).map(([v,t])=>`<option value="${v}">${t}</option>`).join('')}</select><span id="disk-preview-${side}" class="disk-preview"></span>`;
     foot.insertBefore(picker,foot.children[1]);
   }
@@ -89,7 +145,8 @@ const DetailEditor = (() => {
   try {const f=JSON.parse(localStorage.getItem(filterKey)||'{}');for(const key of Object.keys(filters))if(f?.[key]==='__unset__'||Object.hasOwn(DetailData.choices[key],f?.[key]))filters[key]=f[key];}catch{}
   const collect = () => {
     const value={};for(const [key,id]of Object.entries(bindings))value[key]=byId(id).value;
-    value.setback={basis:byId('detailSetbackBasis').value,direction:byId('detailSetbackDirection').value,mm:byId('detailSetbackMm').value};
+    const rawSetback=byId('detailSetbackMm').value,setbackNumber=Number(rawSetback);
+    value.setback={basis:byId('detailSetbackBasis').value,direction:rawSetback===''?'':setbackNumber===0?setbackSign:setbackNumber<0?'tail':'nose',mm:rawSetback===''?'':String(Math.abs(setbackNumber))};
     value.diskShift={};for(const side of ['left','right']){
       const raw=byId(`shift-${side}-longitudinal-mm`).value,n=Number(raw);
       value.diskShift[side]={type:byId(`shift-${side}-type`).value,longitudinal:{direction:raw===''?'':n<0?'tail':'nose',mm:raw===''?'':String(Math.abs(n))},lateral:{direction:byId(`shift-${side}-lateral-direction`).value,mm:byId(`shift-${side}-lateral-mm`).value}};
@@ -99,15 +156,16 @@ const DetailEditor = (() => {
   const retained = () => {byId('detailRetained').hidden=mode==='detail'||!DetailData.has(collect());};
   const persist = (key,value) => {try{localStorage.setItem(key,value);return true;}catch{return false;}};
   const applyMode = (next,save=false) => {
-    mode=next==='detail'?'detail':'simple';panel.hidden=mode!=='detail';select.value=mode;document.documentElement.dataset.inputMode=mode;retained();
+    mode=next==='detail'?'detail':'simple';sections.forEach(section=>section.hidden=mode!=='detail');select.value=mode;document.documentElement.dataset.inputMode=mode;retained();
     const saved=!save||persist(modeKey,mode);
     byId('inputModeStatus').textContent=saved?'シンプルに戻しても詳細データは消えません。':'画面は切り替えましたが、入力モードの設定を保存できませんでした。';
   };
   function write(value) {
     const d=DetailData.normalize(value);for(const [key,id]of Object.entries(bindings))byId(id).value=d[key];
     byId('detailSetbackBasis').value=d.setback.mm===''?'reference':d.setback.basis;
-    byId('detailSetbackDirection').value=d.setback.mm===''?'tail':d.setback.direction;
-    byId('detailSetbackMm').value=d.setback.mm;
+    syncBasis();
+    byId('detailSetbackMm').value=d.setback.mm===''?'':d.setback.direction==='tail'?String(-Number(d.setback.mm)):d.setback.mm;
+    setbackSign=d.setback.direction||'tail';syncSign();
     for(const side of ['left','right']){byId(`shift-${side}-type`).value=d.diskShift[side].type;drawDisk(side);}
     for(const side of ['left','right'])for(const axis of ['longitudinal','lateral']){
       const a=d.diskShift[side][axis];
@@ -118,14 +176,14 @@ const DetailEditor = (() => {
     profileBoard=byId('board').value.trim();autoProfile=false;profileDirty=false;profileNotice();
   }
   function read() {
-    const checks=[['detailSetbackMm',['detailSetbackBasis','detailSetbackDirection']]];
+    const checks=[['detailSetbackMm',['detailSetbackBasis']]];
     for(const side of ['left','right'])for(const axis of ['longitudinal','lateral'])checks.push([`shift-${side}-${axis}-mm`,axis==='lateral'?[`shift-${side}-${axis}-direction`]:[]]);
     for(const [id,directions]of checks){
       const el=byId(id);el.setCustomValidity('');
-      const signed=id.includes('longitudinal');
+      const signed=id==='detailSetbackMm'||id.includes('longitudinal');
       if(el.validity.badInput||el.value!==''&&(!Number.isFinite(Number(el.value))||!signed&&Number(el.value)<0))el.setCustomValidity(signed?'前後のずらし量を数値で入力するか、空欄にしてください。':'移動量は0以上の数値をmmで入力するか、空欄にしてください。');
       if(el.value!==''&&directions.some(name=>!byId(name).value))el.setCustomValidity('移動量に対応する基準・方向を選んでください。');
-      if(!el.checkValidity()){applyMode('detail',true);if(typeof showView==='function')showView('input');el.focus();el.reportValidity();return null;}
+      if(!el.checkValidity()){applyMode('detail',true);if(typeof showView==='function')showView('input');const side=el.closest('[data-detail-foot]')?.dataset.detailFoot;if(side&&typeof showFoot==='function')showFoot(side);el.focus();el.reportValidity();return null;}
     }
     return DetailData.normalize(collect());
   }

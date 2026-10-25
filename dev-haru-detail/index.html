@@ -11,14 +11,14 @@
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
   <meta name="description" content="既存版とは保存先を分離した詳細入力モードの試作環境" />
   <title>スタンスメモ（詳細試作版）</title>
-  <link rel="stylesheet" href="style.css?v=1022">
-  <link rel="stylesheet" href="outdoor.css?v=1022">
-  <link rel="stylesheet" href="theme.css?v=1022">
-  <link rel="stylesheet" href="pwa.css?v=1022">
-  <link rel="stylesheet" href="board-suggestions.css?v=1022">
-  <link rel="stylesheet" href="detail.css?v=1022">
-  <script src="theme.js?v=1022"></script>
-  <script src="pwa.js?v=1022" defer></script>
+  <link rel="stylesheet" href="style.css?v=1028">
+  <link rel="stylesheet" href="outdoor.css?v=1028">
+  <link rel="stylesheet" href="theme.css?v=1028">
+  <link rel="stylesheet" href="pwa.css?v=1028">
+  <link rel="stylesheet" href="board-suggestions.css?v=1028">
+  <link rel="stylesheet" href="detail.css?v=1028">
+  <script src="theme.js?v=1028"></script>
+  <script src="pwa.js?v=1028" defer></script>
 </head>
 <body data-menu-side="left">
 
@@ -40,7 +40,7 @@
 
 <main>
 <section id="inputView" role="tabpanel" aria-labelledby="inputTab">
-<section class="card setup-card" aria-label="セッティング入力">
+<section id="setupCard" class="card setup-card" aria-label="セッティング入力">
 
   <p id="detailRetained" class="detail-retained" hidden>詳細データを保持中です。メニューで詳細モードに切り替えると編集できます。</p>
   <div class="setup-meta">
@@ -63,6 +63,16 @@
   </div>
 
   <div id="boardProfileNotice" class="detail-retained" hidden><p id="boardProfileStatus" role="status"></p><button id="applyBoardProfile" type="button" hidden>保存済みの形状を使う</button></div>
+  <section id="detailFields" class="detail-inline detail-board" data-detail-section aria-label="板の形状" hidden>
+    <h2 class="detail-inline-heading">板の形状 <small>任意</small></h2>
+      <div class="detail-grid">
+        <label>シェイプ<select id="detailShape" aria-label="シェイプ（対称性）"><option value="">未設定</option><option value="twin">ツイン</option><option value="directionalTwin">ディレクショナルツイン</option><option value="directional">ディレクショナル</option><option value="other">その他</option></select></label>
+        <label>ノーズ形状<select id="detailNose"><option value="">未設定</option><option value="round">ラウンド</option><option value="hammer">ハンマーヘッド</option><option value="semiHammer">セミハンマー</option><option value="other">その他</option></select></label>
+        <label>ベンド<select id="detailBend"><option value="">未設定</option><option value="camber">キャンバー</option><option value="rocker">ロッカー</option><option value="flat">フラット</option><option value="hybrid">ハイブリッド</option><option value="other">その他</option></select></label>
+        <label>形状の補足<input id="detailBoardNote" type="text" maxlength="160" placeholder="例：ダブルキャンバー"></label>
+      </div>
+    
+  </section>
   <div class="stance-row">
     <div class="stance-quick" aria-label="スタンス">
     <span class="stance-label">スタンス</span>
@@ -75,6 +85,26 @@
     </label>
   </div>
 
+  <section id="detailSetback" class="detail-inline detail-setback" data-detail-section aria-label="セットバック" hidden>
+    <h2 class="detail-inline-heading">セットバック <small>任意</small></h2>
+      <p>選んだ基準からの移動量です。基準を変えても数値は自動換算しません。</p>
+      <select id="detailSetbackBasis" hidden aria-hidden="true" tabindex="-1"><option value="">選択</option><option value="reference" selected>推奨位置から</option><option value="center">中心から</option></select>
+      <div id="setbackBasisSwitch" class="basis-switch" role="group" aria-label="セットバックの基準" data-basis="reference">
+        <span class="basis-highlight" aria-hidden="true"></span>
+        <button id="basisReference" type="button" aria-pressed="true">推奨位置から</button>
+        <button id="basisCenter" type="button" aria-pressed="false">中心から</button>
+      </div>
+      <div class="setback-adjustment">
+        <div id="setbackSignSwitch" class="basis-switch sign-switch" role="group" aria-label="セットバックの方向" data-basis="tail">
+          <span class="basis-highlight" aria-hidden="true"></span>
+          <button id="setbackNose" type="button" aria-label="プラス・ノーズ側" aria-pressed="false">＋</button>
+          <button id="setbackTail" type="button" aria-label="マイナス・テール側" aria-pressed="true">−</button>
+        </div>
+        <label class="setback-amount">ずらし量（mm）<input id="detailSetbackMm" type="number" step="any" placeholder="例：-20" aria-label="セットバック量（mm）" aria-describedby="setbackSignHelp"></label>
+      </div>
+      <p id="setbackSignHelp">＋ノーズ側／−テール側。0はずらしなし、空欄は未入力。</p>
+    
+  </section>
   <div class="foot-tabs" role="tablist" aria-label="設定する足">
     <button id="leftFootTab" type="button" role="tab" data-foot="left" aria-controls="leftFootPanel" aria-selected="true">左足<span class="foot-summary" data-summary="left">角度未入力 · 穴0</span></button>
     <button id="rightFootTab" type="button" role="tab" data-foot="right" aria-controls="rightFootPanel" aria-selected="false" tabindex="-1">右足<span class="foot-summary" data-summary="right">角度未入力 · 穴0</span></button>
@@ -89,7 +119,10 @@
     <input id="left-angle" type="number" placeholder="+15">
   </label>
 
-  <div class="disk">
+  <div id="leftLeanFields" class="detail-lean-inline" data-detail-section hidden>
+      <label class="inline-lean" for="detailLeanLeft">フォワードリーン<input id="detailLeanLeft" type="text" maxlength="64" placeholder="例：F2"><small>メーカー表記で記録</small></label>
+    </div>
+    <div class="disk">
     <div class="disk-label">ディスク</div>
     <div class="disk-group" data-side="left">
       <button type="button" class="chip" data-value="前">前</button>
@@ -98,6 +131,9 @@
     </div>
   </div>
 </div>
+    <section id="leftFootDetails" class="detail-inline detail-foot" data-detail-section data-detail-foot="left" aria-label="左足の詳細設定" hidden>
+      <div id="detailDisk-left" class="detail-disk-foot"></div>
+    </section>
     <p class="binding-help">↑ ノーズ側 · 中央の枠で推奨位置を選択</p>
     <div class="holes" data-side="left">
       <div class="row">
@@ -115,12 +151,16 @@
         <button type="button" class="hole"></button><button type="button" class="hole"></button><button type="button" class="hole"></button>
       </div>
     </div>
+
   </section>
 
   <section id="rightFootPanel" class="binding-panel" role="tabpanel" aria-labelledby="rightFootTab" hidden>
     <div class="side-row">
       <label class="angle">右足の角度（°）<input id="right-angle" type="number" placeholder="-9"></label>
-      <div class="disk">
+      <div id="rightLeanFields" class="detail-lean-inline" data-detail-section hidden>
+      <label class="inline-lean" for="detailLeanRight">フォワードリーン<input id="detailLeanRight" type="text" maxlength="64" placeholder="例：F2"><small>メーカー表記で記録</small></label>
+    </div>
+    <div class="disk">
         <div class="disk-label">ディスク</div>
         <div class="disk-group" data-side="right">
           <button type="button" class="chip" data-value="前">前</button>
@@ -129,6 +169,9 @@
         </div>
       </div>
     </div>
+    <section id="rightFootDetails" class="detail-inline detail-foot" data-detail-section data-detail-foot="right" aria-label="右足の詳細設定" hidden>
+      <div id="detailDisk-right" class="detail-disk-foot"></div>
+    </section>
     <p class="binding-help">↑ ノーズ側 · 中央の枠で推奨位置を選択</p>
     <div class="holes" data-side="right">
       <div class="row">
@@ -146,6 +189,7 @@
         <button type="button" class="hole"></button><button type="button" class="hole"></button><button type="button" class="hole"></button>
       </div>
     </div>
+
   </section>
 </div>
 
@@ -153,38 +197,10 @@
     <summary>コメント <span id="commentState">任意</span></summary>
     <label class="comment-label" for="comment">滑った感覚・気づいたこと</label>
     <textarea id="comment" rows="2" placeholder="例：カービングしやすい / 右足が疲れる"></textarea>
+    <div id="detailNoteFields" class="detail-inline detail-note" data-detail-section hidden><label for="detailNote">ギア調整メモ</label><textarea id="detailNote" rows="2" maxlength="1000" placeholder="例：ハイバックのローテーション"></textarea></div>
     <button id="commentClearBtn" type="button" class="comment-clear">コメントを消す</button>
   </details>
 
-  <section id="detailFields" class="detail-fields" aria-labelledby="detailHeading" hidden>
-    <h2 id="detailHeading">詳細セッティング <small>すべて任意</small></h2>
-    <fieldset><legend>板の形状</legend>
-      <div class="detail-grid">
-        <label>シェイプ（対称性）<select id="detailShape"><option value="">未設定</option><option value="twin">ツイン</option><option value="directionalTwin">ディレクショナルツイン</option><option value="directional">ディレクショナル</option><option value="other">その他</option></select></label>
-        <label>ノーズ形状<select id="detailNose"><option value="">未設定</option><option value="round">ラウンド</option><option value="hammer">ハンマーヘッド</option><option value="semiHammer">セミハンマー</option><option value="other">その他</option></select></label>
-        <label>ベンド<select id="detailBend"><option value="">未設定</option><option value="camber">キャンバー</option><option value="rocker">ロッカー</option><option value="flat">フラット</option><option value="hybrid">ハイブリッド</option><option value="other">その他</option></select></label>
-        <label>形状の補足<input id="detailBoardNote" type="text" maxlength="160" placeholder="例：ダブルキャンバー"></label>
-      </div>
-    </fieldset>
-    <fieldset><legend>フォワードリーン</legend>
-      <p>メーカーごとの表記で記録できます。角度への換算はしません。</p>
-      <div class="detail-grid"><label>左足のリーン<input id="detailLeanLeft" type="text" maxlength="64" placeholder="例：F2"></label><label>右足のリーン<input id="detailLeanRight" type="text" maxlength="64" placeholder="例：1段目"></label></div>
-    </fieldset>
-    <fieldset><legend>セットバック</legend>
-      <p>選んだ基準からの移動量です。基準を変えても数値は自動換算しません。</p>
-      <div class="detail-grid">
-        <label>セットバックの基準<select id="detailSetbackBasis"><option value="">選択</option><option value="reference" selected>板の推奨位置</option><option value="center">板の中心</option></select></label>
-        <label>セットバックの方向<select id="detailSetbackDirection"><option value="">選択</option><option value="tail" selected>テール側</option><option value="nose">ノーズ側</option></select></label>
-        <label>セットバック量（mm）<input id="detailSetbackMm" type="number" min="0" step="any" inputmode="decimal" placeholder="例：20"></label>
-      </div>
-    </fieldset>
-    <fieldset><legend>ディスクのずらし量</legend>
-      <p>ディスクの中央を0として、方向と移動量を左右別に記録します（mm）。既存の「前／中／後」からは換算しません。</p>
-      <p id="diskSignHelp">前後は ＋＝ノーズ側 ／ −＝テール側（左右の足とも共通）。0はずらしなし、空欄は未入力です。</p>
-      <div id="detailDiskFields"></div>
-    </fieldset>
-    <label class="detail-note-label">詳細メモ<textarea id="detailNote" rows="3" maxlength="1000" placeholder="例：ハイバックのローテーション"></textarea></label>
-  </section>
   <div class="editor-actions">
     <button id="clearBtn" type="button">クリア</button>
     <button id="saveBtn" type="button">この設定を保存</button>
@@ -354,9 +370,9 @@
     </button>
   </div>
 
-<script src="detail.js?v=1022"></script>
-<script src="script.js?v=1022"></script>
-<script src="board-suggestions.js?v=1022"></script>
+<script src="detail.js?v=1028"></script>
+<script src="script.js?v=1028"></script>
+<script src="board-suggestions.js?v=1028"></script>
 
 <div id="toast"></div>
   
