@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'none'; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>スタンスメモ · 履歴デザイン比較</title>
+  <link rel="stylesheet" href="lab.css?v=1">
+  <script src="lab.js?v=1" defer></script>
+</head>
+<body>
+  <header class="lab-head">
+    <div><p class="eyebrow">STANCE MEMO / DESIGN STUDY</p><h1>履歴を、見つけやすく。</h1><p class="intro">3つの表示案。同じ架空データで、見やすさと操作感を比較。</p></div>
+    <span class="demo-badge">デザイン試作 · 保存データに接続しません</span>
+  </header>
+  <section class="workbench" aria-label="試作の表示設定">
+    <div class="variant-picker" role="tablist" aria-label="デザイン案">
+      <button type="button" role="tab" id="tab-summary" aria-selected="true" aria-controls="panel-summary" data-variant="summary">カード</button>
+      <button type="button" role="tab" id="tab-matrix" aria-selected="false" aria-controls="panel-matrix" data-variant="matrix" tabindex="-1" title="左右の詳細を常時表示">詳細一覧</button>
+      <button type="button" role="tab" id="tab-grouped" aria-selected="false" aria-controls="panel-grouped" data-variant="grouped" tabindex="-1">板ごとの履歴</button>
+    </div>
+    <div class="lab-options">
+      <label>配色<select id="theme"><option value="light">ライト</option><option value="dark">ダーク</option></select></label>
+      <label>入力モード<select id="mode"><option value="detail">詳細</option><option value="simple">シンプル</option></select></label>
+      <label>データ例<select id="scenario"><option value="normal">通常の記録</option><option value="edge">未入力・長い名前</option><option value="empty">記録なし</option></select></label>
+      <label class="gallery-option"><input id="gallery" type="checkbox">3案を並べる</label>
+    </div>
+  </section>
+  <main id="studies" class="studies" aria-label="履歴の試作画面"></main>
+  <p class="lab-footer">ここでの星・絞り込み・詳細表示は画面内だけの試作です。実データの読み取り・保存・復元・削除・通信は行いません。</p>
+  <dialog id="recordDialog" aria-labelledby="dialogTitle">
+    <header class="dialog-head"><div><span class="eyebrow">SETTING PREVIEW</span><h2 id="dialogTitle">設定を確認</h2></div><button type="button" id="closeDialog" class="icon-button" aria-label="閉じる">×</button></header>
+    <p class="dialog-notice">試作の確認画面です。実際の入力画面への読み込み・保存は行いません。</p>
+    <div id="dialogContent"></div>
+    <button type="button" id="doneDialog" class="primary">履歴に戻る</button>
+  </dialog>
+</body>
+</html>
