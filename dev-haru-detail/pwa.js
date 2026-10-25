@@ -59,6 +59,7 @@
   });
   byId('applyAppUpdateBtn')?.addEventListener('click', () => {
     if (!registration?.waiting) return;
+    if (typeof DraftGuard !== 'undefined' && !DraftGuard.checkpoint()) return;
     applyingUpdate = true;
     registration.waiting.postMessage({type: 'ACTIVATE_UPDATE'});
   });

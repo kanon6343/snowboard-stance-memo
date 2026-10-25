@@ -168,7 +168,7 @@ if (mountMenu && panel) {
 // saveUI にこれも保存してね（追記）
 
 function saveUI(){
-  localStorage.setItem(UI_KEY, JSON.stringify({
+  try { localStorage.setItem(UI_KEY, JSON.stringify({
     selectedBoard,
     stanceFilter,
     favSortOn,
@@ -178,7 +178,7 @@ function saveUI(){
       right: angleFilter.right,
       tol: angleFilter.tol
     }
-  }));
+  })); } catch { showToast("表示設定を保存できませんでした。画面上の選択は維持しています。", "info"); }
 }
 
 function resetAllFiltersAndSort(){
@@ -361,6 +361,7 @@ clearBtn?.addEventListener("click", () => {
   document.getElementById("commentDetails").open = false;
   showFoot("left");
   syncEditorSummary();
+  if (typeof DraftGuard !== "undefined") DraftGuard.reset();
 });
 
 // 保存
@@ -391,7 +392,6 @@ saveBtn?.addEventListener("click", () => {
     dateTime: new Date().toISOString(),
   };
 
-  const list = loadList();
   const detail = DetailEditor.read();
   if (!detail) return;
   item.detail = detail;
@@ -399,8 +399,14 @@ saveBtn?.addEventListener("click", () => {
     HistoryEditor.save(item);
     return;
   }
+  let list;
+  try { list = readHistorySnapshot().items; }
+  catch { historyStorageNotice("保存履歴を読み込めないため、追加を中止しました。元のデータと入力内容は残しています。"); showToast("保存履歴を読み込めません。追加せず、入力内容を残しています。", "error"); return; }
+  const baseId = item.id;
+  for (let suffix = 1; list.some(record => String(record.id) === String(item.id)); suffix++) item.id = `${baseId}-${suffix}`;
   list.unshift(item);
-  localStorage.setItem(KEY, JSON.stringify(list));
+  if (!writeHistoryList(list)) return;
+  if (typeof DraftGuard !== "undefined") DraftGuard.reset();
   render();
   showToast("保存しました", "success");
 });
@@ -457,6 +463,7 @@ function showView(view) {
     document.getElementById(button.getAttribute("aria-controls")).hidden = !active;
   });
   if (view === "input") renderRefSlots();
+  if (view === "history" && typeof HistoryTools !== "undefined") HistoryTools.position();
 }
 
 function showFoot(side) {
@@ -495,9 +502,61 @@ function setupCompactEditor() {
   syncEditorSummary();
 }
 
+function readHistorySnapshot() {
+  const raw = localStorage.getItem(KEY), items = JSON.parse(raw === null ? "[]" : raw);
+  if (!Array.isArray(items) || items.some(item => !item || typeof item !== "object" || Array.isArray(item))) throw new Error("Invalid history");
+  return { raw, items };
+}
+function historyStorageNotice(message) {
+  const notice = document.getElementById("historyStorageIssue");
+  if (notice) { notice.hidden = false; document.getElementById("historyStorageMessage").textContent = message; }
+}
 function loadList() {
-  try { return JSON.parse(localStorage.getItem(KEY) || "[]"); }
-  catch { return []; }
+  try {
+    const result = readHistorySnapshot();
+    const notice = document.getElementById("historyStorageIssue");
+    if (notice) notice.hidden = true;
+    return result.items;
+  } catch {
+    historyStorageNotice("保存履歴を読み込めません。空の履歴として上書きせず、元のデータを残しています。");
+    return [];
+  }
+}
+function writeHistoryList(items, replace = false) {
+  try {
+    if (!replace) readHistorySnapshot();
+    localStorage.setItem(KEY, JSON.stringify(items));
+    return true;
+  } catch {
+    historyStorageNotice("履歴を保存できませんでした。入力内容は残っています。端末の空き容量や保存の許可を確認して、もう一度試してください。");
+    showToast("保存できませんでした。入力内容は残しています。", "error");
+    return false;
+  }
+}
+
+// Drafts capture form state without validating or writing saved records.
+function captureEditorDraft() {
+  return {
+    fields: Object.fromEntries(Array.from(document.querySelectorAll("#setupCard input[id], #setupCard select[id], #setupCard textarea[id]")).map(el => [el.id, el.value])),
+    detail: DetailEditor.snapshot(), stance, disk: { ...disk }, reference: { ...reference },
+    holes: holes.map(h => h.classList.contains("active")),
+    mode: document.documentElement.dataset.inputMode,
+  };
+}
+function restoreEditorDraft(value) {
+  DetailEditor.write(value.detail);
+  for (const [id, raw] of Object.entries(value.fields || {})) {
+    const el = document.getElementById(id);
+    if (el && el.closest("#setupCard") && ["INPUT", "SELECT", "TEXTAREA"].includes(el.tagName)) el.value = typeof raw === "string" ? raw : "";
+  }
+  stance = ["duck", "forward", "back"].includes(value.stance) ? value.stance : "";
+  disk = { left: value.disk?.left || "", right: value.disk?.right || "" };
+  reference = { left: value.reference?.left ?? null, right: value.reference?.right ?? null };
+  holes.forEach((h, i) => h.classList.toggle("active", !!value.holes?.[i]));
+  DetailEditor.setMode(value.mode);
+  DetailEditor.refresh(); renderStanceUI(); renderDiskUI(); renderRefSlots(); syncEditorSummary();
+  document.getElementById("commentDetails").open = !!commentEl?.value.trim() || !!document.getElementById("detailNote").value.trim();
+  showView("input");
 }
 
 // ===== board tabs =====
@@ -631,6 +690,7 @@ function render() {
   const tol = Number.isFinite(Number(angleFilter.tol)) ? Number(angleFilter.tol) : 2;
 
   const matchAngle = (valueStr, target) => {
+    if (valueStr == null || String(valueStr).trim() === "") return false;
     const v = Number(valueStr);
     if (!Number.isFinite(v)) return false;
     return Math.abs(v - target) <= tol;
@@ -677,6 +737,7 @@ function render() {
   renderRefSlots();
 
   if (typeof DetailHistoryView !== "undefined") DetailHistoryView.sync();
+  if (typeof HistoryTools !== "undefined") HistoryTools.sync({total:all.length,shown:list.length,board:selectedBoard,stance:stanceFilter,angle:angleFilter});
 
   if (list.length === 0) {
     const hasSavedItems = loadList().length > 0;
@@ -788,7 +849,7 @@ function render() {
       if (!item) return;
 
       item.favorite = !item.favorite;
-      localStorage.setItem(KEY, JSON.stringify(list));
+      if (!writeHistoryList(list)) return;
       render();
       showToast(item.favorite ? "お気に入り追加 ⭐" : "お気に入り解除", item.favorite ? "star" : "info");
     });
@@ -804,7 +865,7 @@ function render() {
 
       const id = btn.dataset.delId;
       const next = loadList().filter(x => x.id !== id);
-      localStorage.setItem(KEY, JSON.stringify(next));
+      if (!writeHistoryList(next)) return;
       render();
       showToast("削除しました", "error");
     });
@@ -840,6 +901,7 @@ function render() {
       showView("input");
       showFoot("left");
       document.getElementById("inputTab").focus();
+      if (typeof DraftGuard !== "undefined") DraftGuard.changed();
 
   }
   // 「使う」は新規記録用のコピー。「編集」は元の履歴を更新します。
@@ -1455,7 +1517,7 @@ function exportBackup() {
 
   const cur = loadList();
   const next = mergeItems(cur, pendingImport.items);
-  localStorage.setItem(KEY, JSON.stringify(next));
+  if (!writeHistoryList(next)) return;
 
   // 復元直後は「板タブ含めて全部OFF」
   resetAllFiltersAndSort();
@@ -1485,7 +1547,7 @@ function exportBackup() {
       return;
     }
     const next = mergeItems(latest, applied.items);
-    localStorage.setItem(KEY, JSON.stringify(next));
+    if (!writeHistoryList(next)) return;
     resetAllFiltersAndSort();
     render();
     showView("history");
@@ -1506,7 +1568,7 @@ function exportBackup() {
     return;
   }
 
-  localStorage.setItem(KEY, JSON.stringify(pendingImport.items));
+  if (!writeHistoryList(pendingImport.items, true)) return;
 
   // 復元直後は「板タブ含めて全部OFF」
   resetAllFiltersAndSort();

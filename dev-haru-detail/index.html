@@ -11,17 +11,17 @@
   <link rel="apple-touch-icon" href="icons/apple-touch-icon-trial.png" />
   <meta name="description" content="既存版とは保存先を分離した詳細入力モードの試作環境" />
   <title>スタンスメモ（詳細試作版）</title>
-  <link rel="stylesheet" href="style.css?v=1053">
-  <link rel="stylesheet" href="outdoor.css?v=1053">
-  <link rel="stylesheet" href="theme.css?v=1053">
-  <link rel="stylesheet" href="pwa.css?v=1053">
-  <link rel="stylesheet" href="board-suggestions.css?v=1053">
-  <link rel="stylesheet" href="detail.css?v=1053">
-  <link rel="stylesheet" href="history-views.css?v=1053">
-  <link rel="stylesheet" href="menu-ui.css?v=1053">
-  <link rel="stylesheet" href="ui-consistency.css?v=1053">
-  <script src="theme.js?v=1053"></script>
-  <script src="pwa.js?v=1053" defer></script>
+  <link rel="stylesheet" href="style.css?v=1054">
+  <link rel="stylesheet" href="outdoor.css?v=1054">
+  <link rel="stylesheet" href="theme.css?v=1054">
+  <link rel="stylesheet" href="pwa.css?v=1054">
+  <link rel="stylesheet" href="board-suggestions.css?v=1054">
+  <link rel="stylesheet" href="detail.css?v=1054">
+  <link rel="stylesheet" href="history-views.css?v=1054">
+  <link rel="stylesheet" href="menu-ui.css?v=1054">
+  <link rel="stylesheet" href="ui-consistency.css?v=1054">
+  <script src="theme.js?v=1054"></script>
+  <script src="pwa.js?v=1054" defer></script>
 </head>
 <body data-menu-side="left">
 
@@ -41,11 +41,18 @@
   <button id="historyTab" type="button" role="tab" data-view="history" aria-controls="historyView" aria-selected="false" tabindex="-1">保存履歴 <span id="savedCount" class="count-badge">0</span></button>
 </nav>
 
+<section id="draftRecovery" class="local-notice" aria-label="前回の下書き" hidden>
+  <div><strong id="draftRecoveryLabel">前回の下書きがあります</strong><p id="draftRecoveryBoard"></p><small>履歴にはまだ保存されていません。</small></div>
+  <div class="local-notice-actions"><button id="resumeDraft" type="button">下書きを再開</button><button id="discardDraft" type="button">下書きを破棄</button></div>
+</section>
+<section id="historyStorageIssue" class="local-notice storage-issue" role="alert" hidden>
+  <p id="historyStorageMessage"></p><div class="local-notice-actions"><button id="historyStorageRetry" type="button">再確認</button><button id="exportUnreadableHistory" type="button">元データを退避</button></div>
+</section>
 <main>
 <section id="inputView" role="tabpanel" aria-labelledby="inputTab">
 <section id="setupCard" class="card setup-card" aria-label="セッティング入力">
 
-  <p id="detailRetained" class="detail-retained" hidden>詳細データを保持中です。メニューで詳細モードに切り替えると編集できます。</p>
+  <p id="detailRetained" class="detail-retained" hidden>詳細データを保持中です。メニューで詳細入力に切り替えると編集できます。</p>
   <section id="historyEditBanner" class="history-edit-banner" aria-label="履歴の編集" tabindex="-1" hidden>
     <div><strong>保存履歴を編集中</strong><p id="historyEditTarget"></p><small>元の日時の記録を更新します。</small></div>
     <button id="cancelHistoryEdit" type="button">編集をやめる</button>
@@ -222,6 +229,7 @@
     <button id="cancelHistoryEditBottom" type="button" hidden>キャンセル</button>
     <button id="saveBtn" type="button">この設定を保存</button>
   </div>
+  <p id="draftStatus" class="draft-status" role="status">入力途中の内容は、この端末に一時保存されます</p>
 </section>
 </section>
 
@@ -235,12 +243,12 @@
   </div>
   <p id="detailHistoryStatus" role="status">カード：要点を表示し、調整の詳細は開いて確認します。</p>
 </section>
-<section class="history-heading">
-  <div>
-    <h2>保存履歴</h2>
-    <p>板ごとの設定を読み返したり、お気に入りを上に並べたりできます。</p>
+<span id="historyDockSentinel" class="foot-dock-sentinel" aria-hidden="true"></span>
+<section id="historyDock" class="history-dock" aria-label="表示中の履歴と絞り込み">
+  <div class="history-dock-content">
+    <div class="history-result-row"><div class="history-result-text" role="status"><strong id="historyResultCount">0 / 0件</strong><span id="historyFilterState">すべての履歴</span></div><button id="historyFiltersButton" type="button">絞り込み</button></div>
+    <div class="history-filter-row"><button id="clearHistoryFilters" type="button" hidden>すべて解除</button><div id="historyFilterChips" class="history-filter-chips" hidden></div></div>
   </div>
-  <span class="history-hint">★ お気に入り</span>
 </section>
 
 <div class="tabs-bar">
@@ -285,8 +293,8 @@
   <div id="menuPageDisplay" class="menu-page" role="tabpanel" aria-labelledby="menuTabDisplay" tabindex="0">
   <section class="menu-card">
     <h3>表示・操作</h3>
-    <div class="menu-position-row"><label class="menu-position-label" for="inputMode">入力モード</label><select id="inputMode" class="menu-side-select"><option value="simple">シンプル</option><option value="detail">詳細</option></select></div>
-    <p id="inputModeStatus" class="menu-note" role="status">シンプルに戻しても詳細データは消えません。</p>
+    <div class="menu-position-row"><label class="menu-position-label" for="inputMode">入力モード</label><select id="inputMode" class="menu-side-select"><option value="simple">簡易入力</option><option value="detail">詳細入力</option></select></div>
+    <p id="inputModeStatus" class="menu-note" role="status">簡易入力に戻しても詳細データは消えません。</p>
     <div class="menu-position-row theme-row">
       <label class="menu-position-label" for="colorTheme">カラーモード</label>
       <select id="colorTheme" class="menu-side-select">
@@ -424,15 +432,17 @@
   <p>お気に入りの記録です。編集内容は保存前にもう一度確認できます。</p>
   <div class="history-confirm-actions"><button id="cancelFavoriteEdit" type="button" autofocus>キャンセル</button><button id="confirmFavoriteEdit" type="button">編集する</button></div>
 </dialog>
-<script src="detail.js?v=1053"></script>
-<script src="history-views.js?v=1053"></script>
-<script src="script.js?v=1053"></script>
-<script src="board-suggestions.js?v=1053"></script>
-<script src="menu-ui.js?v=1053"></script>
-<script src="board-shape-history.js?v=1053"></script>
-<script src="history-stats.js?v=1053"></script>
-<script src="history-editor.js?v=1053"></script>
-<script src="foot-dock.js?v=1053"></script>
+<script src="detail.js?v=1054"></script>
+<script src="history-views.js?v=1054"></script>
+<script src="script.js?v=1054"></script>
+<script src="board-suggestions.js?v=1054"></script>
+<script src="menu-ui.js?v=1054"></script>
+<script src="board-shape-history.js?v=1054"></script>
+<script src="history-stats.js?v=1054"></script>
+<script src="history-editor.js?v=1054"></script>
+<script src="draft-guard.js?v=1054"></script>
+<script src="history-tools.js?v=1054"></script>
+<script src="foot-dock.js?v=1054"></script>
 
 <div id="toast"></div>
   

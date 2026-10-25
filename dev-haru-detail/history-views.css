@@ -3,7 +3,6 @@
 :root[data-theme="dark"] :is(#detailHistoryControls,#history.dh-history){--dh-surface:var(--night-card);--dh-field:var(--night-field);--dh-line:#627988;--dh-on-blue:var(--night-on-accent);--dh-soft-orange:#412c18;--dh-reference:var(--outdoor-ink)}
 #detailHistoryControls{margin:0 0 12px;color:var(--dh-ink)}
 #detailHistoryControls[hidden],:root:not([data-input-mode="detail"]) #detailHistoryControls{display:none!important}
-:root[data-input-mode="detail"] #historyView>.history-heading{display:none}
 .dh-layout-switch{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;padding:4px;border:1px solid var(--dh-strong);border-radius:12px;background:var(--dh-field);isolation:isolate}
 .dh-layout-slider{position:absolute;top:4px;bottom:4px;left:4px;width:calc((100% - 8px)/3);border-radius:8px;background:var(--dh-blue);pointer-events:none;z-index:-1;transform:translateX(100%)}
 .dh-layout-switch[data-layout="summary"] .dh-layout-slider{transform:translateX(0)}

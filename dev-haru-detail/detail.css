@@ -20,6 +20,26 @@ body[data-menu-side="right"] #setupCard .foot-dock.is-near-top .foot-tabs{margin
 #setupCard .foot-dock.is-near-top .foot-summary{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 body:has(#footDock.is-stuck) .menu-btn{top:calc(max(8px,env(safe-area-inset-top,0px)) + 10px)}
 #setupCard .foot-dock.is-stuck::before{content:"";position:absolute;z-index:-1;top:calc(0px - var(--foot-dock-offset));bottom:-10px;left:50%;width:100vw;transform:translateX(-50%);background:var(--menu-surface,#fff);border-bottom:1px solid var(--outdoor-border);box-shadow:0 4px 12px #152d3b1f}
+.history-dock{--dock-offset:max(8px,env(safe-area-inset-top,0px));--menu-clearance:max(0px,calc(68px - (100vw - 100%) / 2));position:sticky;top:var(--dock-offset);z-index:30;margin:0 0 12px;color:var(--outdoor-ink)}
+.history-dock-content{position:relative;z-index:0;min-width:0;padding:6px 10px;border:1px solid var(--outdoor-border);border-radius:12px;background:var(--menu-surface,#fff)}
+.history-dock.is-near-top .history-dock-content{margin-left:var(--menu-clearance)}
+body[data-menu-side="right"] .history-dock.is-near-top .history-dock-content{margin-left:0;margin-right:var(--menu-clearance)}
+.history-dock.is-stuck::before{content:"";position:absolute;z-index:-1;top:calc(0px - var(--dock-offset));bottom:-10px;left:50%;width:100vw;transform:translateX(-50%);background:var(--menu-surface,#fff);border-bottom:1px solid var(--outdoor-border);box-shadow:0 4px 12px #152d3b1f}
+body:has(#historyDock.is-stuck) .menu-btn{top:calc(max(8px,env(safe-area-inset-top,0px)) + 10px)}
+.history-result-row{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:48px}
+.history-result-text{min-width:0;display:flex;flex-direction:column;gap:3px;font-size:12px;line-height:1.3;color:var(--outdoor-muted)}
+.history-result-text strong{font-size:16px;color:var(--outdoor-ink);font-variant-numeric:tabular-nums}
+#historyDock button{min-height:44px;flex-shrink:0;padding:7px 10px;border:1px solid var(--outdoor-border);border-radius:8px;background:var(--menu-field,#edf3f6);color:var(--outdoor-ink);font:650 12px/1.4 var(--ui-font,system-ui);cursor:pointer}
+.history-filter-row{display:flex;align-items:center;gap:6px;min-width:0}
+.history-filter-chips{display:flex;gap:6px;min-width:0;overflow-x:auto;scrollbar-width:thin}
+#historyDock .history-filter-chip{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-color:var(--outdoor-amber-border);background:var(--dh-soft-orange,#fff0dc)}
+:root[data-theme="dark"] #historyDock .history-filter-chip{background:#412c18}
+#historyDock [hidden],.local-notice[hidden]{display:none!important}
+.local-notice{display:grid;gap:10px;margin:12px auto;padding:14px;max-width:640px;box-sizing:border-box;border:1px solid var(--outdoor-blue);border-radius:12px;background:var(--menu-surface,#fff);color:var(--outdoor-ink);font-size:14px}
+.local-notice p{margin:4px 0;overflow-wrap:anywhere}.local-notice small{font-size:12px;color:var(--outdoor-muted)}
+.local-notice-actions{display:flex;gap:8px;flex-wrap:wrap}.local-notice button{min-height:44px;padding:8px 12px;border:1px solid var(--outdoor-border);border-radius:8px;background:var(--menu-field,#edf3f6);color:var(--outdoor-ink);font:650 14px var(--ui-font,system-ui);cursor:pointer}
+.local-notice #resumeDraft{background:var(--outdoor-blue);color:var(--menu-on-accent,#fff)}
+.storage-issue{border-color:#a64026}.draft-status{margin:10px 0 0;color:var(--outdoor-muted);font-size:12px;line-height:1.5}.draft-status[data-error="true"]{color:#a64026}:root[data-theme="dark"] .draft-status[data-error="true"]{color:#ffb29d}
 .comment-field-heading{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .comment-field-heading>label{min-width:0;margin:0}
 .comment-details .comment-field-heading .comment-clear{flex-shrink:0;min-height:44px;margin:0 0 4px auto;padding:8px 10px}
@@ -104,7 +124,7 @@ body:has(#footDock.is-stuck) .menu-btn{top:calc(max(8px,env(safe-area-inset-top,
 #cancelHistoryEditBottom[hidden],.editor-actions #clearBtn[hidden]{display:none!important}
 .editor-actions:has(>#cancelHistoryEditBottom:not([hidden])){grid-template-columns:repeat(2,minmax(0,1fr))}
 .editor-actions #cancelHistoryEditBottom{box-sizing:border-box;width:100%;min-height:48px;margin:0;padding:8px;border:2px solid var(--outdoor-border);border-radius:10px;background:var(--menu-surface,#fff);color:var(--outdoor-ink);font:500 16px/1.4 var(--ui-font,system-ui);cursor:pointer}
-#history :is([data-dh-record],.history-card){scroll-margin-top:64px}
+#history :is([data-dh-record],.history-card){scroll-margin-top:var(--history-dock-height,100px)}
 #history :is([data-dh-record],.history-card):focus{outline:2px solid var(--outdoor-blue);outline-offset:3px}
 .history-confirm-dialog{box-sizing:border-box;width:min(480px,calc(100% - 24px));max-height:88vh;max-height:88dvh;margin:auto;padding:20px;border:1px solid var(--outdoor-border);border-radius:16px;background:var(--menu-surface,#fff);color:var(--outdoor-ink);font-family:var(--ui-font,system-ui);overflow:auto}
 .history-confirm-dialog::backdrop{background:rgb(0 0 0 / .55)}.history-confirm-dialog h2{margin:0 0 16px;font-size:18px;line-height:1.5}.history-confirm-dialog p{font-size:14px;line-height:1.6;overflow-wrap:anywhere}.history-confirm-dialog p.menu-note{font-size:12px}

@@ -57,6 +57,8 @@ const HistoryEditor = (() => {
   function reset(){state=null;closeConfirm();closeFavorite();sync();}
   function beforeNew(){
     if(state&&!confirm('編集中の未保存の変更をやめますか？保存済みの履歴は変更しません。'))return false;
+    if(!state&&typeof DraftGuard!=='undefined'&&!DraftGuard.beforeReplace())return false;
+    if(typeof DraftGuard!=='undefined')DraftGuard.reset();
     reset();return true;
   }
   function begin(id,load){
@@ -74,6 +76,7 @@ const HistoryEditor = (() => {
     if(!beforeNew())return false;
     // Form controls may mutate reference/disk objects. Keep a separate immutable baseline.
     const original=clone(item);load(clone(item));state={original};sync();
+    if(typeof DraftGuard!=='undefined')DraftGuard.changed();
     byId('historyEditBanner').focus({preventScroll:true});
     showToast('履歴の編集を開始しました。保存時に変更を確認できます。','info');return true;
   }
@@ -87,6 +90,7 @@ const HistoryEditor = (() => {
   }
   function finish(){
     const id=state?idOf(state.original):'';
+    if(typeof DraftGuard!=='undefined')DraftGuard.reset();
     reset();byId('clearBtn').click();render();showView('history');
     const loadButton=Array.from(byId('history').querySelectorAll('button[data-load-id]')).find(button=>button.dataset.loadId===id);
     const card=loadButton?.closest('[data-dh-record], .history-card');
@@ -126,5 +130,9 @@ const HistoryEditor = (() => {
   favoriteDialog.addEventListener('close',()=>{opening=null;});
   dialog.addEventListener('close',()=>{pending=null;});
   sync();
-  return {plan,begin,save,beforeNew,isEditing:()=>!!state};
+  function restoreContext(original){
+    reset();
+    try{const matches=snapshot().items.filter(item=>idOf(item)===idOf(original));if(matches.length!==1||!equal(matches[0],original))return false;state={original:clone(original)};sync();return true;}catch{return false;}
+  }
+  return {plan,begin,save,beforeNew,isEditing:()=>!!state,draftContext:()=>state?clone(state.original):null,restoreContext};
 })();

@@ -195,7 +195,7 @@ const DetailEditor = (() => {
     mode=next==='detail'?'detail':'simple';sections.forEach(section=>section.hidden=mode!=='detail');select.value=mode;document.documentElement.dataset.inputMode=mode;retained();
     byId('inputTab').textContent=mode==='detail'?'詳細入力':'簡易入力';
     const saved=!save||persist(modeKey,mode);
-    byId('inputModeStatus').textContent=saved?'シンプルに戻しても詳細データは消えません。':'画面は切り替えましたが、入力モードの設定を保存できませんでした。';
+    byId('inputModeStatus').textContent=saved?'簡易入力に戻しても詳細データは消えません。':'画面は切り替えましたが、入力モードの設定を保存できませんでした。';
     if(save&&typeof render==='function')render();
   };
   function write(value) {
@@ -264,5 +264,5 @@ const DetailEditor = (() => {
   }
   panel.querySelectorAll('input[type="number"]').forEach(el=>el.addEventListener('input',()=>el.setCustomValidity('')));
   write({});applyMode(mode);filterStatus();
-  return {read,write,clear:()=>write({}),matches:value=>DetailData.matches(value,filters),historyHtml:DetailData.historyHtml,applyBindingProfile};
+  return {read,write,snapshot:collect,refresh:retained,setMode:next=>applyMode(next,true),clear:()=>write({}),matches:value=>DetailData.matches(value,filters),historyHtml:DetailData.historyHtml,applyBindingProfile};
 })();
