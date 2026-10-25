@@ -1,4 +1,4 @@
-/* Saved board names only: no separate history, network requests or storage writes. */
+/* Saved gear names only: no separate history, network requests or storage writes. */
 function getBoardNameSuggestions(items, query = '') {
   if (!Array.isArray(items)) return [];
   const searchKey = value => value.normalize('NFKC').toLocaleLowerCase('ja');
@@ -17,9 +17,15 @@ function getBoardNameSuggestions(items, query = '') {
   }).map(item => item.name);
 }
 
+function getBindingNameSuggestions(items, query = '') {
+  if (!Array.isArray(items)) return [];
+  return getBoardNameSuggestions(items.map(item => ({board:item?.detail?.bindingName,dateTime:item?.dateTime})), query);
+}
+
 (() => {
-  const input = document.getElementById('board');
-  const list = document.getElementById('boardSuggestions');
+  const connect = ({inputId, listId, optionPrefix, suggestions, emptyMessage, onChoose}) => {
+  const input = document.getElementById(inputId);
+  const list = document.getElementById(listId);
   if (!input || !list) return;
   const field = input.closest('.board-field');
   let matches = [], active = -1, composing = false;
@@ -38,15 +44,16 @@ function getBoardNameSuggestions(items, query = '') {
     } else input.removeAttribute('aria-activedescendant');
   };
   const refresh = () => {
-    const saved = getBoardNameSuggestions(loadList());
-    matches = getBoardNameSuggestions(loadList(), input.value).slice(0, 20);
+    const items = loadList();
+    const saved = suggestions(items);
+    matches = suggestions(items, input.value).slice(0, 20);
     list.replaceChildren();
     active = -1;
     input.removeAttribute('aria-activedescendant');
     if (!saved.length) { close(); return; }
     matches.forEach((name, index) => {
       const option = document.createElement('li');
-      option.id = `boardSuggestion-${index}`;
+      option.id = `${optionPrefix}-${index}`;
       option.setAttribute('role', 'option');
       option.setAttribute('aria-selected', 'false');
       option.dataset.index = String(index);
@@ -57,7 +64,7 @@ function getBoardNameSuggestions(items, query = '') {
       const hint = document.createElement('li');
       hint.className = 'board-suggestion-empty';
       hint.setAttribute('role', 'presentation');
-      hint.textContent = '候補なし。このまま新しい板名を入力できます。';
+      hint.textContent = emptyMessage;
       list.appendChild(hint);
     }
     list.hidden = false;
@@ -68,6 +75,7 @@ function getBoardNameSuggestions(items, query = '') {
     input.value = matches[index];
     input.dispatchEvent(new Event('input', {bubbles: true}));
     input.dispatchEvent(new Event('change', {bubbles: true}));
+    if(onChoose)onChoose(matches[index]);
     input.focus();
     close();
   };
@@ -104,4 +112,7 @@ function getBoardNameSuggestions(items, query = '') {
   window.addEventListener('storage', event => {
     if ((event.key === KEY || event.key === null) && !list.hidden) refresh();
   });
+  };
+  connect({inputId:'board',listId:'boardSuggestions',optionPrefix:'boardSuggestion',suggestions:getBoardNameSuggestions,emptyMessage:'候補なし。このまま新しい板名を入力できます。'});
+  connect({inputId:'detailBindingName',listId:'bindingSuggestions',optionPrefix:'bindingSuggestion',suggestions:getBindingNameSuggestions,emptyMessage:'候補なし。このまま新しいビンディング名を入力できます。',onChoose:name=>DetailEditor.applyBindingProfile(name)});
 })();

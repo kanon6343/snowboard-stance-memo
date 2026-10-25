@@ -85,7 +85,16 @@ const DetailData = (() => {
       .sort((a,b)=>(Number.isFinite(b.time)?b.time:-Infinity)-(Number.isFinite(a.time)?a.time:-Infinity)||a.order-b.order);
     for(const {item}of candidates){const d=normalize(item.detail);if(d.shape||d.nose||d.bend||d.boardNote)return {shape:d.shape,nose:d.nose,bend:d.bend,boardNote:d.boardNote};}return null;
   }
-  return {choices,normalize,rows,has,matches,historyHtml,historyParts,boardProfile};
+  function bindingProfile(items,name) {
+    if(!Array.isArray(items)||typeof name!=='string'||!name.trim())return null;
+    const latest=items.map((item,order)=>({item,order,time:typeof item?.dateTime==='string'?Date.parse(item.dateTime):NaN}))
+      .filter(({item})=>typeof item?.detail?.bindingName==='string'&&item.detail.bindingName.trim()===name.trim())
+      .sort((a,b)=>(Number.isFinite(b.time)?b.time:-Infinity)-(Number.isFinite(a.time)?a.time:-Infinity)||a.order-b.order)[0];
+    if(!latest)return null;
+    const d=normalize(latest.item.detail);
+    return {diskTypes:{left:d.diskShift.left.type,right:d.diskShift.right.type},heelcup:d.heelcup};
+  }
+  return {choices,normalize,rows,has,matches,historyHtml,historyParts,boardProfile,bindingProfile};
 })();
 
 const DetailEditor = (() => {
@@ -102,16 +111,17 @@ const DetailEditor = (() => {
     foot.appendChild(heelcup);
   }
   const panel=byId('setupCard'),select=byId('inputMode');
+  const bindingNotice=(message='')=>{byId('bindingProfileStatus').textContent=message;byId('bindingProfileStatus').hidden=!message;};
   const syncHeelcupOrigin=side=>{
     byId(`heelcup-origin-${side}`).dataset.basis=heelcupOrigins[side];
     for(const origin of ['near','far'])byId(`heelcup-origin-${side}-${origin}`).setAttribute('aria-pressed',String(heelcupOrigins[side]===origin));
   };
   for(const side of ['left','right'])for(const origin of ['near','far']){
     const button=byId(`heelcup-origin-${side}-${origin}`);
-    button.addEventListener('click',()=>{heelcupOrigins[side]=heelcupOrigins[side]===origin?'':origin;syncHeelcupOrigin(side);retained();});
+    button.addEventListener('click',()=>{heelcupOrigins[side]=heelcupOrigins[side]===origin?'':origin;syncHeelcupOrigin(side);retained();bindingNotice();});
     button.addEventListener('keydown',event=>{
       const next=event.key==='ArrowRight'||event.key==='End'?'far':event.key==='ArrowLeft'||event.key==='Home'?'near':null;
-      if(next){event.preventDefault();heelcupOrigins[side]=next;syncHeelcupOrigin(side);byId(`heelcup-origin-${side}-${next}`).focus();retained();}
+      if(next){event.preventDefault();heelcupOrigins[side]=next;syncHeelcupOrigin(side);byId(`heelcup-origin-${side}-${next}`).focus();retained();bindingNotice();}
     });
   }
   let setbackSign='tail';
@@ -201,6 +211,7 @@ const DetailEditor = (() => {
     }
     panel.querySelectorAll('input').forEach(el=>el.setCustomValidity(''));retained();
     profileBoard=byId('board').value.trim();autoProfile=false;profileDirty=false;profileNotice();
+    bindingNotice();
   }
   function read() {
     const checks=[['detailSetbackMm',['detailSetbackBasis']]];
@@ -233,8 +244,22 @@ const DetailEditor = (() => {
   byId('board').addEventListener('blur',changeBoard);
   byId('applyBoardProfile').addEventListener('click',()=>{const profile=DetailData.boardProfile(loadList(),byId('board').value);if(profile)applyProfile(profile);});
   for(const k of profileKeys)for(const event of ['input','change'])byId(bindings[k]).addEventListener(event,()=>{profileDirty=true;autoProfile=false;profileNotice();});
-  for(const side of ['left','right'])byId(`shift-${side}-type`).addEventListener('change',()=>drawDisk(side));
+  function applyBindingProfile(name) {
+    const profile=DetailData.bindingProfile(loadList(),name);
+    if(!profile){bindingNotice('この名前の保存済み設定は見つかりませんでした。入力中の設定は変更していません。');return false;}
+    for(const side of ['left','right']){
+      byId(`shift-${side}-type`).value=profile.diskTypes[side];drawDisk(side);
+      const h=profile.heelcup[side];heelcupRecorded[side]=h.recorded;heelcupOrigins[side]=h.origin;syncHeelcupOrigin(side);
+      for(const pos of ['inner','outer'])byId(`heelcup-${side}-${pos}`).value=h[pos];
+    }
+    retained();bindingNotice('この名前の最新記録から、ディスク形式とヒールカップを反映しました（未入力もそのまま）。角度・ビス位置・ずらし量は変更していません。');return true;
+  }
+  byId('detailBindingName').addEventListener('input',()=>bindingNotice());
+  for(const side of ['left','right']){
+    byId(`shift-${side}-type`).addEventListener('change',()=>{drawDisk(side);bindingNotice();});
+    for(const pos of ['inner','outer'])byId(`heelcup-${side}-${pos}`).addEventListener('input',()=>bindingNotice());
+  }
   panel.querySelectorAll('input[type="number"]').forEach(el=>el.addEventListener('input',()=>el.setCustomValidity('')));
   write({});applyMode(mode);filterStatus();
-  return {read,write,clear:()=>write({}),matches:value=>DetailData.matches(value,filters),historyHtml:DetailData.historyHtml};
+  return {read,write,clear:()=>write({}),matches:value=>DetailData.matches(value,filters),historyHtml:DetailData.historyHtml,applyBindingProfile};
 })();

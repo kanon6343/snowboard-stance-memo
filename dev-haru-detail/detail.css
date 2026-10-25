@@ -9,6 +9,9 @@
 .detail-inline textarea{resize:vertical;}
 .detail-binding{border-top:1px solid var(--outdoor-border);padding-top:12px;margin:14px 0;}
 .detail-binding label small{font-size:10px;font-weight:400;}
+.detail-binding>label{font-size:14px;line-height:1.25;font-weight:650;color:var(--outdoor-muted);}
+.binding-profile-status{font-size:11px;line-height:1.5;color:var(--outdoor-muted);margin:-6px 0 12px;}
+#bindingProfileStatus[hidden]{display:none;}
 .detail-board .detail-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
 .detail-board .detail-grid>label:last-child{grid-column:1/-1;}
 #detailSetbackBasis[hidden]{display:none!important;}

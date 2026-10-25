@@ -11,14 +11,14 @@
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
   <meta name="description" content="既存版とは保存先を分離した詳細入力モードの試作環境" />
   <title>スタンスメモ（詳細試作版）</title>
-  <link rel="stylesheet" href="style.css?v=1038">
-  <link rel="stylesheet" href="outdoor.css?v=1038">
-  <link rel="stylesheet" href="theme.css?v=1038">
-  <link rel="stylesheet" href="pwa.css?v=1038">
-  <link rel="stylesheet" href="board-suggestions.css?v=1038">
-  <link rel="stylesheet" href="detail.css?v=1038">
-  <script src="theme.js?v=1038"></script>
-  <script src="pwa.js?v=1038" defer></script>
+  <link rel="stylesheet" href="style.css?v=1040">
+  <link rel="stylesheet" href="outdoor.css?v=1040">
+  <link rel="stylesheet" href="theme.css?v=1040">
+  <link rel="stylesheet" href="pwa.css?v=1040">
+  <link rel="stylesheet" href="board-suggestions.css?v=1040">
+  <link rel="stylesheet" href="detail.css?v=1040">
+  <script src="theme.js?v=1040"></script>
+  <script src="pwa.js?v=1040" defer></script>
 </head>
 <body data-menu-side="left">
 
@@ -105,9 +105,11 @@
       <p id="setbackSignHelp">＋ノーズ側／−テール側。0はずらしなし、空欄は未入力。</p>
     
   </section>
-  <section id="detailBindingFields" class="detail-inline detail-binding" data-detail-section aria-label="ビンディングのメモ" hidden>
-    <label for="detailBindingName">ビンディング <small>任意・左右共通</small><input id="detailBindingName" type="text" maxlength="128" placeholder="メーカー・モデル・サイズ" autocomplete="off"></label>
+  <section id="detailBindingFields" class="detail-inline detail-binding board-field" data-detail-section aria-label="ビンディングのメモ" hidden>
+    <label for="detailBindingName">ビンディング <small>任意・左右共通</small><input id="detailBindingName" type="text" maxlength="128" placeholder="メーカー・モデル・サイズ" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="bindingSuggestions"></label>
+    <ul id="bindingSuggestions" class="board-suggestions" role="listbox" aria-label="保存履歴のビンディング名候補" hidden></ul>
   </section>
+  <p id="bindingProfileStatus" class="binding-profile-status" role="status" hidden></p>
   <div class="foot-tabs" role="tablist" aria-label="設定する足">
     <button id="leftFootTab" type="button" role="tab" data-foot="left" aria-controls="leftFootPanel" aria-selected="true">左足<span class="foot-summary" data-summary="left">角度未入力 · 穴0</span></button>
     <button id="rightFootTab" type="button" role="tab" data-foot="right" aria-controls="rightFootPanel" aria-selected="false" tabindex="-1">右足<span class="foot-summary" data-summary="right">角度未入力 · 穴0</span></button>
@@ -375,9 +377,9 @@
     </button>
   </div>
 
-<script src="detail.js?v=1038"></script>
-<script src="script.js?v=1038"></script>
-<script src="board-suggestions.js?v=1038"></script>
+<script src="detail.js?v=1040"></script>
+<script src="script.js?v=1040"></script>
+<script src="board-suggestions.js?v=1040"></script>
 
 <div id="toast"></div>
   
