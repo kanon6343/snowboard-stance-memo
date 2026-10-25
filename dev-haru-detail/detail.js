@@ -189,7 +189,7 @@ const DetailEditor = (() => {
     value.heelcup={};for(const side of ['left','right'])value.heelcup[side]={inner:byId(`heelcup-${side}-inner`).value,outer:byId(`heelcup-${side}-outer`).value,origin:heelcupOrigins[side],recorded:heelcupRecorded[side]};
     return value;
   };
-  const retained = () => {byId('detailRetained').hidden=mode==='detail'||!DetailData.has(collect());for(const side of ['left','right'])byId(`heelcup-legacy-${side}`).hidden=!heelcupRecorded[side]||!!byId(`heelcup-${side}-inner`).value.trim()||!!byId(`heelcup-${side}-outer`).value.trim();};
+  const retained = () => {byId('detailRetained').hidden=mode==='detail'||!DetailData.has(collect());for(const side of ['left','right'])byId(`heelcup-legacy-${side}`).hidden=!heelcupRecorded[side]||!!byId(`heelcup-${side}-inner`).value.trim()||!!byId(`heelcup-${side}-outer`).value.trim();if(typeof MenuPresentation!=='undefined')MenuPresentation.syncHints();};
   const persist = (key,value) => {try{localStorage.setItem(key,value);return true;}catch{return false;}};
   const applyMode = (next,save=false) => {
     mode=next==='detail'?'detail':'simple';sections.forEach(section=>section.hidden=mode!=='detail');select.value=mode;document.documentElement.dataset.inputMode=mode;retained();
@@ -226,10 +226,11 @@ const DetailEditor = (() => {
     }
     return DetailData.normalize(collect());
   }
-  const controls=document.createElement('div');controls.className='detail-filters';
-  controls.innerHTML=`<h4>板の形状で絞り込み</h4>${Object.entries({shape:'シェイプ',nose:'ノーズ形状',bend:'ベンド'}).map(([key,label])=>`<label>${label}<select id="filter-${key}"><option value="">すべて</option><option value="__unset__">未設定</option>${Object.entries(DetailData.choices[key]).map(([v,t])=>`<option value="${v}">${t}</option>`).join('')}</select></label>`).join('')}<p class="menu-note">複数指定はすべて一致する記録を表示します。未入力の過去データは「未設定」で探せます。</p><p id="detailFilterStatus" class="menu-note" role="status"></p>`;
+  const controls=document.createElement('details');controls.className='detail-filters menu-shape-filter';
+  controls.innerHTML=`<summary>板の形状で絞り込み<span id="shapeFilterCount">指定なし</span></summary><div class="detail-grid">${Object.entries({shape:'シェイプ',nose:'ノーズ形状',bend:'ベンド'}).map(([key,label])=>`<label>${label}<select id="filter-${key}"><option value="">すべて</option><option value="__unset__">未設定</option>${Object.entries(DetailData.choices[key]).map(([v,t])=>`<option value="${v}">${t}</option>`).join('')}</select></label>`).join('')}</div><p class="menu-note">複数指定はすべて一致する記録を表示します。未入力の過去データは「未設定」で探せます。</p><p id="detailFilterStatus" class="menu-note" role="status"></p>`;
   byId('menuFilters').appendChild(controls);
-  const filterStatus=()=>{const labels=Object.entries({shape:'シェイプ',nose:'ノーズ',bend:'ベンド'}).filter(([k])=>filters[k]).map(([k,label])=>`${label}：${filters[k]==='__unset__'?'未設定':DetailData.choices[k][filters[k]]}`);byId('detailFilterStatus').textContent=labels.length?labels.join(' / '):'形状の絞り込みなし';};
+  controls.open=Object.values(filters).some(Boolean);
+  const filterStatus=()=>{const labels=Object.entries({shape:'シェイプ',nose:'ノーズ',bend:'ベンド'}).filter(([k])=>filters[k]).map(([k,label])=>`${label}：${filters[k]==='__unset__'?'未設定':DetailData.choices[k][filters[k]]}`);byId('detailFilterStatus').textContent=labels.length?labels.join(' / '):'形状の絞り込みなし';byId('shapeFilterCount').textContent=labels.length?`${labels.length}条件`:'指定なし';controls.dataset.active=String(labels.length>0);};
   for(const key of Object.keys(filters)){byId(`filter-${key}`).value=filters[key];byId(`filter-${key}`).addEventListener('change',()=>{filters[key]=byId(`filter-${key}`).value;persist(filterKey,JSON.stringify(filters));filterStatus();render();});}
   byId('btnFilterClear').addEventListener('click',()=>{for(const k of Object.keys(filters)){filters[k]='';byId(`filter-${k}`).value='';}persist(filterKey,JSON.stringify(filters));filterStatus();});
   select.addEventListener('change',()=>applyMode(select.value,true));panel.addEventListener('input',retained);panel.addEventListener('change',retained);

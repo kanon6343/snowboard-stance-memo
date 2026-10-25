@@ -11,15 +11,17 @@
   <link rel="apple-touch-icon" href="icons/apple-touch-icon-trial.png" />
   <meta name="description" content="既存版とは保存先を分離した詳細入力モードの試作環境" />
   <title>スタンスメモ（詳細試作版）</title>
-  <link rel="stylesheet" href="style.css?v=1042">
-  <link rel="stylesheet" href="outdoor.css?v=1042">
-  <link rel="stylesheet" href="theme.css?v=1042">
-  <link rel="stylesheet" href="pwa.css?v=1042">
-  <link rel="stylesheet" href="board-suggestions.css?v=1042">
-  <link rel="stylesheet" href="detail.css?v=1042">
-  <link rel="stylesheet" href="history-views.css?v=1042">
-  <script src="theme.js?v=1042"></script>
-  <script src="pwa.js?v=1042" defer></script>
+  <link rel="stylesheet" href="style.css?v=1045">
+  <link rel="stylesheet" href="outdoor.css?v=1045">
+  <link rel="stylesheet" href="theme.css?v=1045">
+  <link rel="stylesheet" href="pwa.css?v=1045">
+  <link rel="stylesheet" href="board-suggestions.css?v=1045">
+  <link rel="stylesheet" href="detail.css?v=1045">
+  <link rel="stylesheet" href="history-views.css?v=1045">
+  <link rel="stylesheet" href="menu-ui.css?v=1045">
+  <link rel="stylesheet" href="ui-consistency.css?v=1045">
+  <script src="theme.js?v=1045"></script>
+  <script src="pwa.js?v=1045" defer></script>
 </head>
 <body data-menu-side="left">
 
@@ -72,7 +74,7 @@
         <label>ベンド<select id="detailBend"><option value="">未設定</option><option value="camber">キャンバー</option><option value="rocker">ロッカー</option><option value="flat">フラット</option><option value="hybrid">ハイブリッド</option><option value="other">その他</option></select></label>
         <label>形状の補足<input id="detailBoardNote" type="text" maxlength="160" placeholder="例：ダブルキャンバー"></label>
       </div>
-    
+      <div class="board-shape-actions"><button id="applyBoardShapeHistory" type="button">同じ板の履歴へ反映…</button></div>
   </section>
   <div class="stance-row">
     <div class="stance-quick" aria-label="スタンス">
@@ -257,14 +259,23 @@
     <button id="menuCloseBtn" class="menu-close" type="button" aria-label="閉じる">×</button>
   </div>
 
+  <div class="menu-page-tabs" role="tablist" aria-label="メニューのカテゴリ">
+    <button id="menuTabFind" type="button" role="tab" data-menu-page="find" aria-controls="menuPageFind" aria-selected="false" tabindex="-1">探す</button>
+    <button id="menuTabDisplay" type="button" role="tab" data-menu-page="display" aria-controls="menuPageDisplay" aria-selected="true">表示</button>
+    <button id="menuTabData" type="button" role="tab" data-menu-page="data" aria-controls="menuPageData" aria-selected="false" tabindex="-1">データ<span id="menuUpdateBadge" class="menu-update-badge" hidden>更新あり</span></button>
+  </div>
   <div class="menu-body">
+  <div id="menuPageFind" class="menu-page" role="tabpanel" aria-labelledby="menuTabFind" tabindex="0" hidden>
 
   <section class="menu-card" id="menuFilters">
     <h3>絞り込み・並び替え</h3>
     <p class="menu-section-note">保存したセッティングを探す</p>
     <div id="filtersMountMenu"></div>
   </section>
+  <button id="openHistoryStats" type="button" class="history-stats-open">保存履歴の統計を見る</button>
 
+  </div>
+  <div id="menuPageDisplay" class="menu-page" role="tabpanel" aria-labelledby="menuTabDisplay" tabindex="0">
   <section class="menu-card">
     <h3>表示・操作</h3>
     <div class="menu-position-row"><label class="menu-position-label" for="inputMode">入力モード</label><select id="inputMode" class="menu-side-select"><option value="simple">シンプル</option><option value="detail">詳細</option></select></div>
@@ -285,9 +296,10 @@
         <option value="right">右側</option>
       </select>
     </div>
-    <p id="menuGestureHelp" class="menu-note">左端から右へスワイプで開きます。</p>
+    <details class="menu-gesture-guide"><summary>スワイプ操作のヒント</summary><p id="menuGestureHelp" class="menu-note">左端から右へスワイプで開きます。</p></details>
   </section>
-
+  </div>
+  <div id="menuPageData" class="menu-page" role="tabpanel" aria-labelledby="menuTabData" tabindex="0" hidden>
   <section class="menu-card" id="appInstallCard" aria-labelledby="appInstallHeading">
     <h3 id="appInstallHeading">アプリとして使う</h3>
     <p id="installStatus" class="menu-note" role="status">ホーム画面やPCに追加できます。</p>
@@ -348,6 +360,7 @@
     </div>
   </details>
   </div>
+  </div>
 </aside> 
   
   <div id="filtersPanel" class="menu-filters" hidden>
@@ -387,10 +400,17 @@
     </button>
   </div>
 
-<script src="detail.js?v=1042"></script>
-<script src="history-views.js?v=1042"></script>
-<script src="script.js?v=1042"></script>
-<script src="board-suggestions.js?v=1042"></script>
+<dialog id="historyStatsDialog" aria-labelledby="historyStatsTitle">
+  <header class="stats-heading"><h2 id="historyStatsTitle">保存履歴の統計</h2><button id="closeHistoryStats" type="button" aria-label="統計を閉じる" autofocus>×</button></header>
+  <div class="stats-body"><p class="stats-note">記録数は保存した件数です。同じ日の複数記録も1件ずつ数えます。</p><div id="historyStatsContent"></div><button id="refreshHistoryStats" type="button">再集計</button></div>
+</dialog>
+<script src="detail.js?v=1045"></script>
+<script src="history-views.js?v=1045"></script>
+<script src="script.js?v=1045"></script>
+<script src="board-suggestions.js?v=1045"></script>
+<script src="menu-ui.js?v=1045"></script>
+<script src="board-shape-history.js?v=1045"></script>
+<script src="history-stats.js?v=1045"></script>
 
 <div id="toast"></div>
   
