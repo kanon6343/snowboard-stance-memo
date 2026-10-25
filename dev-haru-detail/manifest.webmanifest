@@ -1,6 +1,6 @@
 {
   "name": "スタンスメモ 詳細試作版",
-  "short_name": "スタンス 詳細",
+  "short_name": "スタンス 試作",
   "description": "既存版から保存先を分離した詳細入力モードの試作環境です。",
   "lang": "ja",
   "start_url": "./",
@@ -10,8 +10,8 @@
   "theme_color": "#075579",
   "prefer_related_applications": false,
   "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "icons/icon-trial-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-trial-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-trial-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }

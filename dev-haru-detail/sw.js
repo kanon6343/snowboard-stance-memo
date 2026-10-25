@@ -1,5 +1,5 @@
 /* Release shell: bump RELEASE and every versioned index.html asset together. */
-const RELEASE = '1040';
+const RELEASE = '1041';
 const BASE = new URL('./', self.registration.scope);
 const CACHE_PREFIX = `snowboard-stance-haru-detail:${BASE.href}:`;
 const CACHE_NAME = `${CACHE_PREFIX}${RELEASE}`;
@@ -9,8 +9,8 @@ const SHELL = [
   `pwa.css?v=${RELEASE}`, `pwa.js?v=${RELEASE}`, 'manifest.webmanifest',
   `board-suggestions.css?v=${RELEASE}`, `board-suggestions.js?v=${RELEASE}`,
   `detail.css?v=${RELEASE}`, `detail.js?v=${RELEASE}`,
-  'icons/icon-192.png', 'icons/icon-512.png',
-  'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png',
+  'icons/icon-trial-192.png', 'icons/icon-trial-512.png',
+  'icons/icon-trial-maskable-512.png', 'icons/apple-touch-icon-trial.png',
 ].map(path => new URL(path, BASE).href);
 const SHELL_URLS = new Set(SHELL);
 self.addEventListener('install', event => {
