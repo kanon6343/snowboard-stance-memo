@@ -7,6 +7,16 @@
 .detail-inline label,.disk-type-picker label,.detail-filters label{display:block;min-width:0;font-size:12px;font-weight:650;color:var(--outdoor-muted);}
 .detail-inline input,.detail-inline select,.detail-inline textarea,.detail-filters select{display:block;box-sizing:border-box;width:100%;min-width:0;min-height:44px;margin-top:5px;padding:8px;border:2px solid var(--outdoor-border);border-radius:9px;background:#fff;color:var(--outdoor-ink);font:inherit;font-size:16px;}
 .detail-inline textarea{resize:vertical;}
+/* Clip horizontal overflow without creating a second sticky scroll container. */
+body{overflow-x:clip}
+.foot-dock-sentinel{display:block;height:0;margin:0;padding:0;pointer-events:none}
+#setupCard .foot-dock{--foot-dock-offset:max(8px,env(safe-area-inset-top,0px));--foot-menu-clearance:max(0px,calc(68px - (100vw - 100%) / 2));position:sticky;top:var(--foot-dock-offset);z-index:30;margin-bottom:12px}
+#setupCard .foot-dock .foot-tabs{position:relative;z-index:0;margin-bottom:0}
+#setupCard .foot-dock.is-near-top .foot-tabs{margin-left:var(--foot-menu-clearance)}
+body[data-menu-side="right"] #setupCard .foot-dock.is-near-top .foot-tabs{margin-left:0;margin-right:var(--foot-menu-clearance)}
+#setupCard .foot-dock.is-near-top .foot-summary{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body:has(#footDock.is-stuck) .menu-btn{top:calc(max(8px,env(safe-area-inset-top,0px)) + 10px)}
+#setupCard .foot-dock.is-stuck::before{content:"";position:absolute;z-index:-1;top:calc(0px - var(--foot-dock-offset));bottom:-10px;left:50%;width:100vw;transform:translateX(-50%);background:var(--menu-surface,#fff);border-bottom:1px solid var(--outdoor-border);box-shadow:0 4px 12px #152d3b1f}
 .comment-field-heading{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .comment-field-heading>label{min-width:0;margin:0}
 .comment-details .comment-field-heading .comment-clear{flex-shrink:0;min-height:44px;margin:0 0 4px auto;padding:8px 10px}
@@ -89,6 +99,7 @@
 .history-edit-banner[hidden]{display:none!important}.history-edit-banner strong{font-size:15px}.history-edit-banner p{margin:4px 0;font-size:13px;line-height:1.5;overflow-wrap:anywhere}.history-edit-banner small{font-size:12px;line-height:1.5}
 #cancelHistoryEdit{min-height:44px;padding:8px;border:1px solid var(--outdoor-border);border-radius:8px;background:transparent;color:var(--outdoor-ink);font:500 13px/1.4 var(--ui-font,system-ui);cursor:pointer}
 #cancelHistoryEditBottom[hidden],.editor-actions #clearBtn[hidden]{display:none!important}
+.editor-actions:has(>#cancelHistoryEditBottom:not([hidden])){grid-template-columns:repeat(2,minmax(0,1fr))}
 .editor-actions #cancelHistoryEditBottom{box-sizing:border-box;width:100%;min-height:48px;margin:0;padding:8px;border:2px solid var(--outdoor-border);border-radius:10px;background:var(--menu-surface,#fff);color:var(--outdoor-ink);font:500 16px/1.4 var(--ui-font,system-ui);cursor:pointer}
 #history :is([data-dh-record],.history-card){scroll-margin-top:64px}
 #history :is([data-dh-record],.history-card):focus{outline:2px solid var(--outdoor-blue);outline-offset:3px}

@@ -51,7 +51,7 @@ const HistoryEditor = (() => {
   let state=null,pending=null,opening=null;
   const label=item=>`${typeof item.board==='string'&&item.board.trim()||'板名なし'} · ${DetailHistoryData.date(item)}`;
   function snapshot(){const raw=localStorage.getItem(KEY),items=JSON.parse(raw===null?'[]':raw);if(!Array.isArray(items))throw new Error('Invalid history');return {raw,items};}
-  function sync(){byId('historyEditBanner').hidden=!state;byId('historyEditTarget').textContent=state?label(state.original):'';byId('saveBtn').textContent=state?'この履歴の変更を保存':'この設定を保存';byId('clearBtn').hidden=!!state;byId('cancelHistoryEditBottom').hidden=!state;}
+  function sync(){byId('historyEditBanner').hidden=!state;byId('historyEditTarget').textContent=state?label(state.original):'';byId('saveBtn').textContent=state?'変更を保存':'この設定を保存';byId('clearBtn').hidden=!!state;byId('cancelHistoryEditBottom').hidden=!state;}
   function closeConfirm(){pending=null;if(dialog.open)dialog.close();}
   function closeFavorite(){opening=null;if(favoriteDialog.open)favoriteDialog.close();}
   function reset(){state=null;closeConfirm();closeFavorite();sync();}
