@@ -18,15 +18,16 @@ const DetailData = (() => {
     return {direction:mm===''?'':directions.includes(v.direction)?v.direction:'',mm};
   };
   function normalize(value) {
-    const v=object(value),s=object(v.setback),disk=object(v.diskShift);
+    const v=object(value),s=object(v.setback),disk=object(v.diskShift),heel=object(v.heelcup);
     const setback=axis(s,['nose','tail']);
     setback.basis=setback.mm===''?'':['reference','center'].includes(s.basis)?s.basis:'';
     const foot = side => {
       const f=object(disk[side]);return {type:choice(f.type,choices.diskType),longitudinal:axis(f.longitudinal,['nose','tail']),lateral:axis(f.lateral,['toe','heel'])};
     };
+    const heelcup=side=>{const h=object(heel[side]);return {inner:text(h.inner,64),outer:text(h.outer,64),recorded:h.recorded===true||object(disk[side]).type==='highback'};};
     return {version:1,shape:choice(v.shape,choices.shape),nose:choice(v.nose,choices.nose),bend:choice(v.bend,choices.bend),
       boardNote:text(v.boardNote,160),forwardLeanLeft:text(v.forwardLeanLeft,64),forwardLeanRight:text(v.forwardLeanRight,64),
-      setback,diskShift:{left:foot('left'),right:foot('right')},note:text(v.note,1000)};
+      setback,diskShift:{left:foot('left'),right:foot('right')},heelcup:{left:heelcup('left'),right:heelcup('right')},note:text(v.note,1000)};
   }
   function rows(value) {
     const d=normalize(value),r=[];
@@ -35,6 +36,10 @@ const DetailData = (() => {
     for(const [key,label]of [['forwardLeanLeft','左リーン'],['forwardLeanRight','右リーン']])if(d[key])r.push([label,d[key]]);
     if(d.setback.mm!=='')r.push(['セットバック',`${({reference:'推奨位置',center:'板の中心'})[d.setback.basis]||'基準未設定'}から ${({nose:'ノーズ側',tail:'テール側'})[d.setback.direction]||'方向未設定'} ${d.setback.mm} mm`]);
     for(const [side,label]of [['left','左'],['right','右']]){
+      const h=d.heelcup[side];
+      if(h.inner)r.push([`${label}ヒールカップ内側`,h.inner]);
+      if(h.outer)r.push([`${label}ヒールカップ外側`,h.outer]);
+      if(h.recorded&&!h.inner&&!h.outer)r.push([`${label}ヒールカップ`,'目盛り未入力（旧試作の記録）']);
       if(d.diskShift[side].type)r.push([`${label}ディスク方式`,choices.diskType[d.diskShift[side].type]]);
       for(const [key,axisLabel]of [['longitudinal','前後'],['lateral','横']]){
       const a=d.diskShift[side][key];
@@ -83,29 +88,31 @@ const DetailData = (() => {
 const DetailEditor = (() => {
   const byId=id=>document.getElementById(id), modeKey='haru-detail:input-mode-v1',filterKey='haru-detail:shape-filter-v1';
   const bindings={shape:'detailShape',nose:'detailNose',bend:'detailBend',boardNote:'detailBoardNote',forwardLeanLeft:'detailLeanLeft',forwardLeanRight:'detailLeanRight',note:'detailNote'};
+  const heelcupRecorded={left:false,right:false};
   for(const side of ['left','right']){
     const foot=byId(`detailDisk-${side}`),label=side==='left'?'左足':'右足';
     foot.innerHTML=`<h3>${label}のディスク</h3><div class="detail-offset-grid"><label>前後（mm）<input id="shift-${side}-longitudinal-mm" type="number" step="any" placeholder="例：-3" aria-label="${label}ディスク前後（mm）" aria-describedby="diskSignHelp-${side}"></label><label>横の方向<select id="shift-${side}-lateral-direction" aria-label="${label}ディスク横の方向"><option value="">選択</option><option value="toe">つま先側</option><option value="heel">かかと側</option></select></label><label>横（mm）<input id="shift-${side}-lateral-mm" type="number" min="0" step="any" inputmode="decimal" placeholder="例：3" aria-label="${label}ディスク横（mm）"></label></div><p id="diskSignHelp-${side}" class="detail-hint">前後は ＋ノーズ／−テール。0はずらしなし、空欄は未入力。</p>`;
+    const heelcup=document.createElement('section');heelcup.className='heelcup-settings';heelcup.setAttribute('aria-label',`${label}のヒールカップ`);
+    const leftLabel=side==='left'?'外':'内',rightLabel=side==='left'?'内':'外';
+    heelcup.innerHTML=`<h3>ヒールカップ <small>任意</small></h3><div class="heelcup-layout"><div class="heelcup-explanation"><p>かかと側のU字部分<br>つま先を上に見た図</p><svg viewBox="0 0 120 110" role="img" aria-label="${label}のヒールカップ。図の左が${leftLabel}側、右が${rightLabel}側。両側の目盛りを別々に記録します"><rect x="27" y="12" width="66" height="86" rx="14" fill="none" stroke="currentColor" stroke-width="2" opacity=".3"/><path d="M33 51v23q0 17 27 17t27-17V51" fill="none" stroke="#df6500" stroke-width="7"/><g fill="none" stroke="currentColor" stroke-width="2"><circle cx="33" cy="64" r="5"/><circle cx="87" cy="64" r="5"/><path d="M14 58v29m-4-24 4-5 4 5m-8 19 4 5 4-5M106 58v29m-4-24 4-5 4 5m-8 19 4 5 4-5"/></g><g fill="currentColor" text-anchor="middle" font-size="15"><text x="14" y="50">${leftLabel}</text><text x="106" y="50">${rightLabel}</text><text x="60" y="11" font-size="10">つま先 ↑</text></g></svg></div><div class="heelcup-values"><label>内側 <small>親指側</small><input id="heelcup-${side}-inner" type="text" maxlength="64" placeholder="例：0" aria-label="${label}ヒールカップ内側（親指側）" aria-describedby="heelcup-help-${side}"></label><label>外側 <small>小指側</small><input id="heelcup-${side}-outer" type="text" maxlength="64" placeholder="例：1" aria-label="${label}ヒールカップ外側（小指側）" aria-describedby="heelcup-help-${side}"></label><p id="heelcup-help-${side}" class="detail-hint">目盛りをそのまま記録。mmには換算しません。</p></div></div><p id="heelcup-legacy-${side}" class="detail-hint" hidden>旧試作でヒールカップ調整として記録済みです。内側・外側の目盛りは未入力です。</p>`;
+    foot.appendChild(heelcup);
   }
   const panel=byId('setupCard'),select=byId('inputMode');
   let setbackSign='tail';
   const syncSign=()=>{
-    byId('setbackSignSwitch').dataset.basis=setbackSign;
-    byId('setbackNose').setAttribute('aria-pressed',String(setbackSign==='nose'));
-    byId('setbackTail').setAttribute('aria-pressed',String(setbackSign==='tail'));
+    const input=byId('detailSetbackMm'),button=byId('setbackSignSwitch');
+    const zero=input.value!==''&&!input.validity.badInput&&Number(input.value)===0;
+    button.dataset.basis=zero?'':setbackSign;
+    button.disabled=zero;
+    button.setAttribute('aria-label',zero?'ずらし量は0。符号の切替は無効です':`符号は${setbackSign==='nose'?'プラス':'マイナス'}。タップで${setbackSign==='nose'?'マイナス':'プラス'}に切替`);
   };
-  for(const [id,direction]of [['setbackNose','nose'],['setbackTail','tail']]){
-    byId(id).addEventListener('click',()=>{
-      setbackSign=direction;
-      const input=byId('detailSetbackMm');
-      if(input.value!==''&&Number.isFinite(Number(input.value)))input.value=String(Math.abs(Number(input.value))*(direction==='tail'?-1:1));
-      input.setCustomValidity('');syncSign();retained();
-    });
-    byId(id).addEventListener('keydown',event=>{
-      const next=event.key==='ArrowDown'||event.key==='End'?'setbackTail':event.key==='ArrowUp'||event.key==='Home'?'setbackNose':null;
-      if(next){event.preventDefault();byId(next).focus();byId(next).click();}
-    });
-  }
+  byId('setbackSignSwitch').addEventListener('click',()=>{
+    const input=byId('detailSetbackMm');
+    if(input.validity.badInput||input.value!==''&&(!Number.isFinite(Number(input.value))||Number(input.value)===0))return;
+    setbackSign=setbackSign==='nose'?'tail':'nose';
+    if(input.value!=='')input.value=String(Math.abs(Number(input.value))*(setbackSign==='tail'?-1:1));
+    input.setCustomValidity('');syncSign();retained();
+  });
   byId('detailSetbackMm').addEventListener('input',()=>{
     const raw=byId('detailSetbackMm').value,n=Number(raw);
     if(raw!==''&&Number.isFinite(n)&&n!==0)setbackSign=n<0?'tail':'nose';
@@ -131,15 +138,17 @@ const DetailEditor = (() => {
   const profileNotice=(message='',offer=false)=>{byId('boardProfileNotice').hidden=!message;byId('boardProfileStatus').textContent=message;byId('applyBoardProfile').hidden=!offer;};
   for(const side of ['left','right']){
     const foot=byId(`detailDisk-${side}`);
-    const picker=document.createElement('div');picker.className='disk-type-picker';picker.innerHTML=`<label for="shift-${side}-type">${side==='left'?'左足':'右足'}ディスクの調整方式</label><select id="shift-${side}-type"><option value="">未設定</option>${Object.entries(DetailData.choices.diskType).map(([v,t])=>`<option value="${v}">${t}</option>`).join('')}</select><span id="disk-preview-${side}" class="disk-preview"></span>`;
+    const picker=document.createElement('div');picker.className='disk-type-picker';picker.innerHTML=`<span id="disk-preview-${side}" class="disk-preview"></span><label for="shift-${side}-type">ディスク形式<select id="shift-${side}-type" aria-label="${side==='left'?'左足':'右足'}ディスクの調整方式" aria-describedby="disk-preview-${side}"><option value="">未設定</option>${Object.entries(DetailData.choices.diskType).map(([v,t])=>`<option value="${v}">${t}</option>`).join('')}</select></label>`;
     foot.insertBefore(picker,foot.children[1]);
   }
   const drawDisk=side=>{
     const type=byId(`shift-${side}-type`).value,target=byId(`disk-preview-${side}`);
-    if(!type||type==='other'){target.textContent=type?'形状の特徴は詳細メモに記録できます。':'';return;}
+    target.dataset.type=type;
+    if(!type||type==='other'){target.textContent=type?'特徴はギア調整メモへ':'方式を選ぶと模式図を表示';return;}
     const holes=(x)=>[30,42,54,66].map(y=>`<circle cx="${x}" cy="${y}" r="4"/>`).join('');
     const slot=x=>`<rect x="${x-4}" y="26" width="8" height="44" rx="4"/>`;
-    target.innerHTML=`<svg viewBox="0 0 96 96" width="80" height="80" role="img" aria-label="${DetailData.choices.diskType[type]}の模式図"><circle cx="48" cy="48" r="44" fill="none" stroke="currentColor" stroke-width="2"/><g fill="none" stroke="currentColor" stroke-width="2">${type==='slots'?slot(34)+slot(62):type==='holes'?holes(34)+holes(62):holes(34)+slot(62)}</g></svg><small>模式図（実物の寸法・可動範囲ではありません）</small>`;
+    const illustration=`<circle cx="48" cy="48" r="44"/>${type==='slots'?slot(34)+slot(62):type==='holes'?holes(34)+holes(62):holes(34)+slot(62)}`;
+    target.innerHTML=`<small>穴・溝の模式図<br>実物とは異なります</small><svg viewBox="0 0 96 96" width="44" height="44" role="img" aria-label="${DetailData.choices.diskType[type]}の調整イメージ"><g fill="none" stroke="currentColor" stroke-width="2">${illustration}</g></svg>`;
   };
   try {if(localStorage.getItem(modeKey)==='detail')mode='detail';}catch{}
   try {const f=JSON.parse(localStorage.getItem(filterKey)||'{}');for(const key of Object.keys(filters))if(f?.[key]==='__unset__'||Object.hasOwn(DetailData.choices[key],f?.[key]))filters[key]=f[key];}catch{}
@@ -151,9 +160,10 @@ const DetailEditor = (() => {
       const raw=byId(`shift-${side}-longitudinal-mm`).value,n=Number(raw);
       value.diskShift[side]={type:byId(`shift-${side}-type`).value,longitudinal:{direction:raw===''?'':n<0?'tail':'nose',mm:raw===''?'':String(Math.abs(n))},lateral:{direction:byId(`shift-${side}-lateral-direction`).value,mm:byId(`shift-${side}-lateral-mm`).value}};
     }
+    value.heelcup={};for(const side of ['left','right'])value.heelcup[side]={inner:byId(`heelcup-${side}-inner`).value,outer:byId(`heelcup-${side}-outer`).value,recorded:heelcupRecorded[side]};
     return value;
   };
-  const retained = () => {byId('detailRetained').hidden=mode==='detail'||!DetailData.has(collect());};
+  const retained = () => {byId('detailRetained').hidden=mode==='detail'||!DetailData.has(collect());for(const side of ['left','right'])byId(`heelcup-legacy-${side}`).hidden=!heelcupRecorded[side]||!!byId(`heelcup-${side}-inner`).value.trim()||!!byId(`heelcup-${side}-outer`).value.trim();};
   const persist = (key,value) => {try{localStorage.setItem(key,value);return true;}catch{return false;}};
   const applyMode = (next,save=false) => {
     mode=next==='detail'?'detail':'simple';sections.forEach(section=>section.hidden=mode!=='detail');select.value=mode;document.documentElement.dataset.inputMode=mode;retained();
@@ -166,6 +176,7 @@ const DetailEditor = (() => {
     syncBasis();
     byId('detailSetbackMm').value=d.setback.mm===''?'':d.setback.direction==='tail'?String(-Number(d.setback.mm)):d.setback.mm;
     setbackSign=d.setback.direction||'tail';syncSign();
+    for(const side of ['left','right']){heelcupRecorded[side]=d.heelcup[side].recorded;for(const pos of ['inner','outer'])byId(`heelcup-${side}-${pos}`).value=d.heelcup[side][pos];}
     for(const side of ['left','right']){byId(`shift-${side}-type`).value=d.diskShift[side].type;drawDisk(side);}
     for(const side of ['left','right'])for(const axis of ['longitudinal','lateral']){
       const a=d.diskShift[side][axis];
