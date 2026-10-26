@@ -4,6 +4,9 @@
   let registration = null;
   let offlineReady = false;
   let applyingUpdate = false;
+  let versionWorker = null;
+  let waitingVersion = '';
+  let versionResolved = false;
   const installedQuery = window.matchMedia?.('(display-mode: standalone)');
   const installed = () => Boolean(installedQuery?.matches || navigator.standalone);
   const byId = id => document.getElementById(id);
@@ -22,11 +25,50 @@
       : navigator.onLine === false ? 'オフラインのため、初回の準備には通信が必要です。'
         : 'オフラインで開く準備を確認しています。');
   };
+  const requestVersion = worker => new Promise(resolve => {
+    if (typeof MessageChannel === 'undefined') { resolve(''); return; }
+    let channel, timer, finished = false;
+    const finish = value => {
+      if (finished) return;
+      finished = true;
+      clearTimeout(timer);
+      channel?.port1.close(); channel?.port2.close();
+      resolve(value);
+    };
+    try {
+      channel = new MessageChannel();
+      timer = setTimeout(() => finish(''), 2000);
+      channel.port1.onmessage = event => {
+        const value = event.data?.version;
+        finish(event.data?.type === 'RELEASE_INFO' && typeof value === 'string' && /^\d+\.\d+\.\d+$/.test(value) ? value : '');
+      };
+      channel.port1.onmessageerror = () => finish('');
+      worker.postMessage({type: 'GET_RELEASE_INFO'}, [channel.port2]);
+    } catch { finish(''); }
+  });
+  const renderUpdateVersion = () => {
+    status('appUpdateTarget', waitingVersion ? `更新先：v${waitingVersion}`
+      : versionResolved ? '更新先のバージョンを取得できませんでした。' : '更新先のバージョンを確認しています。');
+    status('applyAppUpdateBtn', waitingVersion ? `v${waitingVersion} に更新する` : '入力を確認して更新する');
+  };
   const showUpdate = () => {
+    const worker = registration?.waiting;
     const ready = byId('appUpdateReady');
-    if (ready) ready.hidden = !registration?.waiting;
-    if (registration?.waiting) status('appUpdateStatus', '更新できます。入力を保存してから切り替えてください。');
-    else status('appUpdateStatus', '');
+    if (ready) ready.hidden = !worker;
+    if (!worker) {
+      versionWorker = null; waitingVersion = ''; versionResolved = false;
+      status('appUpdateTarget', ''); status('applyAppUpdateBtn', '入力を確認して更新する');
+      status('appUpdateStatus', ''); return;
+    }
+    status('appUpdateStatus', '更新できます。入力を保存してから切り替えてください。');
+    if (versionWorker !== worker) {
+      versionWorker = worker; waitingVersion = ''; versionResolved = false;
+      requestVersion(worker).then(version => {
+        if (registration?.waiting !== worker || versionWorker !== worker) return;
+        waitingVersion = version; versionResolved = true; renderUpdateVersion();
+      });
+    }
+    renderUpdateVersion();
   };
   window.addEventListener('beforeinstallprompt', event => {
     event.preventDefault(); promptEvent = event; renderInstall();
@@ -53,7 +95,10 @@
     status('appUpdateStatus', '最新版を確認しています。');
     try {
       await registration.update();
-      if (registration.waiting) showUpdate();
+      if (registration.waiting) {
+        if (versionResolved && !waitingVersion) versionWorker = null;
+        showUpdate();
+      }
       else status('appUpdateStatus', registration.installing ? '新しい版を準備しています。' : '現在は最新の版です。');
     } catch { status('appUpdateStatus', '更新を確認できませんでした。通信できる時にもう一度試してください。'); }
   });

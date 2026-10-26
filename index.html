@@ -11,19 +11,20 @@
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
   <meta name="description" content="スノーボードの板・ビンディング・スタンスと滑走メモを記録。簡易入力と詳細入力、履歴、バックアップに対応。" />
   <title>スタンスメモ</title>
-  <link rel="stylesheet" href="style.css?v=1072">
-  <link rel="stylesheet" href="outdoor.css?v=1072">
-  <link rel="stylesheet" href="theme.css?v=1072">
-  <link rel="stylesheet" href="pwa.css?v=1072">
-  <link rel="stylesheet" href="board-suggestions.css?v=1072">
-  <link rel="stylesheet" href="detail.css?v=1072">
-  <link rel="stylesheet" href="history-views.css?v=1072">
-  <link rel="stylesheet" href="menu-ui.css?v=1072">
-  <link rel="stylesheet" href="tutorial.css?v=1072">
-  <link rel="stylesheet" href="menu-navigation.css?v=1072">
-  <link rel="stylesheet" href="ui-consistency.css?v=1072">
-  <script src="theme.js?v=1072"></script>
-  <script src="pwa.js?v=1072" defer></script>
+  <link rel="stylesheet" href="style.css?v=1078">
+  <link rel="stylesheet" href="outdoor.css?v=1078">
+  <link rel="stylesheet" href="theme.css?v=1078">
+  <link rel="stylesheet" href="pwa.css?v=1078">
+  <link rel="stylesheet" href="board-suggestions.css?v=1078">
+  <link rel="stylesheet" href="detail.css?v=1078">
+  <link rel="stylesheet" href="history-views.css?v=1078">
+  <link rel="stylesheet" href="menu-ui.css?v=1078">
+  <link rel="stylesheet" href="tutorial.css?v=1078">
+  <link rel="stylesheet" href="menu-navigation.css?v=1078">
+  <link rel="stylesheet" href="record-search.css?v=1078">
+  <link rel="stylesheet" href="ui-consistency.css?v=1078">
+  <script src="theme.js?v=1078"></script>
+  <script src="pwa.js?v=1078" defer></script>
 </head>
 <body data-menu-side="left">
 
@@ -279,16 +280,17 @@
   <div class="menu-head">
     <div>
       <p class="menu-eyebrow">STANCE MEMO</p>
-      <h2 class="menu-title">メニュー <small class="thumb-version">v2.0.0</small></h2>
+      <h2 class="menu-title">メニュー</h2>
     </div>
     <button id="menuCloseBtn" class="menu-close" type="button" aria-label="閉じる">×</button>
   </div>
 
-  <div class="menu-page-tabs" role="tablist" aria-label="メニューのカテゴリ">
+  <div class="thumb-menu-top"><div class="menu-page-tabs" role="tablist" aria-label="メニューのカテゴリ">
     <button id="menuTabFind" type="button" role="tab" data-menu-page="find" aria-controls="menuPageFind" aria-selected="false" tabindex="-1">探す</button>
     <button id="menuTabDisplay" type="button" role="tab" data-menu-page="display" aria-controls="menuPageDisplay" aria-selected="true">表示</button>
     <button id="menuTabData" type="button" role="tab" data-menu-page="data" aria-controls="menuPageData" aria-selected="false" tabindex="-1">データ<span id="menuUpdateBadge" class="menu-update-badge" hidden>更新あり</span></button>
   </div>
+  <p id="thumbSwipeStatus" class="thumb-swipe-status" role="status" aria-live="polite">探す · 左へスワイプで閉じる</p></div>
   <div class="menu-body">
   <div id="menuPageFind" class="menu-page" role="tabpanel" aria-labelledby="menuTabFind" tabindex="0" hidden>
 
@@ -341,9 +343,10 @@
       <p class="menu-note">Android・PC：Chrome／Edgeのメニューから「アプリをインストール」または「ホーム画面に追加」。iPhone／iPad：Safariの共有メニューから「ホーム画面に追加」を選びます。名称は端末によって異なります。</p>
     </details>
     <p id="offlineStatus" class="menu-note" role="status">オフラインで開く準備を確認しています。</p>
-    <div class="thumb-version-row"><span>現在のバージョン</span><strong id="appVersion">v2.0.0</strong></div>
+    <div class="thumb-version-row"><span>現在のバージョン</span><strong id="appVersion">v2.1.5</strong></div>
     <button id="checkAppUpdateBtn" type="button" class="menu-action">最新版を確認</button>
     <div id="appUpdateReady" class="app-update-ready" hidden>
+      <p id="appUpdateTarget" class="menu-note" role="status"></p>
       <p class="menu-note">新しい版があります。この画面や別のタブの入力を保存してから更新してください。</p>
       <button id="applyAppUpdateBtn" type="button" class="menu-action menu-primary">入力を確認して更新する</button>
     </div>
@@ -391,10 +394,6 @@
 
   </div>
   </div>
-<footer class="thumb-menu-footer" aria-label="親指で操作するメニュー">
- <p id="thumbSwipeStatus" class="thumb-swipe-status" role="status" aria-live="polite">本文を左右にスワイプして切り替え</p>
- <div id="thumbTabsMount"></div>
-</footer>
 </aside> 
   
   <div id="filtersPanel" class="menu-filters" hidden>
@@ -451,18 +450,19 @@
   <p>お気に入りの記録です。編集内容は保存前にもう一度確認できます。</p>
   <div class="history-confirm-actions"><button id="cancelFavoriteEdit" type="button" autofocus>キャンセル</button><button id="confirmFavoriteEdit" type="button">編集する</button></div>
 </dialog>
-<script src="detail.js?v=1072"></script>
-<script src="history-views.js?v=1072"></script>
-<script src="script.js?v=1072"></script>
-<script src="board-suggestions.js?v=1072"></script>
-<script src="menu-ui.js?v=1072"></script>
-<script src="menu-navigation.js?v=1072"></script>
-<script src="board-shape-history.js?v=1072"></script>
-<script src="history-stats.js?v=1072"></script>
-<script src="history-editor.js?v=1072"></script>
-<script src="draft-guard.js?v=1072"></script>
-<script src="history-tools.js?v=1072"></script>
-<script src="foot-dock.js?v=1072"></script>
+<script src="detail.js?v=1078"></script>
+<script src="history-views.js?v=1078"></script>
+<script src="script.js?v=1078"></script>
+<script src="board-suggestions.js?v=1078"></script>
+<script src="menu-ui.js?v=1078"></script>
+<script src="menu-navigation.js?v=1078"></script>
+<script src="board-shape-history.js?v=1078"></script>
+<script src="history-stats.js?v=1078"></script>
+<script src="history-editor.js?v=1078"></script>
+<script src="draft-guard.js?v=1078"></script>
+<script src="history-tools.js?v=1078"></script>
+<script src="record-search.js?v=1078"></script>
+<script src="foot-dock.js?v=1078"></script>
 
 <dialog id="tutorialDialog" class="tutorial-dialog" aria-labelledby="tutorialTitle" aria-describedby="tutorialText">
   <div id="tutorialShade" class="tutorial-shade" aria-hidden="true"></div>
@@ -474,7 +474,7 @@
     <footer><button id="skipTutorial" type="button">スキップ</button><div><button id="previousTutorial" type="button">戻る</button><button id="nextTutorial" type="button">次へ</button></div></footer>
   </section>
 </dialog>
-<script src="tutorial.js?v=1072"></script>
+<script src="tutorial.js?v=1078"></script>
 
 <div id="toast"></div>
   

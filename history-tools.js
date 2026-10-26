@@ -14,7 +14,8 @@ const HistoryTools = (() => {
     if(value.board!=='__ALL__')filters.push({kind:'board',label:value.board||'板名未入力'});
     if(value.stance)filters.push({kind:'stance',label:labels[value.stance]||value.stance});
     if(value.angle.left!==null||value.angle.right!==null)filters.push({kind:'angle',label:[value.angle.left!==null?`左 ${value.angle.left}°`:'',value.angle.right!==null?`右 ${value.angle.right}°`:'',`±${value.angle.tol}°`].filter(Boolean).join(' ')});
-    for(const key of ['shape','nose','bend']){const select=byId(`filter-${key}`);if(select?.value)filters.push({kind:'shape',key,label:select.options[select.selectedIndex].textContent});}
+    if(document.documentElement.dataset.inputMode==='detail')for(const key of ['shape','nose','bend']){const select=byId(`filter-${key}`);if(select?.value)filters.push({kind:'shape',key,label:select.options[select.selectedIndex].textContent});}
+    if(typeof RecordSearch!=='undefined')for(const filter of RecordSearch.active())filters.push({kind:'search',...filter});
     byId('historyResultCount').textContent=`${value.shown} / ${value.total}件`;
     byId('historyFilterState').textContent=(filters.length?'絞り込み中':'すべての履歴')+(value.savedOutsideFilter?'・保存した1件を一時表示':'');
     byId('clearHistoryFilters').hidden=filters.length===0;
@@ -23,6 +24,7 @@ const HistoryTools = (() => {
     chips.hidden=filters.length===0;schedule();
   }
   function clear(filter){
+    if(filter.kind==='search'){RecordSearch.clear(filter.key);byId('historyFiltersButton').focus({preventScroll:true});return;}
     if(filter.kind==='board'){selectedBoard='__ALL__';saveUI();}
     if(filter.kind==='stance'){stanceFilter='';saveUI();}
     if(filter.kind==='angle'){byId('angleClear').click();byId('historyFiltersButton').focus({preventScroll:true});return;}
@@ -30,6 +32,7 @@ const HistoryTools = (() => {
     render();byId('historyFiltersButton').focus({preventScroll:true});
   }
   byId('clearHistoryFilters').addEventListener('click',()=>{
+    if(typeof RecordSearch!=='undefined')RecordSearch.clearAll(false);
     selectedBoard='__ALL__';stanceFilter='';angleFilter={left:null,right:null,tol:angleFilter.tol};
     byId('angleLeft').value='';byId('angleRight').value='';
     for(const key of ['shape','nose','bend']){const select=byId(`filter-${key}`);select.value='';select.dispatchEvent(new Event('change',{bubbles:true}));}

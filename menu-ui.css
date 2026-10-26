@@ -32,10 +32,8 @@
 #menuPanel .menu-gesture-guide[open]>summary::before{content:'▾'}
 #menuPanel .menu-gesture-guide>summary::-webkit-details-marker{display:none}
 #menuPanel .menu-shape-filter{margin-top:12px;padding-top:0}
-#menuPanel .menu-shape-filter>summary{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;padding:10px 0;cursor:pointer;list-style:none;font-size:14px;font-weight:650;color:var(--outdoor-ink)}
-#menuPanel .menu-shape-filter>summary::-webkit-details-marker{display:none}
-#menuPanel .menu-shape-filter>summary::before{content:'▸';font-weight:400}
-#menuPanel .menu-shape-filter[open]>summary::before{content:'▾'}
+#menuPanel .shape-filter-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:12px 0 8px;color:var(--outdoor-ink)}
+#menuPanel .shape-filter-head h3{margin:0;font-size:14px;font-weight:650}
 #menuPanel #shapeFilterCount{margin-left:auto;color:var(--outdoor-muted);font-size:12px;font-weight:500}
 #menuPanel .menu-shape-filter[data-active="true"] #shapeFilterCount{color:var(--outdoor-blue);font-weight:650}
 #menuPanel .menu-shape-filter .detail-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}

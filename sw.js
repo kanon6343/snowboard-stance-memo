@@ -1,5 +1,6 @@
 /* Release shell: bump RELEASE and every versioned index.html asset together. */
-const RELEASE = '1072';
+const RELEASE = '1078';
+const APP_VERSION = '2.1.5';
 const BASE = new URL('./', self.registration.scope);
 const CACHE_PREFIX = `snowboard-stance-main:${BASE.href}:`;
 const CACHE_NAME = `${CACHE_PREFIX}${RELEASE}`;
@@ -12,19 +13,22 @@ const SHELL = [
   `history-views.css?v=${RELEASE}`, `history-views.js?v=${RELEASE}`,
   `ui-consistency.css?v=${RELEASE}`,
   `menu-ui.css?v=${RELEASE}`, `menu-ui.js?v=${RELEASE}`,
-  `menu-navigation.css?v=${RELEASE}`, `menu-navigation.js?v=${RELEASE}`,
   `board-shape-history.js?v=${RELEASE}`,
   `history-stats.js?v=${RELEASE}`,
   `history-editor.js?v=${RELEASE}`,
   `draft-guard.js?v=${RELEASE}`, `history-tools.js?v=${RELEASE}`,
   `tutorial.css?v=${RELEASE}`, `tutorial.js?v=${RELEASE}`,
   `foot-dock.js?v=${RELEASE}`,
+  `menu-navigation.js?v=${RELEASE}`, `menu-navigation.css?v=${RELEASE}`,
+  `record-search.js?v=${RELEASE}`, `record-search.css?v=${RELEASE}`,
   'icons/icon-192.png', 'icons/icon-512.png',
   'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png',
 ].map(path => new URL(path, BASE).href);
 const SHELL_URLS = new Set(SHELL);
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(SHELL)));
+  // Refresh the HTTP cache too, so an old unversioned index.html cannot be
+  // copied into the newly installed offline shell.
+  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(SHELL.map(url => new Request(url, {cache: 'reload'})))));
 });
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
@@ -34,6 +38,9 @@ self.addEventListener('activate', event => {
   })());
 });
 self.addEventListener('message', event => {
+  if (event.data?.type === 'GET_RELEASE_INFO') {
+    event.ports?.[0]?.postMessage({type: 'RELEASE_INFO', version: APP_VERSION, release: RELEASE});
+  }
   if (event.data?.type === 'ACTIVATE_UPDATE') self.skipWaiting();
 });
 self.addEventListener('fetch', event => {

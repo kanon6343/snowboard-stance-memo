@@ -158,6 +158,7 @@ function saveUI(){
 }
 
 function resetAllFiltersAndSort(){
+  if (typeof RecordSearch !== "undefined") RecordSearch.clearAll(false);
   selectedBoard = "__ALL__";
   favSortOn = false;
 
@@ -657,7 +658,7 @@ function renderRefSlots() {
 }
 
 function historyFilterKey() {
-  return JSON.stringify([selectedBoard, stanceFilter, angleFilter, ...["filter-shape", "filter-nose", "filter-bend"].map(id => document.getElementById(id)?.value || "")]);
+  return JSON.stringify([document.documentElement.dataset.inputMode, typeof RecordSearch === "undefined" ? null : RecordSearch.signature(), selectedBoard, stanceFilter, angleFilter, ...["filter-shape", "filter-nose", "filter-bend"].map(id => document.getElementById(id)?.value || "")]);
 }
 function focusSavedHistory(id) {
   const button = Array.from(historyDiv.querySelectorAll("button[data-load-id]")).find(button => String(button.dataset.loadId) === String(id));
@@ -675,12 +676,14 @@ function focusSavedHistory(id) {
 // ===== render =====
 function render() {
   const all = loadList();
+  if (typeof RecordSearch !== "undefined") RecordSearch.refreshSuggestions(all);
   syncEditorSummary();
 
   let list =
     (selectedBoard === "__ALL__") ? all
     : all.filter(x => (x.board || "").trim() === selectedBoard);
   list = list.filter(item => DetailEditor.matches(item.detail));
+  if (typeof RecordSearch !== "undefined") list = list.filter(item => RecordSearch.matches(item));
 
   // スタンス絞り込み
   if (stanceFilter) {
