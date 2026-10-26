@@ -1,0 +1,14 @@
+#menuPanel .record-width-filter{border-top:1px solid var(--outdoor-border);padding-top:12px}
+#menuPanel #btnFilterClear{margin-top:14px;width:100%}
+#menuPanel .record-search-heading{font:650 13px/1.5 system-ui;color:var(--outdoor-ink)}
+#menuPanel .record-width-range{display:grid;grid-template-columns:minmax(0,1fr) 16px minmax(0,1fr);gap:6px;align-items:end;margin-top:6px}
+#menuPanel .record-width-range>span{align-self:center;text-align:center;padding-top:18px}
+#menuPanel :is(.record-width-range,.record-gear-filters) label{display:block;min-width:0;color:var(--outdoor-muted);font:650 13px/1.5 system-ui}
+#menuPanel :is(.record-width-range,.record-gear-filters) :is(input,select){box-sizing:border-box;display:block;width:100%;min-width:0;height:44px;margin:5px 0 0;padding:8px;border:2px solid var(--outdoor-border);border-radius:9px;background:var(--menu-field);color:var(--outdoor-ink);font:500 16px/1.4 system-ui}
+#menuPanel .record-gear-filters{margin-top:12px;padding-top:12px;border-top:1px solid var(--outdoor-border)}
+#menuPanel .record-gear-filters[hidden],#menuPanel .menu-shape-filter[hidden]{display:none!important}
+#menuPanel .record-disk-filter{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:8px;margin-top:12px}
+#menuPanel .record-gear-filters .menu-note{margin-top:8px}
+#menuPanel .record-search-error{font:500 12px/1.5 system-ui;color:#9c2424;margin-top:8px}
+:root[data-theme="dark"] #menuPanel .record-search-error{color:#ffb7b7}
+#menuPanel :is(.record-width-range,.record-gear-filters) input::placeholder{font-weight:400;color:var(--ui-unset-ink)}

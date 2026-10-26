@@ -1,5 +1,5 @@
 /* Release shell: bump RELEASE and every versioned index.html asset together. */
-const RELEASE = '1069';
+const RELEASE = '1072';
 const BASE = new URL('./', self.registration.scope);
 const CACHE_PREFIX = `snowboard-stance-haru-detail:${BASE.href}:`;
 const CACHE_NAME = `${CACHE_PREFIX}${RELEASE}`;
@@ -18,6 +18,8 @@ const SHELL = [
   `draft-guard.js?v=${RELEASE}`, `history-tools.js?v=${RELEASE}`,
   `tutorial.css?v=${RELEASE}`, `tutorial.js?v=${RELEASE}`,
   `foot-dock.js?v=${RELEASE}`,
+  `menu-navigation.js?v=${RELEASE}`, `menu-navigation.css?v=${RELEASE}`,
+  `record-search.js?v=${RELEASE}`, `record-search.css?v=${RELEASE}`,
   'icons/icon-trial-192.png', 'icons/icon-trial-512.png',
   'icons/icon-trial-maskable-512.png', 'icons/apple-touch-icon-trial.png',
 ].map(path => new URL(path, BASE).href);

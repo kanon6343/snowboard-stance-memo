@@ -184,6 +184,7 @@ function saveUI(){
 }
 
 function resetAllFiltersAndSort(){
+  if (typeof RecordSearch !== "undefined") RecordSearch.clearAll(false);
   selectedBoard = "__ALL__";
   favSortOn = false;
 
@@ -683,7 +684,7 @@ function renderRefSlots() {
 }
 
 function historyFilterKey() {
-  return JSON.stringify([selectedBoard, stanceFilter, angleFilter, ...["filter-shape", "filter-nose", "filter-bend"].map(id => document.getElementById(id)?.value || "")]);
+  return JSON.stringify([document.documentElement.dataset.inputMode, typeof RecordSearch === "undefined" ? null : RecordSearch.signature(), selectedBoard, stanceFilter, angleFilter, ...["filter-shape", "filter-nose", "filter-bend"].map(id => document.getElementById(id)?.value || "")]);
 }
 function focusSavedHistory(id) {
   const button = Array.from(historyDiv.querySelectorAll("button[data-load-id]")).find(button => String(button.dataset.loadId) === String(id));
@@ -701,12 +702,14 @@ function focusSavedHistory(id) {
 // ===== render =====
 function render() {
   const all = loadList();
+  if (typeof RecordSearch !== "undefined") RecordSearch.refreshSuggestions(all);
   syncEditorSummary();
 
   let list =
     (selectedBoard === "__ALL__") ? all
     : all.filter(x => (x.board || "").trim() === selectedBoard);
   list = list.filter(item => DetailEditor.matches(item.detail));
+  if (typeof RecordSearch !== "undefined") list = list.filter(item => RecordSearch.matches(item));
 
   // スタンス絞り込み
   if (stanceFilter) {
@@ -1216,11 +1219,14 @@ const MenuControls = {};
     try { localStorage.setItem(sideKey, menuSide); } catch {}
   });
 
-  function open(){
+  function open(options = {}){
     closeTouch = null;
     clearTimeout(closeTimer);
     clearDragVisuals();
-    if (!panel.classList.contains("open")) returnFocus = document.activeElement;
+    if (!panel.classList.contains("open")) {
+      returnFocus = document.activeElement;
+      MenuControls.prepareOpen?.(options);
+    }
     overlay.hidden = false;
     panel.inert = false;
     panel.classList.add("open");
@@ -1296,9 +1302,9 @@ const MenuControls = {};
     if (!event.isPrimary) return;
     const isOpen = panel.classList.contains("open");
     // Touch dismissal uses the reference-style handlers below, not pointer capture.
-    if (isOpen && event.pointerType === "touch") return;
+    // Prototype: body pages own navigation; the bottom handle owns dismissal.
     // Dismiss by grabbing the drawer itself, not by dragging the dimmed backdrop.
-    if (isOpen && !panel.contains(event.target)) return;
+    if (isOpen) return; // The menu body owns page switching and dismissal.
     const onControl = event.target.closest("input, textarea, select, button, a, summary");
     const onMenuButton = btn.contains(event.target);
     if (!isOpen && onControl && !onMenuButton) return;
@@ -1348,61 +1354,13 @@ const MenuControls = {};
   document.addEventListener("pointercancel", event => {
     if (swipe?.id === event.pointerId) finishSwipe(true, event);
   }, { passive: true });
-  panel.addEventListener("lostpointercapture", () => finishSwipe(true));
+  // A child losing implicit touch capture during transfer is not panel loss.
+  panel.addEventListener("lostpointercapture", event => {
+    if (event.target === panel && swipe?.id === event.pointerId) finishSwipe(true);
+  });
   window.addEventListener("blur", () => { closeTouch = null; finishSwipe(true); });
   window.addEventListener("resize", () => { closeTouch = null; finishSwipe(true); });
 
-  // PhotoAI-style touch dismissal: swipe anywhere inside, then close on release.
-  // Unlike the reference, buttons are included; editing controls remain native.
-  panel.addEventListener("touchstart", event => {
-    closeTouch = null;
-    if (!panel.classList.contains("open") || event.touches.length !== 1) return;
-    if (event.target.closest("input, select, textarea, canvas, [contenteditable], [role='slider']")) return;
-    const touch = event.touches[0];
-    closeTouch = {
-      id: touch.identifier, x: touch.clientX, y: touch.clientY,
-      started: event.timeStamp, direction: menuSide === "left" ? -1 : 1,
-      horizontal: false,
-    };
-  }, { passive: true });
-  panel.addEventListener("touchmove", event => {
-    const start = closeTouch;
-    if (!start) return;
-    const touch = event.touches[0];
-    if (!panel.classList.contains("open") || event.touches.length !== 1 ||
-        touch.identifier !== start.id || event.timeStamp - start.started > 1500) {
-      closeTouch = null;
-      return;
-    }
-    const dx = (touch.clientX - start.x) * start.direction;
-    const dy = Math.abs(touch.clientY - start.y);
-    if (dx < -10 || (dy >= 12 && dx < dy * 1.8)) {
-      closeTouch = null;
-      return;
-    }
-    if (dx >= 12 && dx >= dy * 1.8) {
-      start.horizontal = true;
-      if (event.cancelable) event.preventDefault();
-    }
-  }, { passive: false });
-  panel.addEventListener("touchend", event => {
-    const start = closeTouch;
-    closeTouch = null;
-    if (!start?.horizontal || !panel.classList.contains("open") || event.touches.length ||
-        event.timeStamp - start.started > 1500) return;
-    const touch = Array.from(event.changedTouches).find(item => item.identifier === start.id);
-    if (!touch) return;
-    // A swipe must not activate the button or link it started on, even if too short.
-    suppressSwipeClickUntil = performance.now() + 350;
-    if (event.cancelable) event.preventDefault();
-    const dx = (touch.clientX - start.x) * start.direction;
-    const dy = Math.abs(touch.clientY - start.y);
-    if (dx >= 64 && dx >= dy * 1.8) close();
-  }, { passive: false });
-  panel.addEventListener("touchcancel", () => { closeTouch = null; }, { passive: true });
-  document.addEventListener("touchstart", event => {
-    if (event.touches.length !== 1) closeTouch = null;
-  }, { passive: true });
   document.addEventListener("click", event => {
     if (event.detail === 0 || performance.now() >= suppressSwipeClickUntil) return;
     event.preventDefault();

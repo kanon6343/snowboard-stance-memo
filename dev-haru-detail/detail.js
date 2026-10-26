@@ -192,7 +192,7 @@ const DetailEditor = (() => {
   const retained = () => {byId('detailRetained').hidden=mode==='detail'||!DetailData.has(collect());for(const side of ['left','right'])byId(`heelcup-legacy-${side}`).hidden=!heelcupRecorded[side]||!!byId(`heelcup-${side}-inner`).value.trim()||!!byId(`heelcup-${side}-outer`).value.trim();if(typeof MenuPresentation!=='undefined')MenuPresentation.syncHints();};
   const persist = (key,value) => {try{localStorage.setItem(key,value);return true;}catch{return false;}};
   const applyMode = (next,save=false) => {
-    mode=next==='detail'?'detail':'simple';sections.forEach(section=>section.hidden=mode!=='detail');select.value=mode;document.documentElement.dataset.inputMode=mode;retained();
+    mode=next==='detail'?'detail':'simple';sections.forEach(section=>section.hidden=mode!=='detail');select.value=mode;document.documentElement.dataset.inputMode=mode;controls.hidden=mode!=='detail';retained();if(typeof RecordSearch!=='undefined')RecordSearch.syncMode();
     byId('inputTab').textContent=mode==='detail'?'詳細入力':'簡易入力';
     const saved=!save||persist(modeKey,mode);
     byId('inputModeStatus').textContent=saved?'簡易入力に戻しても詳細データは消えません。':'画面は切り替えましたが、入力モードの設定を保存できませんでした。';
@@ -264,5 +264,5 @@ const DetailEditor = (() => {
   }
   panel.querySelectorAll('input[type="number"]').forEach(el=>el.addEventListener('input',()=>el.setCustomValidity('')));
   write({});applyMode(mode);filterStatus();
-  return {read,write,snapshot:collect,refresh:retained,setMode:(next,save=true)=>applyMode(next,save),clear:()=>write({}),matches:value=>DetailData.matches(value,filters),historyHtml:DetailData.historyHtml,applyBindingProfile};
+  return {read,write,snapshot:collect,refresh:retained,setMode:(next,save=true)=>applyMode(next,save),clear:()=>write({}),matches:value=>mode!=='detail'||DetailData.matches(value,filters),historyHtml:DetailData.historyHtml,applyBindingProfile};
 })();
