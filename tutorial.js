@@ -100,7 +100,7 @@ const AppTutorial = (() => {
       if(sampleRecallLayout!==null){DetailHistoryView.previewLayout(sampleRecallLayout,false);sampleRecallLayout=null;}
     }
   }
-  function menu(open,page){if(page)MenuPresentation.choose(page);const current=byId('menuPanel').classList.contains('open');if(open!==current)MenuControls[open?'open':'close']();}
+  function menu(open,page){if(page)MenuPresentation.choose(page,false,false);const current=byId('menuPanel').classList.contains('open');if(open!==current){if(open)MenuControls.open({preservePage:true});else MenuControls.close();}}
   const targetFor=step=>resolve(step.target)||(step.empty?null:resolve(step.fallback||'#inputTab'));
   function paint(){
     frame=0;if(!state)return;
