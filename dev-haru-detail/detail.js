@@ -264,5 +264,5 @@ const DetailEditor = (() => {
   }
   panel.querySelectorAll('input[type="number"]').forEach(el=>el.addEventListener('input',()=>el.setCustomValidity('')));
   write({});applyMode(mode);filterStatus();
-  return {read,write,snapshot:collect,refresh:retained,setMode:next=>applyMode(next,true),clear:()=>write({}),matches:value=>DetailData.matches(value,filters),historyHtml:DetailData.historyHtml,applyBindingProfile};
+  return {read,write,snapshot:collect,refresh:retained,setMode:(next,save=true)=>applyMode(next,save),clear:()=>write({}),matches:value=>DetailData.matches(value,filters),historyHtml:DetailData.historyHtml,applyBindingProfile};
 })();

@@ -4,9 +4,9 @@ const HistoryTools = (() => {
   const labels={duck:'ダック',forward:'前振り',back:'後振り',none:'スタンス未設定'};
   let queued=false;
   function position(){
-    queued=false;const top=sentinel.getBoundingClientRect().top,offset=parseFloat(getComputedStyle(dock).top)||0,visible=sentinel.getClientRects().length>0;
+    queued=false;const style=getComputedStyle(dock),top=sentinel.getBoundingClientRect().top,offset=parseFloat(style.top)||0,visible=sentinel.getClientRects().length>0;
     dock.classList.toggle('is-stuck',visible&&top<offset);dock.classList.toggle('is-near-top',visible&&top<offset+54);
-    if(visible)document.documentElement.style.setProperty('--history-dock-height',`${dock.getBoundingClientRect().height+20}px`);
+    if(visible){const surround=parseFloat(style.getPropertyValue('--history-dock-surround'))||10,gap=parseFloat(style.getPropertyValue('--history-card-gap'))||16;document.documentElement.style.setProperty('--history-dock-height',`${Math.max(0,offset)+dock.getBoundingClientRect().height+surround+gap}px`);}
   }
   function schedule(){if(!queued){queued=true;requestAnimationFrame(position);}}
   function sync(value){
@@ -16,7 +16,7 @@ const HistoryTools = (() => {
     if(value.angle.left!==null||value.angle.right!==null)filters.push({kind:'angle',label:[value.angle.left!==null?`左 ${value.angle.left}°`:'',value.angle.right!==null?`右 ${value.angle.right}°`:'',`±${value.angle.tol}°`].filter(Boolean).join(' ')});
     for(const key of ['shape','nose','bend']){const select=byId(`filter-${key}`);if(select?.value)filters.push({kind:'shape',key,label:select.options[select.selectedIndex].textContent});}
     byId('historyResultCount').textContent=`${value.shown} / ${value.total}件`;
-    byId('historyFilterState').textContent=filters.length?'絞り込み中':'すべての履歴';
+    byId('historyFilterState').textContent=(filters.length?'絞り込み中':'すべての履歴')+(value.savedOutsideFilter?'・保存した1件を一時表示':'');
     byId('clearHistoryFilters').hidden=filters.length===0;
     const chips=byId('historyFilterChips');chips.replaceChildren();
     for(const filter of filters){const button=document.createElement('button');button.type='button';button.className='history-filter-chip';button.textContent=filter.label+' ×';button.setAttribute('aria-label',filter.label+'の絞り込みを解除');button.addEventListener('click',()=>clear(filter));chips.appendChild(button);}

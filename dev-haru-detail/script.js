@@ -13,6 +13,7 @@ const KEY_PREFIX = IS_DETAIL ? "haru-detail:" : IS_HARU ? "haru:" : (IS_DEV ? "d
 // 既存キー名は維持しつつ prefix だけ付ける
 const KEY    = `${KEY_PREFIX}snowboard-history-v1`;
 const UI_KEY = `${KEY_PREFIX}snowboard-ui-v1`;
+const VIEW_KEY = `${KEY_PREFIX}last-view-v1`;
 
 // ===== 任意：初回だけ prod -> dev をコピーする =====
 if (IS_DEV && !IS_DETAIL) {
@@ -78,6 +79,7 @@ const angleClearEl = document.getElementById("angleClear");
 
 // ===== state =====
 let selectedBoard = "__ALL__";
+let savedHistoryReveal = null;
 let stanceFilter = ""; // ""=未選択 / "duck" / "forward" / "back" / "none"(未設定)
 
 let favSortOn = false;       // ★を上に
@@ -407,7 +409,10 @@ saveBtn?.addEventListener("click", () => {
   list.unshift(item);
   if (!writeHistoryList(list)) return;
   if (typeof DraftGuard !== "undefined") DraftGuard.reset();
+  savedHistoryReveal = { id: String(item.id), filters: historyFilterKey() };
   render();
+  showView("history");
+  focusSavedHistory(item.id);
   showToast("保存しました", "success");
 });
 
@@ -455,7 +460,8 @@ function syncEditorSummary() {
   if (commentState) commentState.textContent = commentEl?.value.trim() || hasDetailNote ? "入力あり" : "任意";
 }
 
-function showView(view) {
+function showView(view, persist = true) {
+  if (view !== "input" && view !== "history") return;
   document.querySelectorAll("[data-view]").forEach(button => {
     const active = button.dataset.view === view;
     button.setAttribute("aria-selected", String(active));
@@ -464,6 +470,15 @@ function showView(view) {
   });
   if (view === "input") renderRefSlots();
   if (view === "history" && typeof HistoryTools !== "undefined") HistoryTools.position();
+  if (persist && document.documentElement.dataset.tutorialActive !== "true") {
+    try { if (localStorage.getItem(VIEW_KEY) !== view) localStorage.setItem(VIEW_KEY, view); } catch {}
+  }
+}
+
+function restoreLastView() {
+  let view = "input";
+  try { const saved = localStorage.getItem(VIEW_KEY); if (saved === "input" || saved === "history") view = saved; } catch {}
+  showView(view, false);
 }
 
 function showFoot(side) {
@@ -667,6 +682,22 @@ function renderRefSlots() {
   });
 }
 
+function historyFilterKey() {
+  return JSON.stringify([selectedBoard, stanceFilter, angleFilter, ...["filter-shape", "filter-nose", "filter-bend"].map(id => document.getElementById(id)?.value || "")]);
+}
+function focusSavedHistory(id) {
+  const button = Array.from(historyDiv.querySelectorAll("button[data-load-id]")).find(button => String(button.dataset.loadId) === String(id));
+  const card = button?.closest("[data-dh-record], .history-card");
+  if (!card) { document.getElementById("historyTab")?.focus(); return false; }
+  card.tabIndex = -1;
+  card.classList.add("saved-record-highlight");
+  card.focus({ preventScroll: true });
+  const reduced = typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  card.scrollIntoView({ block: "start", inline: "nearest", behavior: reduced ? "auto" : "smooth" });
+  setTimeout(() => card.classList.remove("saved-record-highlight"), 2400);
+  return true;
+}
+
 // ===== render =====
 function render() {
   const all = loadList();
@@ -729,6 +760,14 @@ function render() {
     }
   });
 
+  const savedReveal = typeof savedHistoryReveal !== "undefined" ? savedHistoryReveal : null;
+  const filterUnchanged = savedReveal && savedReveal.filters === historyFilterKey();
+  if (savedReveal && !filterUnchanged) savedHistoryReveal = null;
+  const savedItem = filterUnchanged ? all.find(item => String(item.id) === savedReveal.id) : null;
+  const savedOutsideFilter = !!savedItem && !list.some(item => String(item.id) === savedReveal.id);
+  if (savedOutsideFilter) list.unshift(savedItem);
+  const savedNotice = savedOutsideFilter ? `<section class="saved-reveal-notice" role="status"><p>保存したメモは現在の絞り込み対象外のため、今回の1件を一時表示しています。</p><button type="button" data-dismiss-saved="">絞り込み結果に戻る</button></section>` : "";
+
   const detailHistoryOpen = typeof DetailHistoryView !== "undefined" ? DetailHistoryView.capture() : null;
   historyDiv.innerHTML = "";
 
@@ -737,7 +776,7 @@ function render() {
   renderRefSlots();
 
   if (typeof DetailHistoryView !== "undefined") DetailHistoryView.sync();
-  if (typeof HistoryTools !== "undefined") HistoryTools.sync({total:all.length,shown:list.length,board:selectedBoard,stance:stanceFilter,angle:angleFilter});
+  if (typeof HistoryTools !== "undefined") HistoryTools.sync({total:all.length,shown:list.length,savedOutsideFilter,board:selectedBoard,stance:stanceFilter,angle:angleFilter});
 
   if (list.length === 0) {
     const hasSavedItems = loadList().length > 0;
@@ -752,9 +791,15 @@ function render() {
   }
 
   if (typeof DetailHistoryView !== "undefined" && DetailHistoryView.active()) {
-    historyDiv.innerHTML = DetailHistoryView.render(list);
+    historyDiv.innerHTML = savedNotice + DetailHistoryView.render(list);
     DetailHistoryView.restore(detailHistoryOpen);
   } else {
+  if (savedNotice) {
+    const notice = document.createElement("section");
+    notice.className = "saved-reveal-container";
+    notice.innerHTML = savedNotice;
+    historyDiv.appendChild(notice);
+  }
   list.forEach((item) => {
     const card = document.createElement("section");
     card.className = "card history-card";
@@ -787,7 +832,7 @@ function render() {
       <header class="history-card-head">
         <div class="history-card-heading">
           <h3 class="history-board">${escapeHtml(boardLabel)}</h3>
-          <p class="history-meta history-meta-compact"><span>${escapeHtml(metadata)}</span><span>${escapeHtml(snowLabel)}</span>${stanceLabel ? `<span class="stance-tag">${escapeHtml(stanceLabel)}</span>` : ""}</p>
+          <p class="history-meta history-meta-compact"><span>${escapeHtml(metadata)}</span><span>${escapeHtml(snowLabel)}</span>${stanceLabel || stanceWidth ? `<span class="history-stance-pair">${stanceLabel ? `<span class="stance-tag">${escapeHtml(stanceLabel)}</span>` : ""}${stanceWidth ? `<span class="stance-width-tag">幅 ${escapeHtml(stanceWidth)} cm</span>` : ""}</span>` : ""}</p>
         </div>
         <button
           type="button"
@@ -809,10 +854,7 @@ function render() {
       </div>
       ${detailParts.feet}
 
-      ${stanceWidth || detailParts.stance ? `<div class="history-stance ${!stanceWidth ? 'detail-history-inline' : ''}">
-        ${stanceWidth ? `<span class="stance-width-tag">幅 ${escapeHtml(stanceWidth)} cm</span>` : ""}
-        ${detailParts.stance}
-      </div>` : ""}
+      ${detailParts.stance ? `<div class="history-stance detail-history-inline">${detailParts.stance}</div>` : ""}
       ${commentText ? `<div class="comment">${escapeHtml(commentText)}</div>` : ""}
       ${detailParts.note}
 
@@ -839,6 +881,10 @@ function render() {
     historyDiv.appendChild(card);
   });
   }
+
+  historyDiv.querySelectorAll("button[data-dismiss-saved]").forEach(button => button.addEventListener("click", () => {
+    savedHistoryReveal = null; render(); document.getElementById("historyTab")?.focus();
+  }));
 
   // ★お気に入り切替
   historyDiv.querySelectorAll("[data-fav-id]").forEach(btn => {
@@ -1132,6 +1178,7 @@ function exportBackup() {
 }
 
 // ===== 右スライドメニュー（A+ 完全版）=====
+const MenuControls = {};
 (function setupSlideMenu(){
   const btn = document.getElementById("menuBtn");
   const closeBtn = document.getElementById("menuCloseBtn");
@@ -1205,6 +1252,7 @@ function exportBackup() {
     panel.style.removeProperty("transform");
     overlay.style.removeProperty("opacity");
   }
+  if (typeof MenuControls !== "undefined") Object.assign(MenuControls, {open,close,returnFocus:()=>returnFocus,restoreReturnFocus:element=>{returnFocus=element;}});
 
   function paintSwipe() {
     dragFrame = 0;
@@ -1733,6 +1781,7 @@ function formatDateJP(iso){
 // ===== start =====
 setupCompactEditor();
 render();
+restoreLastView();
 
 // ===== dev footer（devのときだけ表示）=====
 (function setupDevFooter(){

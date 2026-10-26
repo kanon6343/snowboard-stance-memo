@@ -20,11 +20,11 @@ body[data-menu-side="right"] #setupCard .foot-dock.is-near-top .foot-tabs{margin
 #setupCard .foot-dock.is-near-top .foot-summary{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 body:has(#footDock.is-stuck) .menu-btn{top:calc(max(8px,env(safe-area-inset-top,0px)) + 10px)}
 #setupCard .foot-dock.is-stuck::before{content:"";position:absolute;z-index:-1;top:calc(0px - var(--foot-dock-offset));bottom:-10px;left:50%;width:100vw;transform:translateX(-50%);background:var(--menu-surface,#fff);border-bottom:1px solid var(--outdoor-border);box-shadow:0 4px 12px #152d3b1f}
-.history-dock{--dock-offset:max(8px,env(safe-area-inset-top,0px));--menu-clearance:max(0px,calc(68px - (100vw - 100%) / 2));position:sticky;top:var(--dock-offset);z-index:30;margin:0 0 12px;color:var(--outdoor-ink)}
+.history-dock{--history-dock-surround:10px;--history-card-gap:16px;--dock-offset:max(8px,env(safe-area-inset-top,0px));--menu-clearance:max(0px,calc(68px - (100vw - 100%) / 2));position:sticky;top:var(--dock-offset);z-index:30;margin:0 0 12px;color:var(--outdoor-ink)}
 .history-dock-content{position:relative;z-index:0;min-width:0;padding:6px 10px;border:1px solid var(--outdoor-border);border-radius:12px;background:var(--menu-surface,#fff)}
 .history-dock.is-near-top .history-dock-content{margin-left:var(--menu-clearance)}
 body[data-menu-side="right"] .history-dock.is-near-top .history-dock-content{margin-left:0;margin-right:var(--menu-clearance)}
-.history-dock.is-stuck::before{content:"";position:absolute;z-index:-1;top:calc(0px - var(--dock-offset));bottom:-10px;left:50%;width:100vw;transform:translateX(-50%);background:var(--menu-surface,#fff);border-bottom:1px solid var(--outdoor-border);box-shadow:0 4px 12px #152d3b1f}
+.history-dock.is-stuck::before{content:"";position:absolute;z-index:-1;top:calc(0px - var(--dock-offset));bottom:calc(0px - var(--history-dock-surround));left:50%;width:100vw;transform:translateX(-50%);background:var(--menu-surface,#fff);border-bottom:1px solid var(--outdoor-border);box-shadow:0 4px 12px #152d3b1f}
 body:has(#historyDock.is-stuck) .menu-btn{top:calc(max(8px,env(safe-area-inset-top,0px)) + 10px)}
 .history-result-row{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:48px}
 .history-result-text{min-width:0;display:flex;flex-direction:column;gap:3px;font-size:12px;line-height:1.3;color:var(--outdoor-muted)}
@@ -179,3 +179,12 @@ body:has(#historyDock.is-stuck) .menu-btn{top:calc(max(8px,env(safe-area-inset-t
 .detail-filters h4{font-size:14px;margin:0 0 10px;}.detail-filters label{margin-bottom:10px;}
 :root[data-theme="dark"] .detail-inline :is(input,select,textarea),:root[data-theme="dark"] .detail-filters select{background:var(--night-field);}
 @media(max-width:350px){.detail-board .detail-grid{grid-template-columns:repeat(2,minmax(0,1fr));}.detail-setback .detail-grid{grid-template-columns:repeat(2,minmax(0,1fr));}.detail-setback .detail-grid>label:first-child{grid-column:1/-1;}}
+
+.history-meta-compact .history-stance-pair{display:inline-flex;flex-wrap:wrap;align-items:center;gap:4px 6px}
+.history-meta-compact .stance-width-tag{padding:2px 6px;font-size:13px;line-height:1.4;white-space:nowrap}
+
+#history :is([data-dh-record],.history-card).saved-record-highlight{outline:3px solid var(--outdoor-amber);outline-offset:3px;animation:saved-record-confirm 2.4s ease-out}
+@keyframes saved-record-confirm{0%,65%{outline-color:var(--outdoor-amber)}100%{outline-color:transparent}}
+@media(prefers-reduced-motion:reduce){#history :is([data-dh-record],.history-card).saved-record-highlight{animation:none}}
+.saved-reveal-notice{display:grid;gap:8px;margin:0 0 14px;padding:12px;border:1px solid var(--outdoor-border);border-left:4px solid var(--outdoor-amber);border-radius:10px;background:var(--menu-field,#edf3f6);color:var(--outdoor-ink)}
+.saved-reveal-notice p{margin:0;font-size:13px;line-height:1.5}.saved-reveal-notice button{justify-self:start;max-width:100%;min-height:44px;padding:8px 10px;border:1px solid var(--outdoor-border);border-radius:8px;background:var(--menu-surface,#fff);color:var(--outdoor-ink);font:600 13px/1.4 var(--ui-font,system-ui)}
