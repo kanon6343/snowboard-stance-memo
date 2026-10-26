@@ -2,28 +2,75 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="スノーボードのスタンスと滑走メモを板ごとに記録するアプリ" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#075579" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="スタンスメモ" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icons/icon-192.png" type="image/png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="description" content="スノーボードの板・ビンディング・スタンスと滑走メモを記録。簡易入力と詳細入力、履歴、バックアップに対応。" />
   <title>スタンスメモ</title>
-  <link rel="stylesheet" href="style.css?v=31">
+  <link rel="stylesheet" href="style.css?v=1070">
+  <link rel="stylesheet" href="outdoor.css?v=1070">
+  <link rel="stylesheet" href="theme.css?v=1070">
+  <link rel="stylesheet" href="pwa.css?v=1070">
+  <link rel="stylesheet" href="board-suggestions.css?v=1070">
+  <link rel="stylesheet" href="detail.css?v=1070">
+  <link rel="stylesheet" href="history-views.css?v=1070">
+  <link rel="stylesheet" href="menu-ui.css?v=1070">
+  <link rel="stylesheet" href="tutorial.css?v=1070">
+  <link rel="stylesheet" href="ui-consistency.css?v=1070">
+  <script src="theme.js?v=1070"></script>
+  <script src="pwa.js?v=1070" defer></script>
 </head>
-<body>
+<body data-menu-side="left">
 
-<header class="app-header">
-  <p class="eyebrow">SNOWBOARD SETUP LOG</p>
-  <h1>スタンスメモ</h1>
-  <p class="lead">滑った感覚とセッティングを、次の一本につなげる。</p>
+<header class="topbar">
+  <div class="title-wrap">
+    <h1 class="title">スタンスメモ</h1>
+  </div>
+
+  <button id="menuBtn" class="menu-btn" type="button" aria-label="メニュー" aria-expanded="false">
+    ☰
+  </button>
 </header>
 
-<section class="card">
-  <h2>セッティング情報</h2>
-  <p class="section-help">滑る前に、板ごとの設定と雪のコンディションを記録しておこう。</p>
 
-  <div class="meta">
-    <label>板名：<input id="board" type="text" placeholder="例：TNT"></label>
+<nav class="view-tabs" role="tablist" aria-label="画面">
+  <button id="inputTab" type="button" role="tab" data-view="input" aria-controls="inputView" aria-selected="true">簡易入力</button>
+  <button id="historyTab" type="button" role="tab" data-view="history" aria-controls="historyView" aria-selected="false" tabindex="-1">保存履歴 <span id="savedCount" class="count-badge">0</span></button>
+</nav>
 
-    <label>雪質：
-      <select id="snow">
+<section id="tutorialInvite" class="tutorial-invite" aria-label="はじめての使い方" hidden>
+  <div><strong>はじめてのスタンスメモ</strong><p>入力から保存まで、画面を見ながら確認できます。</p></div>
+  <div><button id="startBasicInvite" type="button">使い方を見る</button><button id="dismissTutorialInvite" type="button">あとで</button></div>
+</section>
+<section id="draftRecovery" class="local-notice" aria-label="前回の下書き" hidden>
+  <div><strong id="draftRecoveryLabel">前回の下書きがあります</strong><p id="draftRecoveryBoard"></p><small>履歴にはまだ保存されていません。</small></div>
+  <div class="local-notice-actions"><button id="resumeDraft" type="button">下書きを再開</button><button id="discardDraft" type="button">下書きを破棄</button></div>
+</section>
+<section id="historyStorageIssue" class="local-notice storage-issue" role="alert" hidden>
+  <p id="historyStorageMessage"></p><div class="local-notice-actions"><button id="historyStorageRetry" type="button">再確認</button><button id="exportUnreadableHistory" type="button">元データを退避</button></div>
+</section>
+<main>
+<section id="inputView" role="tabpanel" aria-labelledby="inputTab">
+<section id="setupCard" class="card setup-card" aria-label="セッティング入力">
+
+  <p id="detailRetained" class="detail-retained" hidden>詳細データを保持中です。メニューで詳細入力に切り替えると編集できます。</p>
+  <section id="historyEditBanner" class="history-edit-banner" aria-label="履歴の編集" tabindex="-1" hidden>
+    <div><strong>保存履歴を編集中</strong><p id="historyEditTarget"></p><small>元の日時の記録を更新します。</small></div>
+    <button id="cancelHistoryEdit" type="button">編集をやめる</button>
+  </section>
+  <div class="setup-meta">
+    <div class="board-field">
+      <label for="board">板名</label>
+      <input id="board" type="text" placeholder="例：TNT" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="boardSuggestions">
+      <ul id="boardSuggestions" class="board-suggestions" role="listbox" aria-label="保存履歴の板名候補" hidden></ul>
+    </div>
+
+    <label>雪質
+      <select id="snow" aria-label="雪質">
         <option value="">選択</option>
         <option value="パウダー">パウダー</option>
         <option value="圧雪">圧雪</option>
@@ -32,26 +79,77 @@
       </select>
     </label>
     
-    <label>コメント：
-  <textarea id="comment" rows="2" placeholder="例：カービング気持ちいい / 右足が疲れる など"></textarea>
-    </label>
+  </div>
 
-    <div class="stance-quick">
+  <div id="boardProfileNotice" class="detail-retained" hidden><p id="boardProfileStatus" role="status"></p><button id="applyBoardProfile" type="button" hidden>保存済みの形状を使う</button></div>
+  <section id="detailFields" class="detail-inline detail-board" data-detail-section aria-label="板の形状" hidden>
+    <h2 class="detail-inline-heading">板の形状 <small>任意</small></h2>
+      <div class="detail-grid">
+        <label>シェイプ<select id="detailShape" aria-label="シェイプ（対称性）"><option value="">未設定</option><option value="twin">ツイン</option><option value="directionalTwin">ディレクショナルツイン</option><option value="directional">ディレクショナル</option><option value="other">その他</option></select></label>
+        <label>ノーズ形状<select id="detailNose"><option value="">未設定</option><option value="round">ラウンド</option><option value="hammer">ハンマーヘッド</option><option value="semiHammer">セミハンマー</option><option value="other">その他</option></select></label>
+        <label>ベンド<select id="detailBend"><option value="">未設定</option><option value="camber">キャンバー</option><option value="rocker">ロッカー</option><option value="flat">フラット</option><option value="hybrid">ハイブリッド</option><option value="other">その他</option></select></label>
+        <label>形状の補足<input id="detailBoardNote" type="text" maxlength="160" placeholder="例：ダブルキャンバー"></label>
+      </div>
+      <div class="board-shape-actions"><button id="applyBoardShapeHistory" type="button">同じ板の履歴へ反映…</button></div>
+  </section>
+  <div class="stance-row">
+    <div class="stance-quick" aria-label="スタンス">
+    <span class="stance-label">スタンス</span>
     <button type="button" data-stance="duck">ダック</button>
     <button type="button" data-stance="forward">前振り</button>
     <button type="button" data-stance="back">後振り</button>
   </div>
+    <label class="stance-width" for="stanceWidth">幅（cm）<span class="optional-label">任意</span>
+      <input id="stanceWidth" type="number" inputmode="decimal" min="0" step="any" placeholder="例：54" aria-label="スタンス幅（cm・任意）">
+    </label>
+  </div>
+
+  <section id="detailSetback" class="detail-inline detail-setback" data-detail-section aria-label="セットバック" hidden>
+    <h2 class="detail-inline-heading">セットバック <small>任意</small></h2>
+      <select id="detailSetbackBasis" hidden aria-hidden="true" tabindex="-1"><option value="">選択</option><option value="reference" selected>推奨位置から</option><option value="center">中心から</option></select>
+      <div class="setback-row">
+      <div id="setbackBasisSwitch" class="basis-switch" role="group" aria-label="セットバックの基準" data-basis="reference">
+        <span class="basis-highlight" aria-hidden="true"></span>
+        <button id="basisReference" type="button" aria-label="推奨位置から" aria-pressed="true">推奨位置</button>
+        <button id="basisCenter" type="button" aria-label="中心から" aria-pressed="false">中心</button>
+      </div>
+        <button id="setbackSignSwitch" class="basis-switch sign-switch sign-toggle" type="button" aria-label="符号はマイナス。タップでプラスに切替" aria-describedby="setbackSignHelp" data-basis="tail">
+          <span class="basis-highlight" aria-hidden="true"></span>
+          <span id="setbackNose" aria-hidden="true">＋</span>
+          <span id="setbackTail" aria-hidden="true">−</span>
+        </button>
+        <label class="setback-amount"><input id="detailSetbackMm" type="number" step="any" placeholder="-20" aria-label="セットバック量（mm）" aria-describedby="setbackSignHelp"><span class="setback-unit">mm</span></label>
+      </div>
+      <p>選んだ基準からの移動量です。基準を変えても数値は自動換算しません。</p>
+      <p id="setbackSignHelp">＋ノーズ側／−テール側。0はずらしなし、空欄は未入力。</p>
+    
+  </section>
+  <section id="detailBindingFields" class="detail-inline detail-binding board-field" data-detail-section aria-label="ビンディングのメモ" hidden>
+    <label for="detailBindingName">ビンディング <small>任意・左右共通</small><input id="detailBindingName" type="text" maxlength="128" placeholder="メーカー・モデル・サイズ" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="bindingSuggestions"></label>
+    <ul id="bindingSuggestions" class="board-suggestions" role="listbox" aria-label="保存履歴のビンディング名候補" hidden></ul>
+  </section>
+  <p id="bindingProfileStatus" class="binding-profile-status" role="status" hidden></p>
+  <span id="footDockSentinel" class="foot-dock-sentinel" aria-hidden="true"></span>
+  <div id="footDock" class="foot-dock">
+  <div class="foot-tabs" role="tablist" aria-label="設定する足">
+    <button id="leftFootTab" type="button" role="tab" data-foot="left" aria-controls="leftFootPanel" aria-selected="true">左足<span class="foot-summary" data-summary="left">角度未入力 · 穴0</span></button>
+    <button id="rightFootTab" type="button" role="tab" data-foot="right" aria-controls="rightFootPanel" aria-selected="false" tabindex="-1">右足<span class="foot-summary" data-summary="right">角度未入力 · 穴0</span></button>
+  </div>
+  </div>
+
+<div class="bindings">
+  <section id="leftFootPanel" class="binding-panel" role="tabpanel" aria-labelledby="leftFootTab">
     
     <div class="side-row">
-  <div class="side-title">左</div>
-
   <label class="angle">
-    角度
+    左足の角度（°）
     <input id="left-angle" type="number" placeholder="+15">
-    <span class="field-help">例：+15°</span>
   </label>
 
-  <div class="disk">
+  <div id="leftLeanFields" class="detail-lean-inline" data-detail-section hidden>
+      <label class="inline-lean" for="detailLeanLeft">フォワードリーン<input id="detailLeanLeft" type="text" maxlength="64" placeholder="例：F2"><small>メーカー表記で記録</small></label>
+    </div>
+    <div class="disk">
     <div class="disk-label">ディスク</div>
     <div class="disk-group" data-side="left">
       <button type="button" class="chip" data-value="前">前</button>
@@ -60,91 +158,320 @@
     </div>
   </div>
 </div>
-
-<div class="side-row">
-  <div class="side-title">右</div>
-
-  <label class="angle">
-    角度
-    <input id="right-angle" type="number" placeholder="-9">
-    <span class="field-help">例：-9°</span>
-  </label>
-
-  <div class="disk">
-    <div class="disk-label">ディスク</div>
-    <div class="disk-group" data-side="right">
-      <button type="button" class="chip" data-value="前">前</button>
-      <button type="button" class="chip" data-value="中">中</button>
-      <button type="button" class="chip" data-value="後">後</button>
-    </div>
-  </div>
-</div>
-  </div>
-
-  <button id="saveBtn" type="button">保存</button>
-  <button id="clearBtn" type="button">クリア</button>
-</section>
-
-<div class="bindings">
-  <section class="card">
-    <h2>左足</h2>
-    <p class="binding-help">穴位置をタップして選択</p>
+    <section id="leftFootDetails" class="detail-inline detail-foot" data-detail-section data-detail-foot="left" aria-label="左足の詳細設定" hidden>
+      <div id="detailDisk-left" class="detail-disk-foot"></div>
+    </section>
+    <h3 class="binding-heading">ビス穴・推奨位置</h3>
+    <p class="binding-help">↑ つま先側 · 中央の枠で推奨位置を選択</p>
     <div class="holes" data-side="left">
       <div class="row">
-        <div class="hole"></div><div class="hole"></div><div class="hole"></div>
-        <div class="hole"></div><div class="hole"></div><div class="hole"></div>
+        <button type="button" class="hole"></button><button type="button" class="hole"></button><button type="button" class="hole"></button>
+        <button type="button" class="hole"></button><button type="button" class="hole"></button><button type="button" class="hole"></button>
       </div>
 
     <div class="ref-wrap" data-side="left">
-     <div class="ref-help" data-side="left">タップして推奨位置追加</div>
+     <div class="ref-help" data-side="left" aria-hidden="true"></div>
        <div class="ref-line" data-side="left"></div>
      </div>
       
       <div class="row">
-        <div class="hole"></div><div class="hole"></div><div class="hole"></div>
-        <div class="hole"></div><div class="hole"></div><div class="hole"></div>
+        <button type="button" class="hole"></button><button type="button" class="hole"></button><button type="button" class="hole"></button>
+        <button type="button" class="hole"></button><button type="button" class="hole"></button><button type="button" class="hole"></button>
       </div>
     </div>
+
   </section>
 
-  <section class="card">
-    <h2>右足</h2>
-    <p class="binding-help">穴位置をタップして選択</p>
+  <section id="rightFootPanel" class="binding-panel" role="tabpanel" aria-labelledby="rightFootTab" hidden>
+    <div class="side-row">
+      <label class="angle">右足の角度（°）<input id="right-angle" type="number" placeholder="-9"></label>
+      <div id="rightLeanFields" class="detail-lean-inline" data-detail-section hidden>
+      <label class="inline-lean" for="detailLeanRight">フォワードリーン<input id="detailLeanRight" type="text" maxlength="64" placeholder="例：F2"><small>メーカー表記で記録</small></label>
+    </div>
+    <div class="disk">
+        <div class="disk-label">ディスク</div>
+        <div class="disk-group" data-side="right">
+          <button type="button" class="chip" data-value="前">前</button>
+          <button type="button" class="chip" data-value="中">中</button>
+          <button type="button" class="chip" data-value="後">後</button>
+        </div>
+      </div>
+    </div>
+    <section id="rightFootDetails" class="detail-inline detail-foot" data-detail-section data-detail-foot="right" aria-label="右足の詳細設定" hidden>
+      <div id="detailDisk-right" class="detail-disk-foot"></div>
+    </section>
+    <h3 class="binding-heading">ビス穴・推奨位置</h3>
+    <p class="binding-help">↑ つま先側 · 中央の枠で推奨位置を選択</p>
     <div class="holes" data-side="right">
       <div class="row">
-        <div class="hole"></div><div class="hole"></div><div class="hole"></div>
-        <div class="hole"></div><div class="hole"></div><div class="hole"></div>
+        <button type="button" class="hole"></button><button type="button" class="hole"></button><button type="button" class="hole"></button>
+        <button type="button" class="hole"></button><button type="button" class="hole"></button><button type="button" class="hole"></button>
       </div>
 
     <div class="ref-wrap" data-side="right">
-     <div class="ref-help" data-side="right">タップして推奨位置追加</div>
+     <div class="ref-help" data-side="right" aria-hidden="true"></div>
        <div class="ref-line" data-side="right"></div>
      </div>
       
       <div class="row">
-        <div class="hole"></div><div class="hole"></div><div class="hole"></div>
-        <div class="hole"></div><div class="hole"></div><div class="hole"></div>
+        <button type="button" class="hole"></button><button type="button" class="hole"></button><button type="button" class="hole"></button>
+        <button type="button" class="hole"></button><button type="button" class="hole"></button><button type="button" class="hole"></button>
       </div>
     </div>
+
   </section>
 </div>
 
+  <details id="commentDetails" class="comment-details">
+    <summary>コメント <span id="commentState">任意</span></summary>
+    <div class="comment-field-heading"><label class="comment-label" for="comment">滑った感覚・気づいたこと</label><button id="commentClearBtn" type="button" class="comment-clear">感想を消す</button></div>
+    <textarea id="comment" rows="2" placeholder="例：カービングしやすい / 右足が疲れる"></textarea>
+    <div id="detailNoteFields" class="detail-inline detail-note" data-detail-section hidden><div class="comment-field-heading"><label for="detailNote">ギア調整メモ</label><button id="detailNoteClearBtn" type="button" class="comment-clear">調整メモを消す</button></div><textarea id="detailNote" rows="2" maxlength="1000" placeholder="例：ハイバックのローテーション"></textarea></div>
+  </details>
+
+  <div class="editor-actions">
+    <button id="clearBtn" type="button">クリア</button>
+    <button id="cancelHistoryEditBottom" type="button" hidden>キャンセル</button>
+    <button id="saveBtn" type="button">この設定を保存</button>
+  </div>
+  <p id="draftStatus" class="draft-status" role="status">入力途中の内容は、この端末に一時保存されます</p>
+</section>
+</section>
+
+<section id="historyView" role="tabpanel" aria-labelledby="historyTab" hidden>
+<section id="detailHistoryControls" aria-label="詳細履歴の表示設定" hidden>
+  <div id="detailHistoryLayout" class="dh-layout-switch" role="group" aria-label="詳細履歴の表示方法" data-layout="summary" aria-describedby="detailHistoryStatus">
+    <span class="dh-layout-slider" aria-hidden="true"></span>
+    <button type="button" data-history-layout="summary" aria-pressed="true">カード</button>
+    <button type="button" data-history-layout="matrix" aria-pressed="false" tabindex="-1">詳細一覧</button>
+    <button type="button" data-history-layout="grouped" aria-label="板ごとの履歴" aria-pressed="false" tabindex="-1">板ごと</button>
+  </div>
+  <p id="detailHistoryStatus" role="status">カード：要点を表示し、調整の詳細は開いて確認します。</p>
+</section>
+<span id="historyDockSentinel" class="foot-dock-sentinel" aria-hidden="true"></span>
+<section id="historyDock" class="history-dock" aria-label="表示中の履歴と絞り込み">
+  <div class="history-dock-content">
+    <div class="history-result-row"><div class="history-result-text" role="status"><strong id="historyResultCount">0 / 0件</strong><span id="historyFilterState">すべての履歴</span></div><button id="historyFiltersButton" type="button">絞り込み</button></div>
+    <div class="history-filter-row"><button id="clearHistoryFilters" type="button" hidden>すべて解除</button><div id="historyFilterChips" class="history-filter-chips" hidden></div></div>
+  </div>
+</section>
+
 <div class="tabs-bar">
+  <!-- 1段目 左：板タブ -->
   <div id="boardTabs" class="tabs"></div>
-
-  <select id="sortMode" class="sort-select">
-    <option value="savedDesc">保存日↓</option>
-    <option value="savedAsc">保存日↑</option>
-    <option value="boardAsc">板名</option>
-    <option value="snowAsc">雪質</option>
-  </select>
-</div>
+  </div>
   
+<section id="tutorialHistory" aria-label="チュートリアル専用のサンプル履歴" hidden inert>
+  <p class="tutorial-sample-notice">説明用サンプル · 実際の履歴・件数・絞り込みとは別の表示です。案内を閉じると消えます。</p>
+  <div id="tutorialHistoryRecords"></div>
+</section>
 <div id="history"></div>
+</section>
+</main>
+  
+<div id="menuSwipeEdge" class="menu-swipe-edge" aria-hidden="true"></div>
 
-<script src="script.js?v=31"></script>
+  <!-- 設定した側から出るメニュー -->
+<div id="menuOverlay" class="menu-overlay" hidden></div>
 
-<div id="toast" role="status" aria-live="polite"></div>
+<aside id="menuPanel" class="menu-panel" aria-label="設定とデータ管理" aria-hidden="true" inert>
+  <div class="menu-head">
+    <div>
+      <p class="menu-eyebrow">STANCE MEMO</p>
+      <h2 class="menu-title">メニュー</h2>
+    </div>
+    <button id="menuCloseBtn" class="menu-close" type="button" aria-label="閉じる">×</button>
+  </div>
+
+  <div class="menu-page-tabs" role="tablist" aria-label="メニューのカテゴリ">
+    <button id="menuTabFind" type="button" role="tab" data-menu-page="find" aria-controls="menuPageFind" aria-selected="false" tabindex="-1">探す</button>
+    <button id="menuTabDisplay" type="button" role="tab" data-menu-page="display" aria-controls="menuPageDisplay" aria-selected="true">表示</button>
+    <button id="menuTabData" type="button" role="tab" data-menu-page="data" aria-controls="menuPageData" aria-selected="false" tabindex="-1">データ<span id="menuUpdateBadge" class="menu-update-badge" hidden>更新あり</span></button>
+  </div>
+  <div class="menu-body">
+  <div id="menuPageFind" class="menu-page" role="tabpanel" aria-labelledby="menuTabFind" tabindex="0" hidden>
+
+  <section class="menu-card" id="menuFilters">
+    <h3>絞り込み・並び替え</h3>
+    <p class="menu-section-note">保存したセッティングを探す</p>
+    <div id="filtersMountMenu"></div>
+  </section>
+  <button id="openHistoryStats" type="button" class="history-stats-open">保存履歴の統計を見る</button>
+
+  </div>
+  <div id="menuPageDisplay" class="menu-page" role="tabpanel" aria-labelledby="menuTabDisplay" tabindex="0">
+  <section class="menu-card">
+    <h3>表示・操作</h3>
+    <div class="menu-position-row"><label class="menu-position-label" for="inputMode">入力モード</label><select id="inputMode" class="menu-side-select"><option value="simple">簡易入力</option><option value="detail">詳細入力</option></select></div>
+    <p id="inputModeStatus" class="menu-note" role="status">簡易入力に戻しても詳細データは消えません。</p>
+    <div class="menu-position-row theme-row">
+      <label class="menu-position-label" for="colorTheme">カラーモード</label>
+      <select id="colorTheme" class="menu-side-select">
+        <option value="light">ライト</option>
+        <option value="dark">ダーク</option>
+        <option value="auto">端末に合わせる</option>
+      </select>
+    </div>
+    <p id="themeStatus" class="menu-note" role="status">このブラウザーで設定を記憶します。</p>
+    <div class="menu-position-row">
+      <label class="menu-position-label" for="menuSide">メニューの位置</label>
+      <select id="menuSide" class="menu-side-select">
+        <option value="left">左側</option>
+        <option value="right">右側</option>
+      </select>
+    </div>
+    <details class="menu-gesture-guide"><summary>スワイプ操作のヒント</summary><p id="menuGestureHelp" class="menu-note">左端から右へスワイプで開きます。</p></details>
+  </section>
+  <section id="tutorialGuideCard" class="menu-card" aria-labelledby="tutorialMenuHeading" tabindex="-1">
+    <h3 id="tutorialMenuHeading">使い方ガイド</h3>
+    <p id="tutorialMenuStatus" class="menu-note" role="status">ここからいつでも見直せます。入力内容は変わりません。</p>
+    <button id="startBasicTutorial" type="button" class="menu-action">基本の使い方<span class="menu-action-note">入力・保存・履歴・バックアップと復元</span></button>
+    <button id="startDetailTutorial" type="button" class="menu-action">詳細入力の使い方<span class="menu-action-note">板とギアの設定・履歴の見方</span></button>
+    <button id="startHistoryTutorial" type="button" class="menu-action">履歴の見方だけ確認<span class="menu-action-note">カード・詳細一覧・板ごと</span></button>
+  </section>
+  </div>
+  <div id="menuPageData" class="menu-page" role="tabpanel" aria-labelledby="menuTabData" tabindex="0" hidden>
+  <p class="menu-note"><a href="./original/">オリジナル版を見る</a> · <a href="./dev-haru-detail/">試作版を見る</a></p>
+  <section class="menu-card" id="appInstallCard" aria-labelledby="appInstallHeading">
+    <h3 id="appInstallHeading">アプリとして使う</h3>
+    <p id="installStatus" class="menu-note" role="status">ホーム画面やPCに追加できます。</p>
+    <button id="installAppBtn" type="button" class="menu-action menu-primary" hidden>アプリをインストール</button>
+    <details class="install-help">
+      <summary>インストール方法</summary>
+      <p class="menu-note">Android・PC：Chrome／Edgeのメニューから「アプリをインストール」または「ホーム画面に追加」。iPhone／iPad：Safariの共有メニューから「ホーム画面に追加」を選びます。名称は端末によって異なります。</p>
+    </details>
+    <p id="offlineStatus" class="menu-note" role="status">オフラインで開く準備を確認しています。</p>
+    <button id="checkAppUpdateBtn" type="button" class="menu-action">最新版を確認</button>
+    <div id="appUpdateReady" class="app-update-ready" hidden>
+      <p class="menu-note">新しい版があります。この画面や別のタブの入力を保存してから更新してください。</p>
+      <button id="applyAppUpdateBtn" type="button" class="menu-action menu-primary">入力を確認して更新する</button>
+    </div>
+    <p id="appUpdateStatus" class="menu-note" role="status"></p>
+    <p class="menu-note">インストール前にバックアップを書き出してください。履歴はこの端末・ブラウザー内に保存され、自動同期はしません。アプリとブラウザーでデータが共有されない場合は、バックアップから復元できます。</p>
+  </section>
+
+  <details class="menu-card menu-disclosure" id="menuBackup">
+    <summary>
+      <span><strong>バックアップ</strong><small>ファイルに保存・復元</small></span>
+      <span class="menu-chevron" aria-hidden="true">⌄</span>
+    </summary>
+    <div class="menu-disclosure-body">
+      <button id="btnExport" type="button" class="menu-action menu-primary">バックアップを書き出す<span class="menu-action-note">JSONファイルとして保存</span></button>
+
+      <div class="import-box">
+        <label class="import-title" for="importFile">ファイルから復元</label>
+
+        <input id="importFile" type="file" accept="application/json,.json" class="import-file" aria-describedby="importPreview">
+
+        <details class="install-help" id="previousDataHelp">
+          <summary>以前の版から履歴を引き継ぐ</summary>
+          <p class="menu-note">同じ端末・ブラウザーにある履歴を確認できます。下の復元方法を選んで確認するまでは保存しません。元の版の履歴は残ります。</p>
+          <button id="previewTrialHistory" type="button" class="menu-action">試作版の履歴を確認</button>
+          <button id="previewOriginalHistory" type="button" class="menu-action">オリジナル版の履歴を確認</button>
+          <p class="menu-note">別のブラウザーやアプリからは、元の版で書き出したバックアップファイルを選んでください。</p>
+        </details>
+
+        <div id="importPreview" class="import-preview" role="status" aria-live="polite">
+          <div class="import-muted">ファイルを選ぶと、復元する内容を確認できます。</div>
+        </div>
+
+        <div class="import-actions">
+          <button id="btnImportDateUnique" type="button" class="menu-action" disabled>日時の重複を除いて追加</button>
+          <button id="btnImportMerge" type="button" class="menu-action" disabled>今のデータに追加して復元</button>
+          <button id="btnImportReplace" type="button" class="menu-action danger" disabled>今のデータを上書きして復元</button>
+        </div>
+        <p class="menu-note">重複を除く追加では、同じ日時の記録は内容が違っても追加せず、既存の記録を優先します。ファイル内の同じ日時は先頭の1件を採用し、日時不明の記録は残します。</p>
+
+        <div id="importError" class="import-error" role="alert" hidden></div>
+      </div>
+    </div>
+  </details>
+
+
+  </div>
+  </div>
+</aside> 
+  
+  <div id="filtersPanel" class="menu-filters" hidden>
+    <!-- ① 日付ソート -->
+    <div class="menu-label">
+      <label for="sortMode">並び替え</label>
+      <select id="sortMode" class="sort-select">
+        <option value="savedDesc">保存日↓</option>
+        <option value="savedAsc">保存日↑</option>
+        <option value="boardAsc">板名</option>
+        <option value="snowAsc">雪質</option>
+      </select>
+    </div>
+
+    <!-- ② スタンス -->
+    <div class="menu-label">
+      スタンス
+      <div class="stance-tabs" id="stanceTabs" role="group" aria-label="スタンスで絞り込み"></div>
+    </div>
+
+    <!-- ③ 角度 -->
+    <div class="menu-label menu-angle-group">
+      <div class="menu-field-heading">
+        <span>角度（°）</span>
+        <button id="angleClear" class="angle-clear" type="button" aria-label="角度の絞り込みを解除">解除</button>
+      </div>
+      <div class="angle-filter" aria-label="角度検索">
+        <label>左足<input id="angleLeft" class="angle-in" type="number" placeholder="例：15"></label>
+        <label>右足<input id="angleRight" class="angle-in" type="number" placeholder="例：-9"></label>
+        <label>許容 ±<input id="angleTol" class="angle-tol" type="number" value="2" min="0"></label>
+      </div>
+    </div>
+
+    <!-- ✅ オールクリア -->
+    <button id="btnFilterClear" type="button" class="menu-action">
+      絞り込み・並び替えをリセット
+    </button>
+  </div>
+
+<dialog id="historyStatsDialog" aria-labelledby="historyStatsTitle">
+  <header class="stats-heading"><h2 id="historyStatsTitle">保存履歴の統計</h2><button id="closeHistoryStats" type="button" aria-label="統計を閉じる" autofocus>×</button></header>
+  <div class="stats-body"><p class="stats-note">記録数は保存した件数です。同じ日の複数記録も1件ずつ数えます。</p><div id="historyStatsContent"></div><button id="refreshHistoryStats" type="button">再集計</button></div>
+</dialog>
+<dialog id="historyEditConfirm" class="history-confirm-dialog" aria-labelledby="historyEditConfirmTitle">
+  <h2 id="historyEditConfirmTitle">この履歴を更新しますか？</h2>
+  <p id="historyEditConfirmTarget"></p>
+  <p>変更する項目：<span id="historyEditChanges"></span></p>
+  <p class="menu-note">新しい履歴は追加せず、元の日時とお気に入り状態を保持します。</p>
+  <div class="history-confirm-actions"><button id="cancelHistorySave" type="button" autofocus>編集に戻る</button><button id="confirmHistorySave" type="button">変更を保存</button></div>
+</dialog>
+<dialog id="favoriteEditConfirm" class="history-confirm-dialog" aria-labelledby="favoriteEditConfirmTitle">
+  <h2 id="favoriteEditConfirmTitle">★付きの履歴を編集しますか？</h2>
+  <p id="favoriteEditTarget"></p>
+  <p>お気に入りの記録です。編集内容は保存前にもう一度確認できます。</p>
+  <div class="history-confirm-actions"><button id="cancelFavoriteEdit" type="button" autofocus>キャンセル</button><button id="confirmFavoriteEdit" type="button">編集する</button></div>
+</dialog>
+<script src="detail.js?v=1070"></script>
+<script src="history-views.js?v=1070"></script>
+<script src="script.js?v=1070"></script>
+<script src="board-suggestions.js?v=1070"></script>
+<script src="menu-ui.js?v=1070"></script>
+<script src="board-shape-history.js?v=1070"></script>
+<script src="history-stats.js?v=1070"></script>
+<script src="history-editor.js?v=1070"></script>
+<script src="draft-guard.js?v=1070"></script>
+<script src="history-tools.js?v=1070"></script>
+<script src="foot-dock.js?v=1070"></script>
+
+<dialog id="tutorialDialog" class="tutorial-dialog" aria-labelledby="tutorialTitle" aria-describedby="tutorialText">
+  <div id="tutorialShade" class="tutorial-shade" aria-hidden="true"></div>
+  <div id="tutorialSpotlight" class="tutorial-spotlight" aria-hidden="true" hidden></div>
+  <section id="tutorialCard" class="tutorial-card">
+    <header><span id="tutorialStepLabel"></span><button id="closeTutorial" type="button" aria-label="チュートリアルを閉じる">×</button></header>
+    <div id="tutorialCopy" class="tutorial-copy" aria-live="polite"><h2 id="tutorialTitle"></h2><p id="tutorialText"></p><p id="tutorialNote" class="tutorial-note"></p><div id="tutorialExample" class="tutorial-example" role="group" aria-label="説明用の入力例" hidden></div></div>
+    <div id="tutorialProgress" class="tutorial-progress" aria-hidden="true"></div>
+    <footer><button id="skipTutorial" type="button">スキップ</button><div><button id="previousTutorial" type="button">戻る</button><button id="nextTutorial" type="button">次へ</button></div></footer>
+  </section>
+</dialog>
+<script src="tutorial.js?v=1070"></script>
+
+<div id="toast"></div>
+  
   
 </body>
 </html>

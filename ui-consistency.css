@@ -1,0 +1,121 @@
+/* Presentation-only final layer. Shared marks in both modes; type/layout only in detail mode. */
+:root{
+  --ui-font:system-ui,-apple-system,"Segoe UI","Noto Sans JP",sans-serif;
+  --ui-label-size:14px;
+  --ui-value-size:16px;
+  --ui-note-size:12px;
+  --ui-label-weight:650;
+  --ui-value-weight:500;
+  --ui-field-height:44px;
+  --ui-field-gap:12px;
+  --ui-label-gap:6px;
+  --ui-reference-ink:var(--outdoor-reference);
+}
+:root[data-theme="dark"]{--ui-reference-ink:var(--outdoor-ink)}
+
+/* One geometric screw head in the editor, legacy history and all detail-history views. */
+:is(#setupCard .hole.active,:is(#history,#tutorialHistoryRecords) .mini-hole.active,:is(#history,#tutorialHistoryRecords) .dh-hole.is-on){position:relative;--ui-screw-stroke:1px}
+#setupCard .hole.active{--ui-screw-stroke:2px}
+:is(#setupCard .hole.active,:is(#history,#tutorialHistoryRecords) .mini-hole.active,:is(#history,#tutorialHistoryRecords) .dh-hole.is-on)::before,
+:is(#setupCard .hole.active,:is(#history,#tutorialHistoryRecords) .mini-hole.active,:is(#history,#tutorialHistoryRecords) .dh-hole.is-on)::after{
+  content:"";position:absolute;inset:auto;left:50%;top:50%;display:block;
+  margin:0;padding:0;border:0;border-radius:0;box-shadow:none;text-shadow:none;
+  background:var(--outdoor-on-amber);transform:translate(-50%,-50%);
+  pointer-events:none;font-size:0;line-height:0;
+}
+:is(#setupCard .hole.active,:is(#history,#tutorialHistoryRecords) .mini-hole.active,:is(#history,#tutorialHistoryRecords) .dh-hole.is-on)::before{width:60%;height:var(--ui-screw-stroke)}
+:is(#setupCard .hole.active,:is(#history,#tutorialHistoryRecords) .mini-hole.active,:is(#history,#tutorialHistoryRecords) .dh-hole.is-on)::after{width:var(--ui-screw-stroke);height:60%}
+
+/* Keep reference hit areas/borders, but remove the painted tile in every theme. */
+:is(#setupCard .ref-slot.active,:is(#history,#tutorialHistoryRecords) .mini-x.active,:is(#history,#tutorialHistoryRecords) .dh-ref.is-on){
+  position:relative;background:transparent;color:transparent;font-size:0;
+  --ui-reference-width:90%;--ui-reference-stroke:1px;
+}
+#setupCard .ref-slot.active{--ui-reference-width:calc(141.421% - 14px);--ui-reference-stroke:2px;border-color:var(--outdoor-border)}
+:is(#setupCard .ref-slot.active,:is(#history,#tutorialHistoryRecords) .mini-x.active,:is(#history,#tutorialHistoryRecords) .dh-ref.is-on)::before,
+:is(#setupCard .ref-slot.active,:is(#history,#tutorialHistoryRecords) .mini-x.active,:is(#history,#tutorialHistoryRecords) .dh-ref.is-on)::after{
+  content:"";position:absolute;inset:auto;left:50%;top:50%;display:block;
+  margin:0;padding:0;border:0;border-radius:0;box-shadow:none;text-shadow:none;
+  width:var(--ui-reference-width);height:var(--ui-reference-stroke);
+  background:var(--ui-reference-ink);pointer-events:none;font-size:0;line-height:0;
+}
+:is(#setupCard .ref-slot.active,:is(#history,#tutorialHistoryRecords) .mini-x.active,:is(#history,#tutorialHistoryRecords) .dh-ref.is-on)::before{transform:translate(-50%,-50%) rotate(45deg)}
+:is(#setupCard .ref-slot.active,:is(#history,#tutorialHistoryRecords) .mini-x.active,:is(#history,#tutorialHistoryRecords) .dh-ref.is-on)::after{transform:translate(-50%,-50%) rotate(-45deg)}
+
+/* Consistent semantic type roles, without flattening intentionally large values or actions. */
+:root[data-input-mode="detail"] body{font-family:var(--ui-font)}
+:root[data-input-mode="detail"] #setupCard :is(.setup-meta label,.stance-label,.stance-width,.detail-inline label,.inline-lean,.comment-label){
+  font-size:var(--ui-label-size);font-weight:var(--ui-label-weight);
+  line-height:1.4;color:var(--outdoor-muted);
+}
+:root[data-input-mode="detail"] #setupCard :is(.detail-inline-heading,.detail-disk-foot h3,.heelcup-settings h3,.binding-heading){
+  font-size:var(--ui-label-size);font-weight:var(--ui-label-weight);line-height:1.4;color:var(--outdoor-ink);
+}
+:root[data-input-mode="detail"] #setupCard :is(input,select,textarea){
+  box-sizing:border-box;min-width:0;font-family:var(--ui-font);
+  font-size:var(--ui-value-size);line-height:1.25;color:var(--outdoor-ink);
+}
+:root[data-input-mode="detail"] #setupCard :is(input,select){height:var(--ui-field-height);font-weight:var(--ui-value-weight)}
+:root[data-input-mode="detail"] #setupCard textarea{font-weight:400;line-height:1.5}
+:root[data-input-mode="detail"] #setupCard input[type="number"]{font-variant-numeric:tabular-nums}
+:root[data-input-mode="detail"] #setupCard :is(input,textarea)::placeholder{font-weight:400}
+:root[data-input-mode="detail"] #setupCard :is(.detail-inline-heading small,.optional-label,.detail-binding label small,.detail-hint,.detail-inline>p,.binding-profile-status,.binding-help,.disk-preview,.disk-preview small,.heelcup-explanation p,.heelcup-values label small){
+  font-size:var(--ui-note-size);font-weight:400;line-height:1.5;color:var(--outdoor-muted);
+}
+:root[data-input-mode="detail"] #setupCard :is(.detail-inline input,.detail-inline select,.detail-inline textarea){margin-top:var(--ui-label-gap)}
+:root[data-input-mode="detail"] #setupCard .detail-grid{gap:var(--ui-field-gap)}
+
+/* Angle and lean share the same label row, gap and field box. */
+:root[data-input-mode="detail"] #setupCard .side-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--ui-field-gap);align-items:end}
+:root[data-input-mode="detail"] #setupCard :is(.angle,.detail-lean-inline .inline-lean){
+  display:grid!important;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(1.4em,auto) var(--ui-field-height);
+  gap:var(--ui-label-gap);margin:0;max-width:none;transform:none;
+}
+:root[data-input-mode="detail"] #setupCard :is(.angle input,.detail-lean-inline .inline-lean input){
+  grid-column:1;grid-row:2;margin:0;padding:8px;border:2px solid var(--outdoor-border);
+  border-radius:9px;height:var(--ui-field-height);font-weight:var(--ui-value-weight);
+}
+:root[data-input-mode="detail"] #setupCard .detail-lean-inline .inline-lean small{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+:root[data-input-mode="detail"] #setupCard .detail-offset-grid{gap:8px;align-items:end}
+:root[data-input-mode="detail"] #setupCard .detail-offset-grid>label{
+  display:grid;grid-template-rows:minmax(1.4em,auto) var(--ui-field-height);gap:var(--ui-label-gap);
+}
+:root[data-input-mode="detail"] #setupCard .detail-offset-grid>label>:is(input,select){margin:0}
+
+/* Diagrams, headings and the corresponding right-hand controls use the same column axis. */
+:root[data-input-mode="detail"] #setupCard :is(.disk-type-picker,.heelcup-head,.heelcup-layout){grid-template-columns:88px minmax(0,1fr);gap:var(--ui-field-gap)}
+:root[data-input-mode="detail"] #setupCard :is(.disk-type-picker,.heelcup-layout){align-items:start}
+:root[data-input-mode="detail"] #setupCard .heelcup-head{align-items:center}
+:root[data-input-mode="detail"] #setupCard .heelcup-head h3{margin:0}
+:root[data-input-mode="detail"] #setupCard .heelcup-origin{height:var(--ui-field-height)}
+:root[data-input-mode="detail"] #setupCard .heelcup-origin button{font-family:var(--ui-font);font-size:13px;font-weight:var(--ui-label-weight);line-height:1.4}
+:root[data-input-mode="detail"] #setupCard .heelcup-values{align-items:start}
+:root[data-input-mode="detail"] #setupCard .heelcup-values label small{margin-top:2px}
+:root[data-input-mode="detail"] #setupCard .disk-preview svg{margin-inline:auto}
+:root[data-input-mode="detail"] #setupCard .setback-row{align-items:center}
+:root[data-input-mode="detail"] #setupCard .setback-amount input{margin:0}
+:root[data-input-mode="detail"] #setupCard .setback-unit{font-size:var(--ui-note-size);font-weight:var(--ui-label-weight);line-height:1.4}
+
+/* History roles: board identity, metadata, labels, values and hero values stay distinct. */
+:root[data-input-mode="detail"] :is(#history,#tutorialHistoryRecords).dh-history{font-family:var(--ui-font)}
+:root[data-input-mode="detail"] :is(#history,#tutorialHistoryRecords) :is(.dh-head h3,.dh-board-head h3){font-size:20px;font-weight:750;line-height:1.4}
+:root[data-input-mode="detail"] :is(#history,#tutorialHistoryRecords) .dh-date{font-size:13px;font-weight:500;line-height:1.5}
+:root[data-input-mode="detail"] :is(#history,#tutorialHistoryRecords) .dh-meta{font-size:13px;font-weight:400;line-height:1.5}
+:root[data-input-mode="detail"] :is(#history,#tutorialHistoryRecords) :is(.dh-mini-label,.dh-mini-note,.dh-shapes,.dh-setback,.dh-binding,.dh-change,.dh-board-head p,.dh-details>summary>span,.dh-stat small){
+  font-size:var(--ui-note-size);line-height:1.5;color:var(--outdoor-muted);
+}
+:root[data-input-mode="detail"] :is(#history,#tutorialHistoryRecords) :is(.dh-settings caption,.dh-details>summary){font-family:var(--ui-font);font-size:var(--ui-label-size);font-weight:var(--ui-label-weight);line-height:1.4}
+:root[data-input-mode="detail"] :is(#history,#tutorialHistoryRecords) :is(.dh-settings th,.dh-settings td){vertical-align:middle}
+:root[data-input-mode="detail"] :is(#history,#tutorialHistoryRecords) .dh-settings thead th{font-size:var(--ui-note-size);font-weight:var(--ui-label-weight)}
+:root[data-input-mode="detail"] :is(#history,#tutorialHistoryRecords) .dh-settings tbody th{font-size:var(--ui-note-size);font-weight:500;line-height:1.5}
+:root[data-input-mode="detail"] :is(#history,#tutorialHistoryRecords) .dh-settings td:not(.dh-table-angle){font-size:14px;font-weight:500;font-variant-numeric:tabular-nums;line-height:1.5}
+:root[data-input-mode="detail"] :is(#history,#tutorialHistoryRecords) .dh-gear{font-size:14px;font-weight:var(--ui-label-weight);line-height:1.5}
+:root[data-input-mode="detail"] :is(#history,#tutorialHistoryRecords) .dh-stat strong{display:grid;place-items:center;min-height:45px;line-height:1.4}
+:root[data-input-mode="detail"] :is(#history,#tutorialHistoryRecords) .dh-stat .dh-missing{font-size:var(--ui-note-size);font-weight:500;line-height:1.5}
+:root[data-input-mode="detail"] :is(#history,#tutorialHistoryRecords) .dh-actions button{font-family:var(--ui-font);font-weight:var(--ui-label-weight)}
+:root[data-input-mode="detail"] #detailHistoryLayout button{font-family:var(--ui-font)}
+
+/* Reserve equal label rows when narrow columns need wrapping, rather than offsetting fields. */
+@media(max-width:380px){
+  :root[data-input-mode="detail"] #setupCard :is(.angle,.detail-lean-inline .inline-lean,.detail-offset-grid>label){grid-template-rows:2.8em var(--ui-field-height)}
+}
