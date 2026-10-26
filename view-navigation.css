@@ -1,0 +1,4 @@
+/* Native controls and horizontal scrollers keep their own touch behavior. */
+.view-tabs{touch-action:pan-y pinch-zoom}
+:is(#inputView,#historyView).is-view-swiping{transform:translateX(var(--view-swipe-x,0px));user-select:none;will-change:transform}
+@media(prefers-reduced-motion:reduce){:is(#inputView,#historyView).is-view-swiping{transform:none}}

@@ -233,7 +233,12 @@ const DetailEditor = (() => {
   const filterStatus=()=>{const labels=Object.entries({shape:'シェイプ',nose:'ノーズ',bend:'ベンド'}).filter(([k])=>filters[k]).map(([k,label])=>`${label}：${filters[k]==='__unset__'?'未設定':DetailData.choices[k][filters[k]]}`);byId('detailFilterStatus').textContent=labels.length?labels.join(' / '):'形状の絞り込みなし';byId('shapeFilterCount').textContent=labels.length?`${labels.length}条件`:'指定なし';controls.dataset.active=String(labels.length>0);};
   for(const key of Object.keys(filters)){byId(`filter-${key}`).value=filters[key];byId(`filter-${key}`).addEventListener('change',()=>{filters[key]=byId(`filter-${key}`).value;persist(filterKey,JSON.stringify(filters));filterStatus();render();});}
   byId('btnFilterClear').addEventListener('click',()=>{for(const k of Object.keys(filters)){filters[k]='';byId(`filter-${k}`).value='';}persist(filterKey,JSON.stringify(filters));filterStatus();});
-  select.addEventListener('change',()=>applyMode(select.value,true));panel.addEventListener('input',retained);panel.addEventListener('change',retained);
+  select.addEventListener('change',()=>{
+    const before=mode;applyMode(select.value,true);
+    if(before!==mode&&document.documentElement.dataset.tutorialActive!=='true'&&typeof MenuControls!=='undefined'&&byId('menuPanel').classList.contains('open')){
+      MenuControls.close();byId(byId('historyView').hidden?'inputTab':'historyTab').focus({preventScroll:true});
+    }
+  });panel.addEventListener('input',retained);panel.addEventListener('change',retained);
   const applyProfile=profile=>{for(const k of profileKeys)byId(bindings[k]).value=profile[k];autoProfile=true;profileDirty=false;profileBoard=byId('board').value.trim();retained();profileNotice('保存履歴からこの板の形状を入力しました。角度などの設定は変更していません。');};
   const changeBoard=()=>{
     const board=byId('board').value.trim();if(board===profileBoard)return;
