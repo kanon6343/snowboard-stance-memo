@@ -6,6 +6,13 @@
   let applyingUpdate = false;
   let versionWorker = null;
   let waitingVersion = '';
+  let waitingNotes = [];
+  let displayedNotesKey = '';
+  const normalizeReleaseInfo = data => {
+    if (data?.type !== 'RELEASE_INFO' || typeof data.version !== 'string' || data.version.length > 24 || !/^\d+\.\d+\.\d+$/.test(data.version)) return null;
+    const notes = Array.isArray(data.notes) ? data.notes.slice(0, 8).filter(value => typeof value === 'string').map(value => value.trim().slice(0, 240)).filter(Boolean) : [];
+    return {version: data.version, notes};
+  };
   let versionResolved = false;
   const installedQuery = window.matchMedia?.('(display-mode: standalone)');
   const installed = () => Boolean(installedQuery?.matches || navigator.standalone);
@@ -25,8 +32,8 @@
       : navigator.onLine === false ? 'オフラインのため、初回の準備には通信が必要です。'
         : 'オフラインで開く準備を確認しています。');
   };
-  const requestVersion = worker => new Promise(resolve => {
-    if (typeof MessageChannel === 'undefined') { resolve(''); return; }
+  const requestReleaseInfo = worker => new Promise(resolve => {
+    if (typeof MessageChannel === 'undefined') { resolve(null); return; }
     let channel, timer, finished = false;
     const finish = value => {
       if (finished) return;
@@ -37,35 +44,47 @@
     };
     try {
       channel = new MessageChannel();
-      timer = setTimeout(() => finish(''), 2000);
+      timer = setTimeout(() => finish(null), 2000);
       channel.port1.onmessage = event => {
-        const value = event.data?.version;
-        finish(event.data?.type === 'RELEASE_INFO' && typeof value === 'string' && /^\d+\.\d+\.\d+$/.test(value) ? value : '');
+        finish(normalizeReleaseInfo(event.data));
       };
-      channel.port1.onmessageerror = () => finish('');
+      channel.port1.onmessageerror = () => finish(null);
       worker.postMessage({type: 'GET_RELEASE_INFO'}, [channel.port2]);
-    } catch { finish(''); }
+    } catch { finish(null); }
   });
+  const renderPendingNotes = () => {
+    const details = byId('pendingReleaseNotes'), list = byId('pendingReleaseNotesList');
+    if (!details || !list) return;
+    const key = JSON.stringify([waitingVersion, waitingNotes]);
+    if (key !== displayedNotesKey) {
+      displayedNotesKey = key; details.open = false; list.replaceChildren();
+      for (const text of waitingNotes) { const li = document.createElement('li'); li.textContent = text; list.appendChild(li); }
+    }
+    details.hidden = waitingNotes.length === 0;
+    status('pendingReleaseNotesVersion', waitingVersion ? 'v' + waitingVersion + ' の変更点' : '');
+  };
   const renderUpdateVersion = () => {
     status('appUpdateTarget', waitingVersion ? `更新先：v${waitingVersion}`
       : versionResolved ? '更新先のバージョンを取得できませんでした。' : '更新先のバージョンを確認しています。');
     status('applyAppUpdateBtn', waitingVersion ? `v${waitingVersion} に更新する` : '入力を確認して更新する');
+    renderPendingNotes();
   };
   const showUpdate = () => {
     const worker = registration?.waiting;
     const ready = byId('appUpdateReady');
     if (ready) ready.hidden = !worker;
     if (!worker) {
-      versionWorker = null; waitingVersion = ''; versionResolved = false;
+      versionWorker = null; waitingVersion = ''; waitingNotes = []; versionResolved = false;
+      renderPendingNotes();
       status('appUpdateTarget', ''); status('applyAppUpdateBtn', '入力を確認して更新する');
       status('appUpdateStatus', ''); return;
     }
     status('appUpdateStatus', '更新できます。入力を保存してから切り替えてください。');
     if (versionWorker !== worker) {
-      versionWorker = worker; waitingVersion = ''; versionResolved = false;
-      requestVersion(worker).then(version => {
+      versionWorker = worker; waitingVersion = ''; waitingNotes = []; versionResolved = false;
+      requestReleaseInfo(worker).then(info => {
         if (registration?.waiting !== worker || versionWorker !== worker) return;
-        waitingVersion = version; versionResolved = true; renderUpdateVersion();
+        waitingVersion = info?.version || ''; waitingNotes = info?.notes || []; versionResolved = true; renderUpdateVersion();
       });
     }
     renderUpdateVersion();

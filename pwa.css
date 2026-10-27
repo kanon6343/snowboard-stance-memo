@@ -7,3 +7,12 @@
 @media (display-mode: standalone){
   body{ padding-top: max(4px, env(safe-area-inset-top)); padding-bottom: max(12px, env(safe-area-inset-bottom)); }
 }
+
+#menuPanel #appInstallCard .release-notes{margin:8px 0;border-top:1px solid var(--outdoor-border);padding-top:6px}
+#menuPanel .release-notes summary{min-height:44px;display:flex;align-items:center;gap:6px;list-style:none;cursor:pointer;color:var(--outdoor-ink);font:650 14px/1.5 var(--ui-font,system-ui)}
+#menuPanel .release-notes summary::-webkit-details-marker{display:none}
+#menuPanel .release-notes summary::before{content:"▸";flex:0 0 auto}
+#menuPanel .release-notes[open] summary::before{content:"▾"}
+#menuPanel .release-notes ul{margin:4px 0 10px;padding-inline-start:21px;color:var(--outdoor-ink);font:400 14px/1.65 var(--ui-font,system-ui);overflow-wrap:anywhere}
+#menuPanel .release-notes li+li{margin-top:7px}
+#menuPanel .release-notes summary:focus-visible{outline:3px solid var(--outdoor-amber);outline-offset:2px;border-radius:4px}

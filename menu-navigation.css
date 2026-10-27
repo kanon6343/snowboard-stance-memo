@@ -1,5 +1,5 @@
 /* Fixed menu navigation above the scrollable contents. */
-#menuPanel{grid-template-rows:auto auto minmax(0,1fr);overflow:hidden}
+#menuPanel{grid-template-rows:auto auto minmax(0,1fr);overflow:hidden;touch-action:pan-y pinch-zoom}
 #menuPanel .menu-head{padding-top:max(10px,env(safe-area-inset-top));padding-bottom:10px}
 #menuPanel .menu-body{min-height:0;overflow-x:hidden;overflow-y:auto;touch-action:pan-y pinch-zoom;padding-bottom:18px;contain:paint}
 #menuPanel .menu-body .menu-page{transform:translateX(var(--thumb-drag-x,0px))}

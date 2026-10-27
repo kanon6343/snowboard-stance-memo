@@ -1,4 +1,3 @@
-/* Menu navigation: one gesture owner; search is the outward dismissal boundary. */
 const ThumbMenuGesture = (() => {
   const order=side=>side==='right'?['find','display','data']:['data','display','find'];
   const committed=(dx,width,speed=0)=>Math.abs(dx)>=Math.min(48,width*.18)||(Math.abs(dx)>=22&&Math.abs(speed)>=.35);
@@ -26,15 +25,17 @@ const ThumbMenu = (() => {
   const side=()=>document.body.dataset.menuSide==='right'?'right':'left';
   const activePage=()=>['data','display','find'].find(key=>byId('menuTab'+suffix[key])?.getAttribute('aria-selected')==='true');
   let gesture=null,suppressUntil=0,animation=null;
+  const touchEvents='ontouchstart' in window;
   const editing=target=>target.closest('input,select,textarea,[contenteditable],[role="slider"],canvas');
   const isOpen=()=>panel.classList.contains('open');
+  const blocked=()=>!isOpen()||document.documentElement.dataset.tutorialActive==='true'||!!document.querySelector?.('dialog[open]');
   function syncStatus(){
     const page=activePage();
     byId('thumbSwipeStatus').textContent=page==='find'?`探す · ${side()==='right'?'右':'左'}へスワイプで閉じる`:`${names[page]||''} · 左右にスワイプで切り替え`;
   }
   function updateLayout(){
     for(const key of ThumbMenuGesture.order(side()))tabs.appendChild(byId('menuTab'+suffix[key]));
-    byId('menuGestureHelp').textContent=`本文の左右スワイプで切り替えます。「探す」で${side()==='right'?'右':'左'}へ払うと閉じます。縦はスクロール。通常は探すから開きます。`;
+    byId('menuGestureHelp').textContent=`画面の端寄りの余白か☰からメニューを引き出せます。本文の左右スワイプで切り替えます。「探す」では画面全体から${side()==='right'?'右':'左'}へ払うと閉じます。入力欄は入力を優先します。見出しや背景からも閉じられます。縦はスクロール。通常は探すから開きます。`;
     syncStatus();
   }
   function cleanup(){
@@ -43,7 +44,7 @@ const ThumbMenu = (() => {
     body.classList.remove('thumb-page-dragging');body.style.removeProperty('--thumb-drag-x');
     panel.classList.remove('is-dragging');document.body.classList.remove('menu-dragging');
     panel.style.removeProperty('transform');overlay?.style.removeProperty('opacity');
-    if(previous&&body.hasPointerCapture?.(previous.id))try{body.releasePointerCapture(previous.id);}catch{}
+    if(previous?.kind==='pointer'&&body.hasPointerCapture?.(previous.id))try{body.releasePointerCapture(previous.id);}catch{}
     return previous;
   }
   function switchPage(page,direction){
@@ -56,25 +57,29 @@ const ThumbMenu = (() => {
     if(!options.preservePage)MenuPresentation.choose('find',false,false);
     syncStatus();
   };
-  body.addEventListener('pointerdown',event=>{
+  function begin(event,point,kind){
     cleanup();suppressUntil=0;
-    if(!event.isPrimary||event.button!==0||!isOpen()||document.documentElement.dataset.tutorialActive==='true'||editing(event.target))return;
+    if(blocked()||editing(event.target)||window.getSelection?.()?.toString())return;
+    if(typeof getComputedStyle==='function')for(let node=event.target;node&&node!==document.body;node=node.parentElement){
+      if(node.scrollWidth>node.clientWidth+2&&/auto|scroll/.test(getComputedStyle(node).overflowX))return;
+    }
     const page=activePage();if(!page)return;
-    gesture={id:event.pointerId,x:event.clientX,y:event.clientY,lastX:event.clientX,time:event.timeStamp,speed:0,page,side:side(),locked:false};animation?.cancel();
-  });
-  body.addEventListener('pointermove',event=>{
-    const start=gesture;if(!start||start.id!==event.pointerId)return;
-    if(!isOpen()){cleanup();return;}
-    const dx=event.clientX-start.x,dy=event.clientY-start.y;
+    gesture={kind,id:kind==='touch'?point.identifier:event.pointerId,x:point.clientX,y:point.clientY,lastX:point.clientX,time:event.timeStamp,speed:0,page,side:side(),closeOnly:!body.contains(event.target),locked:false};animation?.cancel();
+  }
+  function move(event,point){
+    const start=gesture;if(!start)return;
+    if(blocked()||activePage()!==start.page||(start.kind==='touch'&&!event.cancelable)){cleanup();syncStatus();return;}
+    const dx=point.clientX-start.x,dy=point.clientY-start.y;
     if(!start.locked){
       const intent=ThumbMenuGesture.intent(dx,dy);if(intent==='pending')return;
       if(intent==='vertical'){cleanup();return;}
+      if(start.closeOnly&&!ThumbMenuGesture.outward(dx,start.side)){cleanup();return;}
       start.locked=true;body.classList.add('thumb-page-dragging');
-      try{body.setPointerCapture(event.pointerId);}catch{}
+      if(start.kind==='pointer')try{body.setPointerCapture(start.id);}catch{}
     }
     if(event.cancelable)event.preventDefault();
-    start.speed=(event.clientX-start.lastX)/Math.max(1,event.timeStamp-start.time);start.lastX=event.clientX;start.time=event.timeStamp;
-    if(start.page==='find'&&ThumbMenuGesture.outward(dx,start.side)){
+    start.speed=(point.clientX-start.lastX)/Math.max(1,event.timeStamp-start.time);start.lastX=point.clientX;start.time=event.timeStamp;
+    if((start.page==='find'||start.closeOnly)&&ThumbMenuGesture.outward(dx,start.side)){
       const width=panel.getBoundingClientRect().width,shift=Math.max(-width,Math.min(width,dx));
       panel.classList.add('is-dragging');document.body.classList.add('menu-dragging');
       panel.style.transform=`translateX(${shift}px)`;if(overlay)overlay.style.opacity=String(1-Math.abs(shift)/width);
@@ -83,19 +88,46 @@ const ThumbMenu = (() => {
       panel.classList.remove('is-dragging');document.body.classList.remove('menu-dragging');panel.style.removeProperty('transform');overlay?.style.removeProperty('opacity');
       body.style.setProperty('--thumb-drag-x',Math.max(-56,Math.min(56,dx*.32))+'px');syncStatus();
     }
-  },{passive:false});
-  body.addEventListener('pointerup',event=>{
-    if(!gesture||gesture.id!==event.pointerId)return;
+  }
+  function finish(event,point){
     const start=cleanup();if(!start?.locked)return;
     if(event.cancelable)event.preventDefault();
-    const dx=event.clientX-start.x,speed=event.timeStamp-start.time<100?start.speed:0;
-    const action=ThumbMenuGesture.resolve(start.page,dx,body.getBoundingClientRect().width,speed,start.side);
+    if(blocked()||activePage()!==start.page){syncStatus();return;}
+    const dx=point.clientX-start.x,dy=point.clientY-start.y,speed=event.timeStamp-start.time<100?start.speed:0;
+    if(Math.abs(dx)<Math.abs(dy)*1.5){syncStatus();return;}
+    const width=body.getBoundingClientRect().width;
+    const action=start.closeOnly
+      ?{kind:ThumbMenuGesture.outward(dx,start.side)&&ThumbMenuGesture.committed(dx,width,speed)?'close':'stay'}
+      :ThumbMenuGesture.resolve(start.page,dx,width,speed,start.side);
     if(action.kind==='close'){MenuControls.close();return;}
     if(action.kind==='choose')switchPage(action.page,dx<0?1:-1);else syncStatus();
-  },{passive:false});
-  body.addEventListener('pointercancel',()=>{cleanup();syncStatus();});
-  body.addEventListener('lostpointercapture',event=>{if(event.target===body&&gesture?.id===event.pointerId){cleanup();syncStatus();}});
-  document.addEventListener('pointerdown',event=>{if(!event.isPrimary)cleanup();if(!body.contains(event.target))suppressUntil=0;},true);
+  }
+  document.addEventListener('pointerdown',event=>{
+    if(touchEvents&&event.pointerType==='touch')return;
+    if(!event.isPrimary){cleanup();return;}
+    if(event.button===0)begin(event,event,'pointer');
+  });
+  document.addEventListener('pointermove',event=>{if(gesture?.kind==='pointer'&&gesture.id===event.pointerId)move(event,event);},{passive:false});
+  document.addEventListener('pointerup',event=>{if(gesture?.kind==='pointer'&&gesture.id===event.pointerId)finish(event,event);},{passive:false});
+  document.addEventListener('pointercancel',event=>{if(gesture?.kind==='pointer'&&gesture.id===event.pointerId){cleanup();syncStatus();}});
+  body.addEventListener('lostpointercapture',event=>{if(event.target===body&&gesture?.kind==='pointer'&&gesture.id===event.pointerId){cleanup();syncStatus();}});
+  if(touchEvents){
+    document.addEventListener('touchstart',event=>{
+      if(event.touches.length!==1){cleanup();syncStatus();return;}
+      begin(event,event.touches[0],'touch');
+    },{passive:true});
+    document.addEventListener('touchmove',event=>{
+      if(gesture?.kind!=='touch')return;
+      if(event.touches.length!==1){cleanup();syncStatus();return;}
+      const point=Array.from(event.touches).find(point=>point.identifier===gesture.id);if(point)move(event,point);
+    },{passive:false});
+    document.addEventListener('touchend',event=>{
+      if(gesture?.kind!=='touch')return;
+      if(event.touches.length){cleanup();syncStatus();return;}
+      const point=Array.from(event.changedTouches).find(point=>point.identifier===gesture.id);if(point)finish(event,point);
+    },{passive:false});
+    document.addEventListener('touchcancel',()=>{cleanup();syncStatus();},{passive:true});
+  }
   document.addEventListener('click',event=>{if(event.detail===0||performance.now()>=suppressUntil)return;event.preventDefault();event.stopImmediatePropagation();},true);
   for(const event of ['blur','resize'])window.addEventListener(event,()=>{cleanup();syncStatus();});
   for(const event of ['click','keydown'])tabs?.addEventListener(event,syncStatus);

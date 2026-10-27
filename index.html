@@ -11,21 +11,21 @@
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
   <meta name="description" content="スノーボードの板・ビンディング・スタンスと滑走メモを記録。簡易入力と詳細入力、履歴、バックアップに対応。" />
   <title>スタンスメモ</title>
-  <link rel="stylesheet" href="style.css?v=1080">
-  <link rel="stylesheet" href="outdoor.css?v=1080">
-  <link rel="stylesheet" href="theme.css?v=1080">
-  <link rel="stylesheet" href="pwa.css?v=1080">
-  <link rel="stylesheet" href="board-suggestions.css?v=1080">
-  <link rel="stylesheet" href="detail.css?v=1080">
-  <link rel="stylesheet" href="history-views.css?v=1080">
-  <link rel="stylesheet" href="menu-ui.css?v=1080">
-  <link rel="stylesheet" href="tutorial.css?v=1080">
-  <link rel="stylesheet" href="menu-navigation.css?v=1080">
-  <link rel="stylesheet" href="record-search.css?v=1080">
-  <link rel="stylesheet" href="view-navigation.css?v=1080">
-  <link rel="stylesheet" href="ui-consistency.css?v=1080">
-  <script src="theme.js?v=1080"></script>
-  <script src="pwa.js?v=1080" defer></script>
+  <link rel="stylesheet" href="style.css?v=1086">
+  <link rel="stylesheet" href="outdoor.css?v=1086">
+  <link rel="stylesheet" href="theme.css?v=1086">
+  <link rel="stylesheet" href="pwa.css?v=1086">
+  <link rel="stylesheet" href="board-suggestions.css?v=1086">
+  <link rel="stylesheet" href="detail.css?v=1086">
+  <link rel="stylesheet" href="history-views.css?v=1086">
+  <link rel="stylesheet" href="menu-ui.css?v=1086">
+  <link rel="stylesheet" href="tutorial.css?v=1086">
+  <link rel="stylesheet" href="menu-navigation.css?v=1086">
+  <link rel="stylesheet" href="record-search.css?v=1086">
+  <link rel="stylesheet" href="view-navigation.css?v=1086">
+  <link rel="stylesheet" href="ui-consistency.css?v=1086">
+  <script src="theme.js?v=1086"></script>
+  <script src="pwa.js?v=1086" defer></script>
 </head>
 <body data-menu-side="left">
 
@@ -344,11 +344,13 @@
       <p class="menu-note">Android・PC：Chrome／Edgeのメニューから「アプリをインストール」または「ホーム画面に追加」。iPhone／iPad：Safariの共有メニューから「ホーム画面に追加」を選びます。名称は端末によって異なります。</p>
     </details>
     <p id="offlineStatus" class="menu-note" role="status">オフラインで開く準備を確認しています。</p>
-    <div class="thumb-version-row"><span>現在のバージョン</span><strong id="appVersion">v2.2.0</strong></div>
+    <div class="thumb-version-row"><span>現在のバージョン</span><strong id="appVersion">v2.3.3</strong></div>
+    <details id="currentReleaseNotes" class="release-notes"><summary>v2.3.3 の更新内容</summary><ul><li>入力と保存履歴を短めのスワイプで切り替えられるようにし、メニューを開く開始範囲も広げました。</li><li>メニューの「探す」は見出しや背景からもスワイプで閉じられます。入力欄の操作と縦スクロールは優先します。</li><li>メニューの「データ」で更新内容を確認できます。今後の更新では、適用前にも変更点を見られます。</li><li>バックアップ復元、履歴の呼び出し・削除・お気に入り保護、日時順の不具合を修正しました。</li></ul></details>
     <button id="checkAppUpdateBtn" type="button" class="menu-action">最新版を確認</button>
     <div id="appUpdateReady" class="app-update-ready" hidden>
       <p id="appUpdateTarget" class="menu-note" role="status"></p>
       <p class="menu-note">新しい版があります。この画面や別のタブの入力を保存してから更新してください。</p>
+      <details id="pendingReleaseNotes" class="release-notes" hidden><summary>更新内容を見る</summary><p id="pendingReleaseNotesVersion" class="menu-note"></p><ul id="pendingReleaseNotesList"></ul></details>
       <button id="applyAppUpdateBtn" type="button" class="menu-action menu-primary">入力を確認して更新する</button>
     </div>
     <p id="appUpdateStatus" class="menu-note" role="status"></p>
@@ -451,20 +453,20 @@
   <p>お気に入りの記録です。編集内容は保存前にもう一度確認できます。</p>
   <div class="history-confirm-actions"><button id="cancelFavoriteEdit" type="button" autofocus>キャンセル</button><button id="confirmFavoriteEdit" type="button">編集する</button></div>
 </dialog>
-<script src="detail.js?v=1080"></script>
-<script src="history-views.js?v=1080"></script>
-<script src="script.js?v=1080"></script>
-<script src="board-suggestions.js?v=1080"></script>
-<script src="menu-ui.js?v=1080"></script>
-<script src="menu-navigation.js?v=1080"></script>
-<script src="board-shape-history.js?v=1080"></script>
-<script src="history-stats.js?v=1080"></script>
-<script src="history-editor.js?v=1080"></script>
-<script src="draft-guard.js?v=1080"></script>
-<script src="history-tools.js?v=1080"></script>
-<script src="record-search.js?v=1080"></script>
-<script src="foot-dock.js?v=1080"></script>
-<script src="view-navigation.js?v=1080"></script>
+<script src="detail.js?v=1086"></script>
+<script src="history-views.js?v=1086"></script>
+<script src="script.js?v=1086"></script>
+<script src="board-suggestions.js?v=1086"></script>
+<script src="menu-ui.js?v=1086"></script>
+<script src="menu-navigation.js?v=1086"></script>
+<script src="board-shape-history.js?v=1086"></script>
+<script src="history-stats.js?v=1086"></script>
+<script src="history-editor.js?v=1086"></script>
+<script src="draft-guard.js?v=1086"></script>
+<script src="history-tools.js?v=1086"></script>
+<script src="record-search.js?v=1086"></script>
+<script src="foot-dock.js?v=1086"></script>
+<script src="view-navigation.js?v=1086"></script>
 
 <dialog id="tutorialDialog" class="tutorial-dialog" aria-labelledby="tutorialTitle" aria-describedby="tutorialText">
   <div id="tutorialShade" class="tutorial-shade" aria-hidden="true"></div>
@@ -476,7 +478,7 @@
     <footer><button id="skipTutorial" type="button">スキップ</button><div><button id="previousTutorial" type="button">戻る</button><button id="nextTutorial" type="button">次へ</button></div></footer>
   </section>
 </dialog>
-<script src="tutorial.js?v=1080"></script>
+<script src="tutorial.js?v=1086"></script>
 
 <div id="toast"></div>
   

@@ -1,6 +1,7 @@
 /* Release shell: bump RELEASE and every versioned index.html asset together. */
-const RELEASE = '1080';
-const APP_VERSION = '2.2.0';
+const RELEASE = '1086';
+const APP_VERSION = '2.3.3';
+const RELEASE_NOTES = ["入力と保存履歴を短めのスワイプで切り替えられるようにし、メニューを開く開始範囲も広げました。","メニューの「探す」は見出しや背景からもスワイプで閉じられます。入力欄の操作と縦スクロールは優先します。","メニューの「データ」で更新内容を確認できます。今後の更新では、適用前にも変更点を見られます。","バックアップ復元、履歴の呼び出し・削除・お気に入り保護、日時順の不具合を修正しました。"];
 const BASE = new URL('./', self.registration.scope);
 const CACHE_PREFIX = `snowboard-stance-main:${BASE.href}:`;
 const CACHE_NAME = `${CACHE_PREFIX}${RELEASE}`;
@@ -40,7 +41,7 @@ self.addEventListener('activate', event => {
 });
 self.addEventListener('message', event => {
   if (event.data?.type === 'GET_RELEASE_INFO') {
-    event.ports?.[0]?.postMessage({type: 'RELEASE_INFO', version: APP_VERSION, release: RELEASE});
+    event.ports?.[0]?.postMessage({type: 'RELEASE_INFO', version: APP_VERSION, release: RELEASE, notes: RELEASE_NOTES});
   }
   if (event.data?.type === 'ACTIVATE_UPDATE') self.skipWaiting();
 });

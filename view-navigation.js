@@ -26,7 +26,9 @@ const ViewNavigation = (() => {
     // Mouse text selection stays native; blank surfaces can still be dragged.
     if(kind==='pointer'&&event.pointerType==='mouse'&&event.target.closest('p,span,strong,h1,h2,h3,h4,label'))return;
     const view=current();animation?.cancel();
-    gesture={kind,id:kind==='touch'?point.identifier:event.pointerId,view,surface:panes[view],x:point.clientX,y:point.clientY,lastX:point.clientX,time:event.timeStamp,speed:0,scroll:window.scrollY,locked:false};
+    const side=document.body.dataset.menuSide==='right'?'right':'left',edge=typeof MenuControls==='undefined'?0:MenuControls.openingEdgeWidth?.()||0;
+    const menuDirection=(side==='left'?point.clientX<=edge:point.clientX>=window.innerWidth-edge)?(side==='left'?1:-1):0;
+    gesture={kind,menuDirection,id:kind==='touch'?point.identifier:event.pointerId,view,surface:panes[view],x:point.clientX,y:point.clientY,lastX:point.clientX,time:event.timeStamp,speed:0,scroll:window.scrollY,locked:false};
   }
   function move(event,point){
     const start=gesture;if(!start)return;
@@ -36,6 +38,7 @@ const ViewNavigation = (() => {
     if(!start.locked){
       if(Math.max(Math.abs(dx),Math.abs(dy))<12)return;
       if(Math.abs(dx)<Math.abs(dy)*1.6){cleanup();return;}
+      if(start.menuDirection&&dx*start.menuDirection>0){cleanup();return;}
       start.locked=true;start.surface.classList.add('is-view-swiping');
       if(start.kind==='pointer')try{start.surface.setPointerCapture(start.id);}catch{}
     }
@@ -50,8 +53,8 @@ const ViewNavigation = (() => {
     if(blocked()||current()!==start.view)return;
     const dx=point.clientX-start.x,dy=point.clientY-start.y,speed=event.timeStamp-start.time<100?start.speed:0;
     if(Math.abs(dx)<Math.abs(dy)*1.6||(start.view==='input'?dx>=0:dx<=0))return;
-    const distance=Math.abs(dx),fast=distance>=36&&Math.abs(speed)>=.5&&Math.sign(speed)===Math.sign(dx);
-    if(distance<Math.min(76,window.innerWidth*.2)&&!fast)return;
+    const distance=Math.abs(dx),fast=distance>=24&&Math.abs(speed)>=.4&&Math.sign(speed)===Math.sign(dx);
+    if(distance<Math.min(40,window.innerWidth*.12)&&!fast)return;
     const next=start.view==='input'?'history':'input';positions[start.view]=start.scroll;
     showView(next);window.scrollTo({top:positions[next],left:0,behavior:'auto'});
     byId(next==='input'?'inputTab':'historyTab').focus({preventScroll:true});
