@@ -4,6 +4,32 @@
 #menuPanel .install-help[open] summary::before{ content: "▾"; }
 #menuPanel .app-update-ready{ margin: 8px 0; padding: 10px; border: 2px solid var(--outdoor-border); border-radius: 10px; }
 #menuPanel #appInstallCard [hidden]{ display: none !important; }
+#menuPanel .app-share-actions{ display: flex; flex-wrap: wrap; gap: 8px; }
+#menuPanel .app-share-actions .menu-action{ flex: 1 1 8rem; min-height: 48px; margin: 0; }
+#menuPanel #copyAppLinkBtn{ text-align: center; }
+#menuPanel .app-share-actions .app-share-icon{
+  display: grid;
+  place-items: center;
+  flex: 0 0 48px;
+  box-sizing: border-box;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+}
+#menuPanel .app-share [hidden], #menuPanel #appShareStatus:empty{ display: none; }
+#menuPanel #appShareStatus{ margin-top: 8px; }
+#menuPanel #appShareUrl{
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 8px;
+  padding: 8px;
+  border: 1px solid var(--outdoor-border);
+  border-radius: 8px;
+  background: var(--menu-field);
+  color: var(--outdoor-ink);
+  font: inherit;
+}
 @media (display-mode: standalone){
   body{ padding-top: max(4px, env(safe-area-inset-top)); padding-bottom: max(12px, env(safe-area-inset-bottom)); }
 }

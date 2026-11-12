@@ -18,6 +18,34 @@
   const installed = () => Boolean(installedQuery?.matches || navigator.standalone);
   const byId = id => document.getElementById(id);
   const status = (id, value) => { const el = byId(id); if (el) el.textContent = value; };
+  const shareUrl = byId('appShareUrl');
+  const shareButton = byId('shareAppBtn');
+  if (shareButton && shareUrl && typeof navigator.share === 'function') {
+    shareButton.hidden = false;
+    shareButton.addEventListener('click', async () => {
+      status('appShareStatus', '');
+      try {
+        await navigator.share({title: 'スタンスメモ', url: shareUrl.value});
+      } catch (error) {
+        if (error?.name !== 'AbortError') {
+          status('appShareStatus', '共有画面を開けませんでした。「リンクをコピー」を使えます。');
+        }
+      }
+    });
+  }
+  byId('copyAppLinkBtn')?.addEventListener('click', async () => {
+    if (!shareUrl) return;
+    try {
+      await navigator.clipboard.writeText(shareUrl.value);
+      shareUrl.hidden = true;
+      status('appShareStatus', '正式版のリンクをコピーしました。');
+    } catch {
+      shareUrl.hidden = false;
+      shareUrl.focus();
+      shareUrl.select();
+      status('appShareStatus', '選択したURLをコピーしてください。');
+    }
+  });
   const renderInstall = () => {
     const button = byId('installAppBtn');
     if (button) button.hidden = installed() || !promptEvent;
